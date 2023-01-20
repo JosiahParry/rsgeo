@@ -3,6 +3,8 @@
 export(linestring_to_points)
 export(linestrings_to_multilinestring)
 export(points_to_multipoint)
+export(poly_area)
+export(poly_areas)
 export(print_rs_line)
 export(print_rs_linestring)
 export(print_rs_multilinestring)

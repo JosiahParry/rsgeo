@@ -78,7 +78,7 @@ rs_multilinestring(mlns) |>
 # Polygon -----------------------------------------------------------------
 
 polys <- sfdep::guerry$geometry |>
-  st_cast("POLYGON")
+  sf::st_cast("POLYGON")
 
 
 rs_polygon(polys[[1]]) |>
@@ -103,4 +103,32 @@ print.polygon <- function(x, width = options("width")[[1]], ...) {
 
 
 
+
+
+# area --------------------------------------------------------------------
+
+signed_area(rs_polygon(polys[[1]]))
+
+pnts <- sf::st_centroid(polys)
+
+
+rs_polys <- rs_polygons(polys)
+geos_polys <- geos::as_geos_geometry(polys)
+
+geos_poly <- geos::as_geos_geometry(polys[1])
+x <- rs_polys[[1]]
+
+bench::mark(
+  geos::geos_area(geos_poly),
+  signed_area(x),
+  iterations = 100000
+)
+
+bench::mark(
+  rust = signed_areas(rs_polygons(polys)),
+  geos = geos::geos_area(geos::as_geos_geometry(polys)),
+  sf = sf::st_area(polys),
+  check = FALSE,
+  iterations = 5000
+)
 

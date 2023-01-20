@@ -72,5 +72,15 @@ print_rs_polygon <- function(x) invisible(.Call(wrap__print_rs_polygon, x))
 #'@export
 rs_polygons <- function(x) .Call(wrap__rs_polygons, x)
 
+#'@export
+poly_area <- function(x) .Call(wrap__poly_area, x)
+
+#'@export
+poly_areas <- function(x) .Call(wrap__poly_areas, x)
+
+poly_centroid <- function(x) .Call(wrap__poly_centroid, x)
+
+poly_centroids <- function(x) .Call(wrap__poly_centroids, x)
+
 
 # nolint end

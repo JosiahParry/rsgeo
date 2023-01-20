@@ -1,6 +1,6 @@
 use extendr_api::prelude::*;
 use extendr_api::wrapper::{ExternalPtr, RMatrix};
-use geo::{coord, Polygon};
+use geo::{coord, Polygon, Area, Centroid};
 use ndarray::{Array2, ShapeBuilder, Axis};
 
 use geo::geometry::{Point, Line, LineString, Coord, MultiPoint, MultiLineString};
@@ -310,7 +310,59 @@ fn rs_polygons(x: List) -> Robj {
     res
 
 }
+
+// POLYGON AREA algos
+
+// Single polygon unsigned area
+// because you can't have negative area
+///@export
+#[extendr]
+fn poly_area(x: Robj) ->  Rfloat {
+    let poly: ExternalPtr<Polygon> = x.try_into().unwrap(); 
+    Rfloat::from(poly.unsigned_area())
+}
+
+//list of polygons
+///@export
+#[extendr]
+fn poly_areas(x: List) -> Doubles {
+    let n = x.len();
+    let mut out = Doubles::new(n);
+
+    for i in 0..n {
+        let xi = x[i].to_owned();
+        let res_i = poly_area(xi);
+        out[i] = res_i;
+    }
+    out
+}
  
+// polygon centroid
+#[extendr]
+fn poly_centroid(x: Robj) ->  Doubles {
+    let poly: ExternalPtr<Polygon> = x.try_into().unwrap(); 
+    let centroid = poly.centroid().unwrap();
+    let mut res = Doubles::new(2);
+    res[0] = Rfloat::from(centroid.x());
+    res[1] = Rfloat::from(centroid.y());
+    res
+
+}
+
+#[extendr]
+fn poly_centroids(x: List) -> Robj {
+    let n = x.len();
+    let mut res = List::new(n);
+
+    for i in 0..n {
+        let poly: ExternalPtr<Polygon> = x[i].to_owned().try_into().unwrap();
+        let centroid = poly.centroid().unwrap();
+        let res_i = rs_point(centroid.x(), centroid.y());
+        res.set_elt(i,res_i);
+    }
+
+    r![res].set_attrib("class", "rs_POINT").unwrap()
+}
 
 
 
@@ -372,4 +424,8 @@ extendr_module! {
     fn rs_polygon;
     fn print_rs_polygon;
     fn rs_polygons;
+    fn poly_area;
+    fn poly_areas;
+    fn poly_centroid;
+    fn poly_centroids;
 }
