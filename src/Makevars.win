@@ -2,8 +2,8 @@ TARGET = $(subst 64,x86_64,$(subst 32,i686,$(WIN)))-pc-windows-gnu
 
 TARGET_DIR = ./rust/target
 LIBDIR = $(TARGET_DIR)/$(TARGET)/release
-STATLIB = $(LIBDIR)/librustpkg.a
-PKG_LIBS = -L$(LIBDIR) -lrustpkg -lws2_32 -ladvapi32 -luserenv -lbcrypt
+STATLIB = $(LIBDIR)/librsgeo.a
+PKG_LIBS = -L$(LIBDIR) -lrsgeo -lws2_32 -ladvapi32 -luserenv -lbcrypt
 
 all: C_clean
 

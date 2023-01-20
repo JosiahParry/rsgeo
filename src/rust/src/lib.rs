@@ -1,6 +1,6 @@
 use extendr_api::prelude::*;
 use extendr_api::wrapper::{ExternalPtr, RMatrix};
-use geo::{coord, Polygon, Area, Centroid};
+use geo::{coord, Polygon, Area, Centroid, Intersects};
 use ndarray::{Array2, ShapeBuilder, Axis};
 
 use geo::geometry::{Point, Line, LineString, Coord, MultiPoint, MultiLineString};
@@ -364,7 +364,44 @@ fn poly_centroids(x: List) -> Robj {
     r![res].set_attrib("class", "rs_POINT").unwrap()
 }
 
+// INTERSECTIONS -------
+#[extendr]
+fn intersect_poly_poly(lhs: Robj, rhs: Robj) -> Rbool {
+    let xpoly: ExternalPtr<Polygon> = lhs.try_into().unwrap(); 
+    let ypoly: ExternalPtr<Polygon> = rhs.try_into().unwrap(); 
 
+    Rbool::from(xpoly.intersects(&*ypoly))
+
+}
+
+// This is so much slower than the 1 - 1 and so much slower than geos
+// Tried without cloning. same speed. It must be the claiming ownership?
+// or the deparsing. idk intersect_poly_poly is SOOO much faster than c
+// but the loop is slower idk
+// man idfk 
+#[extendr]
+fn intersect_poly_polys(lhs: Robj, rhs: List) -> Logicals {
+    let n = rhs.len();
+    let mut res = Logicals::new(n);
+    let xpoly: ExternalPtr<Polygon> = lhs.try_into().unwrap();
+
+    for i in 0..n {
+        let ypoly: ExternalPtr<Polygon> = rhs[i].to_owned().try_into().unwrap();
+        res.set_elt(i, Rbool::from(xpoly.intersects(&*ypoly)));
+    }
+    res
+}
+
+// let xpoly = TryInto::<ExternalPtr<Polygon>>::try_into(lhs).unwrap();
+
+// let res = rhs.iter().
+//     map(|y| 
+//         xpoly.intersects(
+//             &*TryInto::<ExternalPtr<Polygon>>::try_into(y.1).unwrap())
+//         ).collect_robj();
+
+// res
+// }
 
 // Helpers -----------------------------------------------------------------
 
@@ -405,7 +442,7 @@ fn matrix_to_coords(x: RMatrix<f64>) -> Vec<Coord> {
 // This ensures exported functions are registered with R.
 // See corresponding C code in `entrypoint.c`.
 extendr_module! {
-    mod rustpkg;
+    mod rsgeo;
     fn rs_point;
     fn rs_points;
     fn print_rs_point;
@@ -428,4 +465,6 @@ extendr_module! {
     fn poly_areas;
     fn poly_centroid;
     fn poly_centroids;
+    fn intersect_poly_poly;
+    fn intersect_poly_polys;
 }

@@ -4,21 +4,21 @@
 
 #
 # This file was created with the following call:
-#   .Call("wrap__make_rustpkg_wrappers", use_symbols = TRUE, package_name = "rustpkg")
+#   .Call("wrap__make_rsgeo_wrappers", use_symbols = TRUE, package_name = "rsgeo")
 
 #' @docType package
 #' @usage NULL
-#' @useDynLib rustpkg, .registration = TRUE
+#' @useDynLib rsgeo, .registration = TRUE
 NULL
 
 #' Create a single point
-#' 
+#'
 #' For a single x, y coordinate create a point
 #' @export
 rs_point <- function(x, y) .Call(wrap__rs_point, x, y)
 
-#' Create a list of points 
-#' 
+#' Create a list of points
+#'
 #' Given a matrix of x, y coordinates, create a list of points
 #' uses the `mat_to_rs()` helper to convert an RMatrix to ndarray::Array2
 #'@export
@@ -81,6 +81,10 @@ poly_areas <- function(x) .Call(wrap__poly_areas, x)
 poly_centroid <- function(x) .Call(wrap__poly_centroid, x)
 
 poly_centroids <- function(x) .Call(wrap__poly_centroids, x)
+
+intersect_poly_poly <- function(lhs, rhs) .Call(wrap__intersect_poly_poly, lhs, rhs)
+
+intersect_poly_polys <- function(lhs, rhs) .Call(wrap__intersect_poly_polys, lhs, rhs)
 
 
 # nolint end

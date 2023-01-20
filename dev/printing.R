@@ -48,7 +48,7 @@ rs_linestring(m) |>
   linestring_to_points()
 
 library(sf)
-library(rustpkg)
+library(rsgeo)
 
 print.linestring <- function(x) {
   message(capture.output(print_rs_linestring(x)))
@@ -79,10 +79,11 @@ rs_multilinestring(mlns) |>
 
 polys <- sfdep::guerry$geometry |>
   sf::st_cast("POLYGON")
-
-
-rs_polygon(polys[[1]]) |>
-  print_rs_polygon()
+rs_poly <- rs_polygon(polys[[1]])
+rs_polys <- rs_polygons(polys)
+geos_polys <- geos::as_geos_geometry(polys)
+geos_poly <- geos::as_geos_geometry(polys[1])
+x <- rs_polys[[1]]
 
 # not valid but still works
 rs_polygon(mlns) |>
@@ -112,11 +113,8 @@ signed_area(rs_polygon(polys[[1]]))
 pnts <- sf::st_centroid(polys)
 
 
-rs_polys <- rs_polygons(polys)
-geos_polys <- geos::as_geos_geometry(polys)
 
-geos_poly <- geos::as_geos_geometry(polys[1])
-x <- rs_polys[[1]]
+
 
 bench::mark(
   geos::geos_area(geos_poly),
@@ -132,3 +130,19 @@ bench::mark(
   iterations = 5000
 )
 
+bench::mark(
+  rust = intersect_poly_polys(rs_poly, rs_polys),
+  sf = sf::st_intersects(polys[[1]], polys)[[1]],
+  check = F
+)
+
+bench::mark(
+  geos = geos::geos_intersects(geos_polys[[1]], geos_polys),
+  rust = intersect_poly_polys(rs_poly, rs_polys),
+  check = FALSE
+)
+
+bench::mark(
+  geos = geos::geos_intersects(geos_polys[[1]], geos_polys[[10]]),
+  rust = intersect_poly_poly(rs_poly, rs_polys[[10]])
+)

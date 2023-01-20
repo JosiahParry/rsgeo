@@ -1,7 +1,7 @@
 TARGET_DIR = ./rust/target
 LIBDIR = $(TARGET_DIR)/release
-STATLIB = $(LIBDIR)/librustpkg.a
-PKG_LIBS = -L$(LIBDIR) -lrustpkg
+STATLIB = $(LIBDIR)/librsgeo.a
+PKG_LIBS = -L$(LIBDIR) -lrsgeo
 
 all: C_clean
 
