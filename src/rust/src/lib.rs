@@ -1,10 +1,13 @@
 use extendr_api::prelude::*;
 use extendr_api::wrapper::{ExternalPtr, RMatrix};
-use geo::{coord, Polygon, Area, Centroid, Intersects};
+use geo::{coord, Polygon, Area, Centroid, Intersects, BoundingRect};
 use ndarray::{Array2, ShapeBuilder, Axis};
 
 use geo::geometry::{Point, Line, LineString, Coord, MultiPoint, MultiLineString};
 
+mod spatialindex;
+use crate::spatialindex::*;
+use rstar::{RTree, AABB};
 
 // POINT -------------------------------------------------------------------
 
@@ -358,7 +361,7 @@ fn poly_centroids(x: List) -> Robj {
         let poly: ExternalPtr<Polygon> = x[i].to_owned().try_into().unwrap();
         let centroid = poly.centroid().unwrap();
         let res_i = rs_point(centroid.x(), centroid.y());
-        res.set_elt(i,res_i);
+        res.set_elt(i,res_i).unwrap();
     }
 
     r![res].set_attrib("class", "rs_POINT").unwrap()
@@ -379,29 +382,67 @@ fn intersect_poly_poly(lhs: Robj, rhs: Robj) -> Rbool {
 // or the deparsing. idk intersect_poly_poly is SOOO much faster than c
 // but the loop is slower idk
 // man idfk 
-#[extendr]
-fn intersect_poly_polys(lhs: Robj, rhs: List) -> Logicals {
-    let n = rhs.len();
-    let mut res = Logicals::new(n);
-    let xpoly: ExternalPtr<Polygon> = lhs.try_into().unwrap();
+// #[extendr]
+// fn intersect_poly_polys(lhs: Robj, rhs: List) -> Logicals {
+//     let n = rhs.len();
+//     let mut res = Logicals::new(n);
+//     let xpoly: ExternalPtr<Polygon> = lhs.try_into().unwrap();
 
-    for i in 0..n {
-        let ypoly: ExternalPtr<Polygon> = rhs[i].to_owned().try_into().unwrap();
-        res.set_elt(i, Rbool::from(xpoly.intersects(&*ypoly)));
+//     for i in 0..n {
+//         let ypoly: ExternalPtr<Polygon> = rhs[i].to_owned().try_into().unwrap();
+//         res.set_elt(i, Rbool::from(xpoly.intersects(&*ypoly)));
+//     }
+//     res
+
+// }
+
+
+// Spatial Index -----------------------------------------------------------------
+
+
+fn make_index(x: List) -> RTree<TreeNode> {
+
+    let mut r_tree: RTree<TreeNode> = RTree::new();
+
+    for (index, obj) in x.into_iter().enumerate() {
+
+        let robj: ExternalPtr<Polygon> = obj.1.try_into().unwrap();
+
+        let env = NodeEnvelope::from(&*robj);
+        let node = TreeNode {
+            index,
+            envelope: env
+        };
+        r_tree.insert(node);
     }
-    res
+
+    r_tree
 }
 
-// let xpoly = TryInto::<ExternalPtr<Polygon>>::try_into(lhs).unwrap();
+fn find_index(r_tree: RTree<TreeNode>, geom: ExternalPtr<Polygon>) ->  Integers {
 
-// let res = rhs.iter().
-//     map(|y| 
-//         xpoly.intersects(
-//             &*TryInto::<ExternalPtr<Polygon>>::try_into(y.1).unwrap())
-//         ).collect_robj();
+    //let y = TreeNode::from(*geom);
+    let rect = geom.bounding_rect().unwrap();
+    let bbox = [[rect.min().x, rect.min().y],
+            [rect.max().x, rect.max().y]];
+    
+    let intersect_candidates = r_tree.
+        locate_in_envelope_intersecting(&AABB::from_corners(bbox[0], bbox[1]));
+    let indexes: Vec<i32> = intersect_candidates.map(|node| node.index as i32).collect();
+    Integers::from_values(indexes)
 
-// res
-// }
+}
+
+///@export
+#[extendr]
+fn intersect_poly_polys(lhs: Robj, rhs: List) -> Integers {
+
+    let geom: ExternalPtr<Polygon> = lhs.try_into().unwrap();
+    let r_tree = make_index(rhs);
+
+    find_index(r_tree, geom)
+
+}
 
 // Helpers -----------------------------------------------------------------
 
@@ -436,7 +477,7 @@ fn matrix_to_coords(x: RMatrix<f64>) -> Vec<Coord> {
 }
 
 
-
+// ---------------------------------------------------------------------------------
 
 // Macro to generate exports.
 // This ensures exported functions are registered with R.

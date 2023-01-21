@@ -11,3 +11,4 @@ name = 'rsgeo'
 extendr-api = '*'
 geo = "0.23.1"
 ndarray = "0.15.6"
+rstar = "0.9.3"

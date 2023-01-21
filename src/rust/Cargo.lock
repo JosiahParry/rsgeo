@@ -277,6 +277,7 @@ dependencies = [
  "extendr-api",
  "geo",
  "ndarray",
+ "rstar",
 ]
 
 [[package]]
