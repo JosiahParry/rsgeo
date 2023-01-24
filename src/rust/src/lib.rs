@@ -1,13 +1,11 @@
 use extendr_api::prelude::*;
 use extendr_api::wrapper::{ExternalPtr, RMatrix};
-use geo::{coord, Polygon, Area, Centroid, Intersects, BoundingRect};
+use geo::{coord, Polygon, Area, Centroid, Intersects};
 use ndarray::{Array2, ShapeBuilder, Axis};
 
 use geo::geometry::{Point, Line, LineString, Coord, MultiPoint, MultiLineString};
 
-mod spatialindex;
-use crate::spatialindex::*;
-use rstar::{RTree, AABB};
+//use rstar::{RTree, AABB};
 
 // POINT -------------------------------------------------------------------
 
@@ -397,52 +395,26 @@ fn intersect_poly_poly(lhs: Robj, rhs: Robj) -> Rbool {
 // }
 
 
-// Spatial Index -----------------------------------------------------------------
+// Intersect wrapper
 
+// mod intersects;
+// use crate::intersects::poly_geoms;
 
-fn make_index(x: List) -> RTree<TreeNode> {
+// mod utils;
+// use crate::utils::as_vec_geoms;
+// ///@export
+// #[extendr (use_try_from = true)]
+// fn poly_intersect(x: ExternalPtr<Polygon>, y: List) -> Integers {
+//     let geoms = as_vec_geoms(y);
 
-    let mut r_tree: RTree<TreeNode> = RTree::new();
+//     let res = poly_geoms(*x, geoms);
 
-    for (index, obj) in x.into_iter().enumerate() {
+//     let res: Integers = res.into_iter()
+//         .map(|index| Rint::from(index as i32))
+//         .collect();
 
-        let robj: ExternalPtr<Polygon> = obj.1.try_into().unwrap();
-
-        let env = NodeEnvelope::from(&*robj);
-        let node = TreeNode {
-            index,
-            envelope: env
-        };
-        r_tree.insert(node);
-    }
-
-    r_tree
-}
-
-fn find_index(r_tree: RTree<TreeNode>, geom: ExternalPtr<Polygon>) ->  Integers {
-
-    //let y = TreeNode::from(*geom);
-    let rect = geom.bounding_rect().unwrap();
-    let bbox = [[rect.min().x, rect.min().y],
-            [rect.max().x, rect.max().y]];
-    
-    let intersect_candidates = r_tree.
-        locate_in_envelope_intersecting(&AABB::from_corners(bbox[0], bbox[1]));
-    let indexes: Vec<i32> = intersect_candidates.map(|node| node.index as i32).collect();
-    Integers::from_values(indexes)
-
-}
-
-///@export
-#[extendr]
-fn intersect_poly_polys(lhs: Robj, rhs: List) -> Integers {
-
-    let geom: ExternalPtr<Polygon> = lhs.try_into().unwrap();
-    let r_tree = make_index(rhs);
-
-    find_index(r_tree, geom)
-
-}
+//     res
+// }
 
 // Helpers -----------------------------------------------------------------
 
@@ -507,5 +479,5 @@ extendr_module! {
     fn poly_centroid;
     fn poly_centroids;
     fn intersect_poly_poly;
-    fn intersect_poly_polys;
+    //fn poly_intersect;
 }
