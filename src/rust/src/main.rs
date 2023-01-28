@@ -1,12 +1,12 @@
 
 
-use geo::{point, line_string, polygon};
-use geo_types::{Polygon, Geometry, coord, Point};
+use geo::{Polygon, polygon};
+// use geo_types::{Polygon, Geometry, coord, Point};
 
 
-use std::fs::File;
-use std::io::{BufReader, BufRead};
-use wkt::{TryFromWkt};
+// use std::fs::File;
+// use std::io::{BufReader, BufRead};
+// use wkt::{TryFromWkt};
 
 
 
@@ -16,12 +16,13 @@ use wkt::{TryFromWkt};
 // }
 
 mod intersects;
-use crate::intersects::*;
+//use crate::intersects::*;
 
 mod types;
 use crate::types::*;
 
 fn main() {
+
 
     // // read geometries from a text file
     // let f = File::open("geoms.txt").expect("this shit to work"); 

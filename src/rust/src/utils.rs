@@ -1,13 +1,37 @@
-// use geo::Geometry;
-// use extendr_api::prelude::*;
+use crate::types::Geom;
+use extendr_api::prelude::*;
+use geo::BooleanOps;
+use geo_types::geometry::*;
+//use extendr_api::wrapper::{};
 
-// #[extendr (use_try_from = true)]
-// pub fn as_vec_geoms(x: List) -> Vec<Geometry>  {
-
-//     let gg: Vec<Geometry> = x.into_iter()
-//         .map(|x| *x.into())
-//         .collect();
-
-//     gg
+// pub trait Geometrize {
+//     //https://www.dictionary.com/browse/geometrize
+//     fn as_geom(self) -> Geom; 
+//     //fn as_points_from_mat(self) -> Vec<Geom>;
 // }
+
+
+// impl Geometrize for RMatrix<f64>  {
+//     fn as_points_from_mat(self) -> Vec<Geom> {
+//         //crate::geoms::geom_points_matrix(self)
+//     }
+// }
+
+// extendr_module! {
+//     mod utils;
+// }
+
+// pub trait Aggregate {
+//     fn aggregate(self) -> ();
+// }
+
+// impl Aggregate for Vec<Geometry> {
+//     fn aggregate(self) -> () {
+//         let x = self; 
+//         match x {
+//             Vec<Point> => MultiPoint::new(x)
+//         };
+//     }
+// }
+
 

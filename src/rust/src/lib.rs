@@ -1,9 +1,38 @@
+// module imports
+mod utils;
+
+mod geoms;
+use geoms::get_geoms_metadata;
+
+mod area;
+use area::get_area_metadata;
+
+mod length;
+use length::get_length_metadata;
+
+mod query;
+use query::get_query_metadata;
+
+mod distance;
+use distance::get_distance_metadata;
+
+mod boundary;
+use boundary::get_boundary_metadata;
+
+
+mod casting;
+use casting::get_casting_metadata;
+
+
+pub mod types;
 use extendr_api::prelude::*;
 use extendr_api::wrapper::{ExternalPtr, RMatrix};
-use geo::{coord, Polygon, Area, Centroid, Intersects};
+use geo::{coord, Polygon, Centroid, HaversineDestination, HaversineIntermediate, ChaikinSmoothing};
+use crate::types::Geom;
 use ndarray::{Array2, ShapeBuilder, Axis};
+use geo_types::line_string;
 
-use geo::geometry::{Point, Line, LineString, Coord, MultiPoint, MultiLineString};
+use geo::geometry::{Point, Line, LineString, Coord, MultiPoint, MultiLineString, Geometry};
 
 //use rstar::{RTree, AABB};
 
@@ -293,87 +322,19 @@ fn rs_polygon(x: List) -> Robj {
     r![ExternalPtr::new(polygon)].set_attrib("class", "polygon").unwrap()
 }
 
-// List of polygons 
-// a list of polygons 
-///@export
-#[extendr]
-fn rs_polygons(x: List) -> Robj {
-    let n = x.len();
-    let mut polygons: Vec<Robj> = Vec::with_capacity(n);
 
-    for i in 0..n {
-        let xi: List = x[i].to_owned().try_into().unwrap();
-        polygons.push(rs_polygon(xi));
-    }
 
-    let res = List::from_values(polygons);
-    let res = res.set_attrib("class", "rs_POLYGON").unwrap();
-    res
 
-}
 
-// POLYGON AREA algos
+// // INTERSECTIONS -------
+// #[extendr]
+// fn intersect_poly_poly(lhs: Robj, rhs: Robj) -> Rbool {
+//     let xpoly: ExternalPtr<Polygon> = lhs.try_into().unwrap(); 
+//     let ypoly: ExternalPtr<Polygon> = rhs.try_into().unwrap(); 
 
-// Single polygon unsigned area
-// because you can't have negative area
-///@export
-#[extendr]
-fn poly_area(x: Robj) ->  Rfloat {
-    let poly: ExternalPtr<Polygon> = x.try_into().unwrap(); 
-    Rfloat::from(poly.unsigned_area())
-}
+//     Rbool::from(xpoly.intersects(&*ypoly))
 
-//list of polygons
-///@export
-#[extendr]
-fn poly_areas(x: List) -> Doubles {
-    let n = x.len();
-    let mut out = Doubles::new(n);
-
-    for i in 0..n {
-        let xi = x[i].to_owned();
-        let res_i = poly_area(xi);
-        out[i] = res_i;
-    }
-    out
-}
- 
-// polygon centroid
-#[extendr]
-fn poly_centroid(x: Robj) ->  Doubles {
-    let poly: ExternalPtr<Polygon> = x.try_into().unwrap(); 
-    let centroid = poly.centroid().unwrap();
-    let mut res = Doubles::new(2);
-    res[0] = Rfloat::from(centroid.x());
-    res[1] = Rfloat::from(centroid.y());
-    res
-
-}
-
-#[extendr]
-fn poly_centroids(x: List) -> Robj {
-    let n = x.len();
-    let mut res = List::new(n);
-
-    for i in 0..n {
-        let poly: ExternalPtr<Polygon> = x[i].to_owned().try_into().unwrap();
-        let centroid = poly.centroid().unwrap();
-        let res_i = rs_point(centroid.x(), centroid.y());
-        res.set_elt(i,res_i).unwrap();
-    }
-
-    r![res].set_attrib("class", "rs_POINT").unwrap()
-}
-
-// INTERSECTIONS -------
-#[extendr]
-fn intersect_poly_poly(lhs: Robj, rhs: Robj) -> Rbool {
-    let xpoly: ExternalPtr<Polygon> = lhs.try_into().unwrap(); 
-    let ypoly: ExternalPtr<Polygon> = rhs.try_into().unwrap(); 
-
-    Rbool::from(xpoly.intersects(&*ypoly))
-
-}
+// }
 
 // This is so much slower than the 1 - 1 and so much slower than geos
 // Tried without cloning. same speed. It must be the claiming ownership?
@@ -449,8 +410,92 @@ fn matrix_to_coords(x: RMatrix<f64>) -> Vec<Coord> {
 }
 
 
-// ---------------------------------------------------------------------------------
 
+
+// MISC algos -------
+#[extendr]
+fn centroid(x: Robj) -> Robj {
+    let x: Geom = x.try_into().unwrap();
+    let res = x.geom.centroid().unwrap();
+
+    let res: Geom = res.into();
+
+    r![ExternalPtr::new(res)].set_attrib("class", "point").unwrap()
+
+}
+
+
+#[extendr]
+fn haversine_destination(x: Robj, bearing: f64, distance: f64) -> Robj {
+    let x: Geom = x.try_into().unwrap();
+    let x: Point = x.try_into().unwrap();
+
+    let point = x.haversine_destination(bearing, distance);
+
+    let res = Geom::from(point);
+
+    r![ExternalPtr::new(res)].set_attrib("class", "point").unwrap()
+
+}
+
+#[extendr]
+fn haversine_intermediate(x: Robj, y: Robj, distance: f64) -> Robj {
+    let x: Geom = x.try_into().unwrap();
+    let x: Point = x.try_into().unwrap();
+
+    let y: Geom = y.try_into().unwrap();
+    let y: Point = y.try_into().unwrap();
+
+    let point = x.haversine_intermediate(&y, distance);
+    let res = Geom::from(point);
+
+    r![ExternalPtr::new(res)].set_attrib("class", "point").unwrap()
+
+}
+
+#[extendr]
+fn chaikin_smoothing(x: Robj, niter: f64) -> Robj {
+
+    let x: Geom = x.try_into().unwrap();
+    let x = x.geom;
+
+    let res = match x {
+        Geometry::LineString(x) => {
+            Geom::from(x.chaikin_smoothing(niter as usize))
+        },
+        Geometry::MultiLineString(x) => {
+            Geom::from(x.chaikin_smoothing(niter as usize))
+        },
+        Geometry::MultiPolygon(x) => {
+            Geom::from(x.chaikin_smoothing(niter as usize))
+        },
+        Geometry::Polygon(x) => {
+            Geom::from(x.chaikin_smoothing(niter as usize))
+        },
+        // these types will return themselves
+        Geometry::Point(x) => {
+            Geom::from(x)
+        },
+        Geometry::MultiPoint(x) => {
+            Geom::from(x)
+        },
+        Geometry::Rect(x) => {
+            Geom::from(x)
+        },
+        Geometry::Line(x) => {
+            Geom::from(x)
+        },
+
+        
+        _ => {Geom::from(line_string![])}
+    };
+
+    r![ExternalPtr::new(res)].set_attrib("class", "point").unwrap()    
+
+}
+
+// ---------------------------------------------------------------------------------
+ 
 // Macro to generate exports.
 // This ensures exported functions are registered with R.
 // See corresponding C code in `entrypoint.c`.
@@ -473,11 +518,13 @@ extendr_module! {
     fn print_rs_multilinestring;
     fn rs_polygon;
     fn print_rs_polygon;
-    fn rs_polygons;
-    fn poly_area;
-    fn poly_areas;
-    fn poly_centroid;
-    fn poly_centroids;
-    fn intersect_poly_poly;
-    //fn poly_intersect;
+    fn centroid;
+    fn haversine_destination;
+    use area;
+    use geoms;
+    use length;
+    use query; 
+    use distance;
+    use boundary;
+    use casting;
 }
