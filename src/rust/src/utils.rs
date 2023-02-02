@@ -35,3 +35,27 @@ use geo_types::geometry::*;
 // }
 
 
+
+
+// #[extendr]
+// fn euclidean_distance_matrix(x: List, y:List) -> RMatrix<f64> {
+//     let nr = x.len();
+//     let nc = y.len();
+
+//     let xg = from_list(x);
+//     let yg = from_list(y);
+
+//     let res_vec = xg.into_iter()
+//         .map(|x| yg.to_owned().into_iter()
+//             .map(|y| euclidean_distance_impl(x.geom.clone(), &y.geom))
+//             .collect::<Vec<f64>>())
+//         .collect::<Vec<Vec<f64>>>();
+    
+
+//     RMatrix::new_matrix(
+//         nr, nc,
+//         | r, c | res_vec[r][c]
+//     )
+// }
+
+

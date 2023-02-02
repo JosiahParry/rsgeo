@@ -18,6 +18,13 @@ impl fmt::Display for Geom {
 }
 
 // FROM geo-types to Geom
+impl From<Geometry> for Geom {
+    fn from(geom: Geometry) -> Self {
+        Geom { geom: geom }
+    }
+}
+
+
 impl From<Point> for Geom {
     fn from(pnt: Point) -> Self {
         let x: Geometry = pnt.into();

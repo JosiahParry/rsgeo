@@ -494,6 +494,7 @@ fn chaikin_smoothing(x: Robj, niter: f64) -> Robj {
 
 }
 
+
 // ---------------------------------------------------------------------------------
  
 // Macro to generate exports.

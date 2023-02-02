@@ -1,7 +1,8 @@
 use crate::types::*;
 use extendr_api::prelude::*;
 use extendr_api::wrapper::{ExternalPtr, RMatrix};
-use geo_types::{LineString, Polygon, Point};
+use geo::{point, MultiPoint, MultiPolygon};
+use geo_types::{LineString, Polygon, Point, Geometry};
 use crate::matrix_to_coords;
 use crate::mat_to_rs;
 use ndarray::{Axis};
@@ -33,10 +34,27 @@ fn print_geoms(x: List) {
 fn geom_point(x: f64, y: f64) -> Robj {
     let pnt = Point::new(x, y);
     let pnt: Geom = pnt.try_into().unwrap();
-    let res = ExternalPtr::new(pnt);
-    r![res].set_attrib("class", "point").unwrap()
+    to_pntr(pnt)
 }
 
+
+#[extendr]
+fn geom_points(x: List) -> Robj {
+    let n = x.len();
+    let mut res: Vec<Robj> = Vec::with_capacity(n);
+
+
+    for i in 0..(n - 1) {
+        let xi: Doubles = x[i].to_owned().try_into().unwrap();
+        res.push(geom_point(xi[0].0, xi[1].0));
+
+    }
+
+    let res = List::from_values(res);
+    let res = res.set_attrib("class", "rs_POINT").unwrap();
+    res
+
+}
 
 /// Create a list of points 
 /// Given a matrix of x, y coordinates, create a list of points
@@ -55,6 +73,31 @@ pub fn geom_points_matrix(x: RMatrix<f64>) -> Robj {
     let res = List::from_values(res);
     let res = res.set_attrib("class", "rs_POINT").unwrap();
     res
+}
+
+// MULTIPOINT
+
+#[extendr]
+fn geom_multipoint(x: RMatrix<f64>) -> Robj {
+    let arr = mat_to_rs(x);
+
+    let mpnt = MultiPoint::new(
+        arr.axis_iter(Axis(0))
+            .map(|x| point!{x : x[0], y: x[1]})
+            .collect::<Vec<Point>>()
+    );
+    
+    to_pntr( Geom { geom: Geometry::from(mpnt) })
+
+}
+
+#[extendr]
+fn geom_multipoints(x: List) -> Robj {
+    x.into_iter()
+        .map(|(_, x)| geom_multipoint(RMatrix::try_from(x).unwrap()))
+        .collect::<List>().as_robj()
+        .set_attrib("class", "rs_MULTIPOINT")
+        .unwrap()
 }
 
 // POLYGONS 
@@ -81,7 +124,7 @@ pub fn geom_polygon(x: List) -> Robj {
     let polygon = Polygon::new(exterior, linestrings);
     let polygon: Geom = polygon.into();
 
-    r![ExternalPtr::new(polygon)].set_attrib("class", "polygon").unwrap()
+    to_pntr(polygon)
 }
 
 // List of polygons 
@@ -103,6 +146,57 @@ fn geom_polygons(x: List) -> Robj {
 
 }
 
+// MULTIPOLYGON
+#[extendr]
+fn geom_multipolygon(x: List) -> Robj {
+
+    let res = MultiPolygon::new(
+            x.into_iter()
+                .map(|(_, x) | 
+                    polygon_inner(List::try_from(x).unwrap())
+                )
+                .collect::<Vec<Polygon>>()
+        );
+
+    let res: Geom = res.into();
+
+    to_pntr(res)
+    
+}
+
+
+#[extendr]
+fn geom_multipolygons(x: List) -> Robj {
+    x.into_iter()
+        .map(|(_, x)| 
+        geom_multipolygon(List::try_from(x).unwrap())
+    ).collect::<List>()
+    .set_attrib("class", "rs_MULTIPOLYGON")
+    .unwrap()
+}
+
+// utility function to take a list and convert to a Polygon
+// will be used to collect into `Vec<Polygon>` and thus into `MultiPolygon`
+fn polygon_inner(x: List) -> Polygon {
+    let n = x.len();
+    let mut linestrings: Vec<LineString> = Vec::with_capacity(n);
+
+    let exterior = matrix_to_coords(x[0].as_matrix().unwrap());
+    let exterior = LineString::new(exterior);
+
+    if n > 1 {
+        for i in 1..(n - 1) {
+            let xi: RMatrix<f64> = x[i].to_owned().try_into().unwrap();
+            let coords = matrix_to_coords(xi);
+            let line = LineString::new(coords);
+            linestrings.push(line);
+        }
+    }
+    
+    Polygon::new(exterior, linestrings)
+}
+
+
 
 // utility function to extract a Vec of Geoms from a list 
 pub fn from_list(x: List) -> Vec<Geom> {
@@ -112,13 +206,35 @@ pub fn from_list(x: List) -> Vec<Geom> {
 }
 
 
+// helpers to cast to the proper external pointer
+pub fn to_pntr(x: Geom) -> Robj {
+    let geom = x.geom.clone();
+    let pntr = ExternalPtr::new(x);
+    let cls = match geom {
+        Geometry::Point(_geom) => "point",
+        Geometry::MultiPoint(_geom) => "multipoint",
+        Geometry::LineString(_geom) => "linestring",
+        Geometry::MultiLineString(_geom) => "multilinestring",
+        Geometry::Polygon(_geom) => "polygon",
+        Geometry::MultiPolygon(_geom) => "multipolygon",
+        _ => ""
+    };
+
+    r![pntr].set_attrib("class", cls).unwrap()
+}
+
 // Macro to generate exports
 extendr_module! {
     mod geoms;
-    fn geom_point;
-    fn geom_points_matrix;
-    fn geom_polygon;
-    fn geom_polygons;
+    fn geom_point; // a single point
+    fn geom_points; // a list of points
+    fn geom_points_matrix; // a matrix of coordinates
+    fn geom_multipoint; // a single multipoint from matrix of coords
+    fn geom_multipoints; // a list of coordinates (sfc of multipoints)
+    fn geom_polygon; // a list of coordinates
+    fn geom_polygons; // a list of polygons
+    fn geom_multipolygon; // a list of a list of coordinates
+    fn geom_multipolygon; // a list of a list of a list of coordinates 
     fn print_geom;
     fn print_geoms;
 }

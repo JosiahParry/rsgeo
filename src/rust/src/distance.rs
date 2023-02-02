@@ -28,7 +28,6 @@ fn euclidean_distance_matrix(x: List, y:List) -> RMatrix<f64> {
         nr, nc,
         | r, c | res_vec[r][c]
     )
-
 }
 
 fn euclidean_distance_impl(x: Geometry, y: &Geometry) -> f64 {
