@@ -54,7 +54,7 @@ Do one-to-many it becomes super slow but still very memory efficient.
 ```{r}
 bench::mark(
   rust = intersect_poly_polys(rs_polys[[1]], rs_polys),
-  sf = sf::st_intersects(polys[[1]], polys),
+  sf = sf::st_intersects(polys[[1]], polys, prepared = F),
   check = FALSE
 )
 ```

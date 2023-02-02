@@ -106,6 +106,7 @@ print.polygon <- function(x, width = options("width")[[1]], ...) {
 
 
 
+
 # area --------------------------------------------------------------------
 
 signed_area(rs_polygon(polys[[1]]))

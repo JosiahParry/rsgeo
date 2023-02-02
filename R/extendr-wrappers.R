@@ -12,13 +12,13 @@
 NULL
 
 #' Create a single point
-#'
+#' 
 #' For a single x, y coordinate create a point
 #' @export
 rs_point <- function(x, y) .Call(wrap__rs_point, x, y)
 
-#' Create a list of points
-#'
+#' Create a list of points 
+#' 
 #' Given a matrix of x, y coordinates, create a list of points
 #' uses the `mat_to_rs()` helper to convert an RMatrix to ndarray::Array2
 #'@export
@@ -69,22 +69,96 @@ rs_polygon <- function(x) .Call(wrap__rs_polygon, x)
 #'@export
 print_rs_polygon <- function(x) invisible(.Call(wrap__print_rs_polygon, x))
 
-#'@export
-rs_polygons <- function(x) .Call(wrap__rs_polygons, x)
+centroid <- function(x) .Call(wrap__centroid, x)
+
+haversine_destination <- function(x, bearing, distance) .Call(wrap__haversine_destination, x, bearing, distance)
 
 #'@export
-poly_area <- function(x) .Call(wrap__poly_area, x)
+signed_area <- function(x) .Call(wrap__signed_area, x)
 
 #'@export
-poly_areas <- function(x) .Call(wrap__poly_areas, x)
+unsigned_area <- function(x) .Call(wrap__unsigned_area, x)
 
-poly_centroid <- function(x) .Call(wrap__poly_centroid, x)
+#'@export
+geodesic_signed_area <- function(x) .Call(wrap__geodesic_signed_area, x)
 
-poly_centroids <- function(x) .Call(wrap__poly_centroids, x)
+#'@export
+geodesic_unsigned_area <- function(x) .Call(wrap__geodesic_unsigned_area, x)
 
-intersect_poly_poly <- function(lhs, rhs) .Call(wrap__intersect_poly_poly, lhs, rhs)
+#' Create a single point
+#' 
+#' For a single x, y coordinate create a point
+#' @export
+geom_point <- function(x, y) .Call(wrap__geom_point, x, y)
 
-intersect_poly_polys <- function(lhs, rhs) .Call(wrap__intersect_poly_polys, lhs, rhs)
+geom_points <- function(x) .Call(wrap__geom_points, x)
+
+#' Create a list of points 
+#' Given a matrix of x, y coordinates, create a list of points
+#'@export
+geom_points_matrix <- function(x) .Call(wrap__geom_points_matrix, x)
+
+geom_multipoint <- function(x) .Call(wrap__geom_multipoint, x)
+
+geom_multipoints <- function(x) .Call(wrap__geom_multipoints, x)
+
+#'@export
+geom_polygon <- function(x) .Call(wrap__geom_polygon, x)
+
+#'@export
+geom_polygons <- function(x) .Call(wrap__geom_polygons, x)
+
+geom_multipolygon <- function(x) .Call(wrap__geom_multipolygon, x)
+
+print_geom <- function(x) invisible(.Call(wrap__print_geom, x))
+
+print_geoms <- function(x) invisible(.Call(wrap__print_geoms, x))
+
+euclidean_length <- function(x) .Call(wrap__euclidean_length, x)
+
+geodesic_length <- function(x) .Call(wrap__geodesic_length, x)
+
+vincenty_length <- function(x) .Call(wrap__vincenty_length, x)
+
+#'@export
+bearing <- function(x, y) .Call(wrap__bearing, x, y)
+
+#'@export
+bearings <- function(x, y) .Call(wrap__bearings, x, y)
+
+euclidean_distance <- function(x, y) .Call(wrap__euclidean_distance, x, y)
+
+euclidean_distances <- function(x, y) .Call(wrap__euclidean_distances, x, y)
+
+euclidean_distance_pairwise <- function(x, y) .Call(wrap__euclidean_distance_pairwise, x, y)
+
+euclidean_distance_matrix <- function(x, y) .Call(wrap__euclidean_distance_matrix, x, y)
+
+haversine_distance <- function(x, y) .Call(wrap__haversine_distance, x, y)
+
+haversine_distances <- function(x, y) .Call(wrap__haversine_distances, x, y)
+
+haversine_distance_matrix <- function(x, y) .Call(wrap__haversine_distance_matrix, x, y)
+
+geodesic_distance <- function(x, y) .Call(wrap__geodesic_distance, x, y)
+
+geodesic_distances <- function(x, y) .Call(wrap__geodesic_distances, x, y)
+
+geodesic_distance_matrix <- function(x, y) .Call(wrap__geodesic_distance_matrix, x, y)
+
+vincenty_distance <- function(x, y) .Call(wrap__vincenty_distance, x, y)
+
+vincenty_distances <- function(x, y) .Call(wrap__vincenty_distances, x, y)
+
+vincenty_distance_matrix <- function(x, y) .Call(wrap__vincenty_distance_matrix, x, y)
+
+bounding_rectangle <- function(x) .Call(wrap__bounding_rectangle, x)
+
+concave_hull <- function(x, concavity) .Call(wrap__concave_hull, x, concavity)
+
+union_geoms <- function(x) .Call(wrap__union_geoms, x)
+
+union_polys <- function(x) .Call(wrap__union_polys, x)
 
 
 # nolint end
