@@ -58,4 +58,5 @@ extendr_module! {
     mod boundary;
     fn bounding_rectangle;
     fn concave_hull;
+    fn convex_hull;
 }

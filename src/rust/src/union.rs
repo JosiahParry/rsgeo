@@ -99,31 +99,31 @@ fn union_polygon(x: Vec<Polygon> ) -> MultiPolygon {
 
 }
 
-#[extendr]
-fn union_polys(x: List) -> Robj {
-    let x = from_list(x);
+// #[extendr]
+// fn union_polys(x: List) -> Robj {
+//     let x = from_list(x);
 
-    let x: Vec<Polygon> = x.into_iter()
-        .map(|x| Polygon::try_from(x.geom).unwrap())
-        .collect();
+//     let x: Vec<Polygon> = x.into_iter()
+//         .map(|x| Polygon::try_from(x.geom).unwrap())
+//         .collect();
 
-        // create the tree
-    let mut r_tree = RTree::new();
+//         // create the tree
+//     let mut r_tree = RTree::new();
 
-    // insert into rtree with index as data
-    for (index, geom) in x.into_iter().enumerate() {
-        let geom = GeomWithData::new(geom, index);
-        r_tree.insert(geom);
-    }
+//     // insert into rtree with index as data
+//     for (index, geom) in x.into_iter().enumerate() {
+//         let geom = GeomWithData::new(geom, index);
+//         r_tree.insert(geom);
+//     }
 
-    let papa = r_tree.root();
+//     let papa = r_tree.root();
 
 
-    let x = inner(papa);
+//     let x = inner(papa);
     
-    to_pntr(Geom { geom: Geometry::from(x)})
+//     to_pntr(Geom { geom: Geometry::from(x)})
     
-}
+// }
 
 fn union_multipolygon(x: Vec<MultiPolygon>) -> MultiPolygon {
 
@@ -192,8 +192,6 @@ fn union_multilinestring(x: Vec<MultiLineString>) -> MultiLineString {
 extendr_module! {
     mod union;
     fn union_geoms;
-    fn union_polys;
- //   fn union_polygon;
 }
 
 
@@ -211,7 +209,7 @@ fn inner(papa: &ParentNode<GeomWithData<Polygon, usize>>) -> MultiPolygon {
             },
             RTreeNode::Parent(parent) => {
                 let value = inner(parent);
-                value
+                accum.union(&value)
             }
         })
 }

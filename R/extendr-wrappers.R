@@ -11,66 +11,15 @@
 #' @useDynLib rsgeo, .registration = TRUE
 NULL
 
-#' Create a single point
-#' 
-#' For a single x, y coordinate create a point
-#' @export
-rs_point <- function(x, y) .Call(wrap__rs_point, x, y)
-
-#' Create a list of points 
-#' 
-#' Given a matrix of x, y coordinates, create a list of points
-#' uses the `mat_to_rs()` helper to convert an RMatrix to ndarray::Array2
-#'@export
-rs_points <- function(x) .Call(wrap__rs_points, x)
-
-#'@export
-print_rs_point <- function(x) invisible(.Call(wrap__print_rs_point, x))
-
-#'@export
-print_rs_points <- function(x) invisible(.Call(wrap__print_rs_points, x))
-
-#'@export
-points_to_multipoint <- function(x) .Call(wrap__points_to_multipoint, x)
-
-#'@export
-print_rs_multipoint <- function(x) invisible(.Call(wrap__print_rs_multipoint, x))
-
-#'@export
-rs_line <- function(xy1, xy2) .Call(wrap__rs_line, xy1, xy2)
-
-#'@export
-print_rs_line <- function(x) invisible(.Call(wrap__print_rs_line, x))
-
-#'@export
-rs_linestring <- function(x) .Call(wrap__rs_linestring, x)
-
-#'@export
-print_rs_linestring <- function(x) invisible(.Call(wrap__print_rs_linestring, x))
-
 #'@export
 linestring_to_points <- function(x) .Call(wrap__linestring_to_points, x)
 
+#' Find centroid
 #'@export
-rs_linestrings <- function(x) .Call(wrap__rs_linestrings, x)
-
-#'@export
-rs_multilinestring <- function(x) .Call(wrap__rs_multilinestring, x)
-
-#'@export
-linestrings_to_multilinestring <- function(x) .Call(wrap__linestrings_to_multilinestring, x)
-
-#'@export
-print_rs_multilinestring <- function(x) invisible(.Call(wrap__print_rs_multilinestring, x))
-
-#'@export
-rs_polygon <- function(x) .Call(wrap__rs_polygon, x)
-
-#'@export
-print_rs_polygon <- function(x) invisible(.Call(wrap__print_rs_polygon, x))
-
 centroid <- function(x) .Call(wrap__centroid, x)
 
+#' Haversine Destination
+#'@export
 haversine_destination <- function(x, bearing, distance) .Call(wrap__haversine_destination, x, bearing, distance)
 
 #'@export
@@ -88,24 +37,20 @@ geodesic_unsigned_area <- function(x) .Call(wrap__geodesic_unsigned_area, x)
 #' Create a single point
 #' 
 #' For a single x, y coordinate create a point
-#' @export
 geom_point <- function(x, y) .Call(wrap__geom_point, x, y)
 
 geom_points <- function(x) .Call(wrap__geom_points, x)
 
 #' Create a list of points 
 #' Given a matrix of x, y coordinates, create a list of points
-#'@export
 geom_points_matrix <- function(x) .Call(wrap__geom_points_matrix, x)
 
 geom_multipoint <- function(x) .Call(wrap__geom_multipoint, x)
 
 geom_multipoints <- function(x) .Call(wrap__geom_multipoints, x)
 
-#'@export
 geom_polygon <- function(x) .Call(wrap__geom_polygon, x)
 
-#'@export
 geom_polygons <- function(x) .Call(wrap__geom_polygons, x)
 
 geom_multipolygon <- function(x) .Call(wrap__geom_multipolygon, x)
@@ -166,11 +111,15 @@ bounding_rectangle <- function(x) .Call(wrap__bounding_rectangle, x)
 
 concave_hull <- function(x, concavity) .Call(wrap__concave_hull, x, concavity)
 
+convex_hull <- function(x) .Call(wrap__convex_hull, x)
+
 union_geoms <- function(x) .Call(wrap__union_geoms, x)
 
 union_polys <- function(x) .Call(wrap__union_polys, x)
 
-rust_to_r <- function(x) .Call(wrap__rust_to_r, x)
+geom_to_r <- function(x) .Call(wrap__geom_to_r, x)
+
+geoms_to_r <- function(x) .Call(wrap__geoms_to_r, x)
 
 
 # nolint end

@@ -6,11 +6,20 @@ use crate::types::Geom;
 
 
 #[extendr]
-fn rust_to_r(x: Robj) -> Robj {
+fn geom_to_r(x: Robj) -> Robj {
     let x = Geom::from(x);
     let x = Robj::from(x);
     x
 }
+
+#[extendr]
+fn geoms_to_r(x: List) -> List {
+
+    x.into_iter()
+        .map(|(_, robj)| geom_to_r(robj))
+        .collect::<List>()
+}
+
 
 // from point to Robj
 impl From<Geom> for Robj {
@@ -95,5 +104,6 @@ fn from_multipolygon(x: MultiPolygon) -> Robj {
  
 extendr_module! {
     mod conversion;
-    fn rust_to_r;
+    fn geom_to_r;
+    fn geoms_to_r;
 }

@@ -31,7 +31,6 @@ fn print_geoms(x: List) {
 /// Create a single point
 /// 
 /// For a single x, y coordinate create a point
-/// @export
 #[extendr]
 fn geom_point(x: f64, y: f64) -> Robj {
     let pnt = Point::new(x, y);
@@ -60,7 +59,6 @@ fn geom_points(x: List) -> Robj {
 
 /// Create a list of points 
 /// Given a matrix of x, y coordinates, create a list of points
-///@export
 #[extendr]
 pub fn geom_points_matrix(x: RMatrix<f64>) -> Robj {
 
@@ -106,7 +104,6 @@ fn geom_multipoints(x: List) -> Robj {
 
 
 #[extendr]
-///@export
 pub fn geom_polygon(x: List) -> Robj {
     let n = x.len();
     let mut linestrings: Vec<LineString> = Vec::with_capacity(n);
@@ -131,7 +128,6 @@ pub fn geom_polygon(x: List) -> Robj {
 
 // List of polygons 
 // a list of polygons 
-///@export
 #[extendr]
 fn geom_polygons(x: List) -> Robj {
     let n = x.len();

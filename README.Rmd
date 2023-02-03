@@ -15,11 +15,9 @@ knitr::opts_chunk$set(
 
 # rsgeo
 
-This package is in very very very very very infantile state. This is an R package to add bindings to the rust geo crate. 
-
-Load the package
 ```{r}
-devtools::load_all()
+# remotes::install_github("josiahparry/rsgeo")
+library(rsgeo)
 ```
 
 
@@ -29,11 +27,15 @@ Create geometries.
 
 ```{r}
 # get geometry from sf
-polys <- sfdep::guerry[["geometry"]] |>
+data(guerry, package = "sfdep")
+
+polys <- guerry[["geometry"]] |>
   sf::st_cast("POLYGON")
 
-# cast to rust
-rs_polys <- rs_polygons(polys)
+# cast to rust geo-types
+rs_polys <- as_rsgeom(polys)
+
+head(rs_polys)
 ```
 
 
