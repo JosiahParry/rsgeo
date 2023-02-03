@@ -33,18 +33,41 @@ fn union_geoms(x: List) -> Robj {
             let x = x.into_iter()
                 .map(|x| Point::try_from(x).unwrap())
                 .collect::<Vec<Point>>();
-            let res = Geometry::from(union_point(x));
-            res
+            Geometry::from(union_point(x))
         },
 
         "rs_POLYGON" => {
             let x = x.into_iter()
                 .map(|x| Polygon::try_from(x).unwrap())
                 .collect::<Vec<Polygon>>();
-            let res = Geometry::from(union_polygon(x));
-            res
-        }
+            Geometry::from(union_polygon(x))
+        },
 
+        "rs_MULTIPOLYGON" => {
+            let x = x.into_iter()
+                .map(|x| MultiPolygon::try_from(x).unwrap())
+                .collect::<Vec<MultiPolygon>>();
+            Geometry::from(union_multipolygon(x))
+        },
+
+        "rs_MULTIPOINT" => {
+            let x = x.into_iter()
+                .map(|x| MultiPoint::try_from(x).unwrap())
+                .collect::<Vec<MultiPoint>>();
+            Geometry::from(union_multipoint(x))
+        },
+        "rs_LINESTRING" => {
+            let x = x.into_iter()
+                .map(|x| LineString::try_from(x).unwrap())
+                .collect::<Vec<LineString>>();
+            Geometry::from(union_linestring(x))
+        },
+        "rs_MULTILINESTRING" => {
+            let x = x.into_iter()
+                .map(|x| MultiLineString::try_from(x).unwrap())
+                .collect::<Vec<MultiLineString>>();
+            Geometry::from(union_multilinestring(x))
+        },
         _ => {
             point!(x: 1.0, y: 1.0).into()
         }
@@ -126,6 +149,8 @@ fn union_multipolygon(x: Vec<MultiPolygon>) -> MultiPolygon {
     x
 }
 
+
+// duplicate points are
 fn union_point(x: Vec<Point>) -> MultiPoint {
 
     let res: MultiPoint = x.try_into().unwrap();
@@ -134,14 +159,15 @@ fn union_point(x: Vec<Point>) -> MultiPoint {
     res.remove_repeated_points()
 }
 
+
+// duplicate points are not removed
 fn union_multipoint(x: Vec<MultiPoint>) -> MultiPoint {
 
-    let point_vec =  x.into_iter()
-    .flat_map(|x| x.into_iter()
-            .map(|xi| xi)
-        ).collect::<Vec<Point>>();
+    let point_vec = x.into_iter()
+    .flat_map(|x|x.0)
+    .collect::<Vec<Point>>();
 
-    MultiPoint::new(point_vec).remove_repeated_points()
+    MultiPoint::new(point_vec)
     
 }
 
@@ -149,17 +175,14 @@ fn union_multipoint(x: Vec<MultiPoint>) -> MultiPoint {
 fn union_linestring(x: Vec<LineString>) -> MultiLineString {
 
     let res = MultiLineString::new(x);
-
-    // remove repeated points (similar to sf::st_union())
     res.remove_repeated_points()
 }
 
 fn union_multilinestring(x: Vec<MultiLineString>) -> MultiLineString {
 
    let line_vecs =  x.into_iter()
-        .flat_map(|x| x.into_iter()
-                .map(|xi| xi)
-            ).collect::<Vec<LineString>>();
+        .flat_map(|x|  x.0)
+        .collect::<Vec<LineString>>();
     
     MultiLineString::new(line_vecs).remove_repeated_points()
 }
@@ -167,7 +190,7 @@ fn union_multilinestring(x: Vec<MultiLineString>) -> MultiLineString {
 
 
 extendr_module! {
-    mod casting;
+    mod union;
     fn union_geoms;
     fn union_polys;
  //   fn union_polygon;

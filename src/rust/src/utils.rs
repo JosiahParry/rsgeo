@@ -1,7 +1,7 @@
-use crate::types::Geom;
-use extendr_api::prelude::*;
-use geo::BooleanOps;
-use geo_types::geometry::*;
+// use crate::types::Geom;
+// use extendr_api::prelude::*;
+// use geo::BooleanOps;
+// use geo_types::geometry::*;
 //use extendr_api::wrapper::{};
 
 // pub trait Geometrize {

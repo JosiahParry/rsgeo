@@ -1,7 +1,9 @@
+use std::vec;
+
 use crate::types::*;
 use extendr_api::prelude::*;
 use extendr_api::wrapper::{ExternalPtr, RMatrix};
-use geo::{point, MultiPoint, MultiPolygon};
+use geo::{point, MultiPoint, MultiPolygon, MultiLineString};
 use geo_types::{LineString, Polygon, Point, Geometry};
 use crate::matrix_to_coords;
 use crate::mat_to_rs;
@@ -44,7 +46,7 @@ fn geom_points(x: List) -> Robj {
     let mut res: Vec<Robj> = Vec::with_capacity(n);
 
 
-    for i in 0..(n - 1) {
+    for i in 0..n {
         let xi: Doubles = x[i].to_owned().try_into().unwrap();
         res.push(geom_point(xi[0].0, xi[1].0));
 
@@ -113,7 +115,7 @@ pub fn geom_polygon(x: List) -> Robj {
     let exterior = LineString::new(exterior);
 
     if n > 1 {
-        for i in 1..(n - 1) {
+        for i in 1..n {
             let xi: RMatrix<f64> = x[i].to_owned().try_into().unwrap();
             let coords = matrix_to_coords(xi);
             let line = LineString::new(coords);
@@ -175,6 +177,25 @@ fn geom_multipolygons(x: List) -> Robj {
     .unwrap()
 }
 
+
+// LINESTRING
+
+#[extendr]
+fn geom_linestring(x: RMatrix<f64>) -> Robj {
+    let coords = matrix_to_coords(x);
+    let lns = LineString::new(coords); 
+    to_pntr(Geom::try_from(lns).unwrap())
+}
+
+#[extendr]
+fn geom_linestrings(x: List) -> Robj {
+    x.into_iter()
+        .map(|(_, x)| geom_linestring(RMatrix::try_from(x).unwrap()))
+        .collect::<List>()
+        .set_attrib("class", "rs_LINESTRING")
+        .unwrap()
+}
+
 // utility function to take a list and convert to a Polygon
 // will be used to collect into `Vec<Polygon>` and thus into `MultiPolygon`
 fn polygon_inner(x: List) -> Polygon {
@@ -185,7 +206,7 @@ fn polygon_inner(x: List) -> Polygon {
     let exterior = LineString::new(exterior);
 
     if n > 1 {
-        for i in 1..(n - 1) {
+        for i in 1..n {
             let xi: RMatrix<f64> = x[i].to_owned().try_into().unwrap();
             let coords = matrix_to_coords(xi);
             let line = LineString::new(coords);
@@ -197,6 +218,26 @@ fn polygon_inner(x: List) -> Polygon {
 }
 
 
+// MUlTILINESTRING
+#[extendr]
+fn geom_multilinestring(x: List) -> Robj {
+    let vec_lns = x.into_iter()
+        .map(|(_, x)| 
+        LineString::new(matrix_to_coords(RMatrix::try_from(x).unwrap())))
+    .collect::<Vec<LineString>>();
+
+    let res = MultiLineString::new(vec_lns).into();
+    to_pntr(res)
+}
+
+#[extendr]
+fn geom_multilinestrings(x: List) -> Robj {
+    x.into_iter()
+        .map(|(_, x)| geom_multilinestring(List::try_from(x).unwrap()))
+        .collect::<List>()
+        .set_attrib("class", "rs_MULTILINESTRING")
+        .unwrap()
+}
 
 // utility function to extract a Vec of Geoms from a list 
 pub fn from_list(x: List) -> Vec<Geom> {
@@ -234,7 +275,11 @@ extendr_module! {
     fn geom_polygon; // a list of coordinates
     fn geom_polygons; // a list of polygons
     fn geom_multipolygon; // a list of a list of coordinates
-    fn geom_multipolygon; // a list of a list of a list of coordinates 
+    fn geom_multipolygons; // a list of a list of a list of coordinates 
+    fn geom_linestring;
+    fn geom_linestrings;
+    fn geom_multilinestring;
+    fn geom_multilinestrings;
     fn print_geom;
     fn print_geoms;
 }

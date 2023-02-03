@@ -104,16 +104,6 @@ impl From<Robj> for Geom {
 }
 
 
-// impl From<&Robj> for &Geom {
-//     fn from(robj: &Robj) -> Self {
-//         let robj: &ExternalPtr<Geom> = robj.
-//             .try_into()
-//             .unwrap();
-
-//         robj
-//     }
-// }
-
 // TO geo-types from Geom
 impl From<Geom> for Polygon {
     fn from(geom: Geom) -> Self {

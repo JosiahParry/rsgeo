@@ -110,6 +110,16 @@ geom_polygons <- function(x) .Call(wrap__geom_polygons, x)
 
 geom_multipolygon <- function(x) .Call(wrap__geom_multipolygon, x)
 
+geom_multipolygons <- function(x) .Call(wrap__geom_multipolygons, x)
+
+geom_linestring <- function(x) .Call(wrap__geom_linestring, x)
+
+geom_linestrings <- function(x) .Call(wrap__geom_linestrings, x)
+
+geom_multilinestring <- function(x) .Call(wrap__geom_multilinestring, x)
+
+geom_multilinestrings <- function(x) .Call(wrap__geom_multilinestrings, x)
+
 print_geom <- function(x) invisible(.Call(wrap__print_geom, x))
 
 print_geoms <- function(x) invisible(.Call(wrap__print_geoms, x))
@@ -159,6 +169,8 @@ concave_hull <- function(x, concavity) .Call(wrap__concave_hull, x, concavity)
 union_geoms <- function(x) .Call(wrap__union_geoms, x)
 
 union_polys <- function(x) .Call(wrap__union_polys, x)
+
+rust_to_r <- function(x) .Call(wrap__rust_to_r, x)
 
 
 # nolint end
