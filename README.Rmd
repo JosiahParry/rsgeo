@@ -15,15 +15,14 @@ knitr::opts_chunk$set(
 
 # rsgeo
 
+`rsgeo` is an interface to the Rust libraries `geo-types` and `geo`. `geo-types` implements pure rust geometry primitives. The `geo` library adds additional algorithm functionalities on top of `geo-types`. This package lets you harness the speed, safety, and memory efficiency of these libraries. `geo-types` does not support Z or M dimensions. There is no support for CRS at this moment.
+
 ```{r}
 # remotes::install_github("josiahparry/rsgeo")
 library(rsgeo)
 ```
 
-
-Here is a performance challenge i am running into. 
-
-Create geometries.
+Create geometries from sf objects
 
 ```{r}
 # get geometry from sf
@@ -38,57 +37,118 @@ rs_polys <- as_rsgeom(polys)
 head(rs_polys)
 ```
 
+Cast geometries to sf
 
-Benchmark one-to-one intersections.
+```{r}
+as_sf(rs_polys)
+```
+
+
+Calculate the unsigned area of polygons. 
 
 ```{r}
 bench::mark(
-  rust = intersect_poly_poly(rs_polys[[1]], rs_polys[[85]]),
-  sf = sf::st_intersects(polys[[1]], polys[[85]]),
+  rust = unsigned_area(rs_polys),
+  sf = sf::st_area(polys),
+  check = FALSE
+)
+```
+Find centroids 
+
+```{r}
+bench::mark(
+  centroids(rs_polys),
+  sf::st_centroid(polys),
+  check = FALSE
+)
+```
+Extract points as matrix
+
+```{r}
+rs_polys |> 
+  centroids() |> 
+  as.matrix() |> 
+  head()
+```
+
+Plot the polygons and their centroids
+```{r}
+plot(rs_polys)
+plot(centroids(rs_polys), add = TRUE)
+```
+
+Calculate a distance matrix 
+
+```{r}
+pnts <- centroids(rs_polys)
+pnts_sf <- as_sf(pnts)
+
+bench::mark(
+  rust = euclidean_distance_matrix(pnts, pnts),
+  sf = sf::st_distance(pnts_sf, pnts_sf)
+)
+
+```
+
+Simplify a geometry
+
+```{r}
+x <- rs_polys[[37]]
+x_simple <- simplify_geom(x, 5000)
+
+plot(x)
+plot(x_simple, add = TRUE)
+```
+
+```{r}
+bench::mark(
+  rust = simplify_geoms(rs_polys, 500),
+  sf = sf::st_simplify(polys, FALSE, 500),
   check = FALSE
 )
 ```
 
-Rust is insanely fast. 
-
-Do one-to-many it becomes super slow but still very memory efficient. 
+Find the haversine destination of a point, bearing, and distance. 
 
 ```{r}
 bench::mark(
-  rust = intersect_poly_polys(rs_polys[[1]], rs_polys),
-  sf = sf::st_intersects(polys[[1]], polys, prepared = F),
+  rust = haversine_destination(geom_point(10, 10), 45, 10000),
+  Cpp = geosphere::destPoint(c(10, 10), 45, 10000),
   check = FALSE
 )
 ```
 
-Rust implementation for `intersect_poly_poly()`. See line 353 in lib.rs.
 
-```rust
-fn intersect_poly_poly(lhs: Robj, rhs: Robj) -> Rbool {
-    let xpoly: ExternalPtr<Polygon> = lhs.try_into().unwrap(); 
-    let ypoly: ExternalPtr<Polygon> = rhs.try_into().unwrap(); 
 
-    Rbool::from(xpoly.intersects(&*ypoly))
 
-}
+```{r}
+origin <- geom_point(10, 10)
+
+destination <- haversine_destination(origin, 45, 10000)
+
+plot(origin)
+plot(destination, col = "blue", add = TRUE)
 ```
 
-This is nice and fast. 
+Find intermediate point.
 
-The implementation for `intersect_poly_polys()`. See line 383
+```{r}
+middle <- haversine_intermediate(origin, destination, 1/2)
 
-```rust
-fn intersect_poly_polys(lhs: Robj, rhs: List) -> Logicals {
-    let n = rhs.len();
-    let mut res = Logicals::new(n);
-    let xpoly: ExternalPtr<Polygon> = lhs.try_into().unwrap();
+plot(origin)
+plot(destination, add = TRUE, col = "red")
+plot(middle, add = TRUE, col = "blue")
+```
 
-    for i in 0..n {
-        let ypoly: ExternalPtr<Polygon> = rhs[i].to_owned().try_into().unwrap();
-        res.set_elt(i, Rbool::from(xpoly.intersects(&*ypoly)));
-    }
-    res
-}
+Utilize the chaikin smoothing algorithm with 5 iterations.
+
+```{r}
+region <- rs_polys[[2]]
+plot(chaikin_smoothing(region, 5))
 ```
 
 
+
+#### Notes
+
+Right now plotting is done using `sf` by first casting into R native objects and then assigned the appropriate sf class. That object is then plotted by sf

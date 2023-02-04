@@ -16,6 +16,7 @@ use rstar::primitives::GeomWithData;
 use rstar::{ParentNode, RTreeNode, RTree};
 
 #[extendr]
+///@export
 fn union_geoms(x: List) -> Robj {
 
     let geom_type = x.class().unwrap();

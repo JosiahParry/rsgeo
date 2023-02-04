@@ -14,7 +14,6 @@ fn geom_to_r(x: Robj) -> Robj {
 
 #[extendr]
 fn geoms_to_r(x: List) -> List {
-
     x.into_iter()
         .map(|(_, robj)| geom_to_r(robj))
         .collect::<List>()

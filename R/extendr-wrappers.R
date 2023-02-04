@@ -15,12 +15,25 @@ NULL
 linestring_to_points <- function(x) .Call(wrap__linestring_to_points, x)
 
 #' Find centroid
+#' @param x an object of class `point`
 #'@export
 centroid <- function(x) .Call(wrap__centroid, x)
+
+#' @rdname centroid
+#' @export
+centroids <- function(x) .Call(wrap__centroids, x)
 
 #' Haversine Destination
 #'@export
 haversine_destination <- function(x, bearing, distance) .Call(wrap__haversine_destination, x, bearing, distance)
+
+#' Haversine Intermediate
+#'@export
+haversine_intermediate <- function(x, y, distance) .Call(wrap__haversine_intermediate, x, y, distance)
+
+#' Chaikin Smoothing
+#'@export
+chaikin_smoothing <- function(x, niter) .Call(wrap__chaikin_smoothing, x, niter)
 
 #'@export
 signed_area <- function(x) .Call(wrap__signed_area, x)
@@ -34,35 +47,60 @@ geodesic_signed_area <- function(x) .Call(wrap__geodesic_signed_area, x)
 #'@export
 geodesic_unsigned_area <- function(x) .Call(wrap__geodesic_unsigned_area, x)
 
-#' Create a single point
+#' Create geometry
 #' 
-#' For a single x, y coordinate create a point
+#' @export
+#' @rdname geometry
 geom_point <- function(x, y) .Call(wrap__geom_point, x, y)
 
+#' @export
+#' @rdname geometry
 geom_points <- function(x) .Call(wrap__geom_points, x)
 
 #' Create a list of points 
 #' Given a matrix of x, y coordinates, create a list of points
+#' @export
+#' @rdname geometry
 geom_points_matrix <- function(x) .Call(wrap__geom_points_matrix, x)
 
+#' @export
+#' @rdname geometry
 geom_multipoint <- function(x) .Call(wrap__geom_multipoint, x)
 
+#' @export
+#' @rdname geometry
 geom_multipoints <- function(x) .Call(wrap__geom_multipoints, x)
 
+#' @export
+#' @rdname geometry
 geom_polygon <- function(x) .Call(wrap__geom_polygon, x)
 
+#' @export
+#' @rdname geometry
 geom_polygons <- function(x) .Call(wrap__geom_polygons, x)
 
+#' @export
+#' @rdname geometry
 geom_multipolygon <- function(x) .Call(wrap__geom_multipolygon, x)
 
+#' @export
+#' @rdname geometry
 geom_multipolygons <- function(x) .Call(wrap__geom_multipolygons, x)
 
+#' @export
+#' @rdname geometry
 geom_linestring <- function(x) .Call(wrap__geom_linestring, x)
 
+#' @export
+#' @rdname geometry
 geom_linestrings <- function(x) .Call(wrap__geom_linestrings, x)
 
+#' @export
+#' @rdname geometry
 geom_multilinestring <- function(x) .Call(wrap__geom_multilinestring, x)
 
+#' @export
+#' @rdname geometry
 geom_multilinestrings <- function(x) .Call(wrap__geom_multilinestrings, x)
 
 print_geom <- function(x) invisible(.Call(wrap__print_geom, x))
@@ -75,36 +113,73 @@ geodesic_length <- function(x) .Call(wrap__geodesic_length, x)
 
 vincenty_length <- function(x) .Call(wrap__vincenty_length, x)
 
-#'@export
+#' Calculate Bearing
+#' 
+#' @param x an object of class `point`
+#' @param y for `bearing()` an object of class `point`. For `bearings()` an object of class `rs_POINT`
+#' 
+#' @returns
+#' A vector of doubles of the calculated bearing for between x and y
+#' 
+#' @export
 bearing <- function(x, y) .Call(wrap__bearing, x, y)
 
+#'@rdname bearing
 #'@export
 bearings <- function(x, y) .Call(wrap__bearings, x, y)
 
+#'@export
+#' @rdname distance
 euclidean_distance <- function(x, y) .Call(wrap__euclidean_distance, x, y)
 
 euclidean_distances <- function(x, y) .Call(wrap__euclidean_distances, x, y)
 
+#'@export
+#' @rdname distance
 euclidean_distance_pairwise <- function(x, y) .Call(wrap__euclidean_distance_pairwise, x, y)
 
+#' Distance calculations 
+#' 
+#' @param x a single `point` or list of points `rs_POINT`
+#' @param y a single `point` or list of points `rs_POINT`
+#'@export
+#' @rdname distance
 euclidean_distance_matrix <- function(x, y) .Call(wrap__euclidean_distance_matrix, x, y)
 
+#'@export
+#' @rdname distance
 haversine_distance <- function(x, y) .Call(wrap__haversine_distance, x, y)
 
+#'@export
+#' @rdname distance
 haversine_distances <- function(x, y) .Call(wrap__haversine_distances, x, y)
 
+#'@export
+#' @rdname distance
 haversine_distance_matrix <- function(x, y) .Call(wrap__haversine_distance_matrix, x, y)
 
+#'@export
+#' @rdname distance
 geodesic_distance <- function(x, y) .Call(wrap__geodesic_distance, x, y)
 
+#'@export
+#' @rdname distance
 geodesic_distances <- function(x, y) .Call(wrap__geodesic_distances, x, y)
 
+#'@export
+#' @rdname distance
 geodesic_distance_matrix <- function(x, y) .Call(wrap__geodesic_distance_matrix, x, y)
 
+#'@export
+#'@rdname distance
 vincenty_distance <- function(x, y) .Call(wrap__vincenty_distance, x, y)
 
+#'@export
+#' @rdname distance
 vincenty_distances <- function(x, y) .Call(wrap__vincenty_distances, x, y)
 
+#'@export
+#' @rdname distance
 vincenty_distance_matrix <- function(x, y) .Call(wrap__vincenty_distance_matrix, x, y)
 
 bounding_rectangle <- function(x) .Call(wrap__bounding_rectangle, x)
@@ -113,13 +188,20 @@ concave_hull <- function(x, concavity) .Call(wrap__concave_hull, x, concavity)
 
 convex_hull <- function(x) .Call(wrap__convex_hull, x)
 
+#'@export
 union_geoms <- function(x) .Call(wrap__union_geoms, x)
-
-union_polys <- function(x) .Call(wrap__union_polys, x)
 
 geom_to_r <- function(x) .Call(wrap__geom_to_r, x)
 
 geoms_to_r <- function(x) .Call(wrap__geoms_to_r, x)
+
+#' Simplfiy Geometries
+#' @export
+simplify_geom <- function(x, epsilon) .Call(wrap__simplify_geom, x, epsilon)
+
+#' @export
+#' @rdname simplify_geom
+simplify_geoms <- function(x, epsilon) .Call(wrap__simplify_geoms, x, epsilon)
 
 
 # nolint end

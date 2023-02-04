@@ -35,3 +35,11 @@
 
 
 
+
+# as.matrix ---------------------------------------------------------------
+#' @export
+as.matrix.rs_POINT <- function(x) do.call(rbind, geoms_to_r(x))
+
+#' @export
+as.matrix.linestring <- function(x) geom_to_r(x)
+

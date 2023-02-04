@@ -2,9 +2,15 @@
 % Please edit documentation in R/extendr-wrappers.R
 \name{centroid}
 \alias{centroid}
+\alias{centroids}
 \title{Find centroid}
 \usage{
 centroid(x)
+
+centroids(x)
+}
+\arguments{
+\item{x}{an object of class \code{point}}
 }
 \description{
 Find centroid

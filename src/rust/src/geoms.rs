@@ -28,10 +28,11 @@ fn print_geoms(x: List) {
 }
 // POINTS
 
-/// Create a single point
+/// Create geometry
 /// 
-/// For a single x, y coordinate create a point
 #[extendr]
+/// @export
+/// @rdname geometry
 fn geom_point(x: f64, y: f64) -> Robj {
     let pnt = Point::new(x, y);
     let pnt: Geom = pnt.try_into().unwrap();
@@ -40,6 +41,8 @@ fn geom_point(x: f64, y: f64) -> Robj {
 
 
 #[extendr]
+/// @export
+/// @rdname geometry
 fn geom_points(x: List) -> Robj {
     let n = x.len();
     let mut res: Vec<Robj> = Vec::with_capacity(n);
@@ -60,6 +63,8 @@ fn geom_points(x: List) -> Robj {
 /// Create a list of points 
 /// Given a matrix of x, y coordinates, create a list of points
 #[extendr]
+/// @export
+/// @rdname geometry
 pub fn geom_points_matrix(x: RMatrix<f64>) -> Robj {
 
     let arr = mat_to_rs(x);
@@ -78,6 +83,8 @@ pub fn geom_points_matrix(x: RMatrix<f64>) -> Robj {
 // MULTIPOINT
 
 #[extendr]
+/// @export
+/// @rdname geometry
 fn geom_multipoint(x: RMatrix<f64>) -> Robj {
     let arr = mat_to_rs(x);
 
@@ -92,6 +99,8 @@ fn geom_multipoint(x: RMatrix<f64>) -> Robj {
 }
 
 #[extendr]
+/// @export
+/// @rdname geometry
 fn geom_multipoints(x: List) -> Robj {
     x.into_iter()
         .map(|(_, x)| geom_multipoint(RMatrix::try_from(x).unwrap()))
@@ -104,6 +113,8 @@ fn geom_multipoints(x: List) -> Robj {
 
 
 #[extendr]
+/// @export
+/// @rdname geometry
 pub fn geom_polygon(x: List) -> Robj {
     let n = x.len();
     let mut linestrings: Vec<LineString> = Vec::with_capacity(n);
@@ -129,6 +140,8 @@ pub fn geom_polygon(x: List) -> Robj {
 // List of polygons 
 // a list of polygons 
 #[extendr]
+/// @export
+/// @rdname geometry
 fn geom_polygons(x: List) -> Robj {
     let n = x.len();
     let mut polygons: Vec<Robj> = Vec::with_capacity(n);
@@ -146,6 +159,8 @@ fn geom_polygons(x: List) -> Robj {
 
 // MULTIPOLYGON
 #[extendr]
+/// @export
+/// @rdname geometry
 fn geom_multipolygon(x: List) -> Robj {
 
     let res = MultiPolygon::new(
@@ -164,6 +179,8 @@ fn geom_multipolygon(x: List) -> Robj {
 
 
 #[extendr]
+/// @export
+/// @rdname geometry
 fn geom_multipolygons(x: List) -> Robj {
     x.into_iter()
         .map(|(_, x)| 
@@ -177,6 +194,8 @@ fn geom_multipolygons(x: List) -> Robj {
 // LINESTRING
 
 #[extendr]
+/// @export
+/// @rdname geometry
 fn geom_linestring(x: RMatrix<f64>) -> Robj {
     let coords = matrix_to_coords(x);
     let lns = LineString::new(coords); 
@@ -184,6 +203,8 @@ fn geom_linestring(x: RMatrix<f64>) -> Robj {
 }
 
 #[extendr]
+/// @export
+/// @rdname geometry
 fn geom_linestrings(x: List) -> Robj {
     x.into_iter()
         .map(|(_, x)| geom_linestring(RMatrix::try_from(x).unwrap()))
@@ -216,6 +237,8 @@ fn polygon_inner(x: List) -> Polygon {
 
 // MUlTILINESTRING
 #[extendr]
+/// @export
+/// @rdname geometry
 fn geom_multilinestring(x: List) -> Robj {
     let vec_lns = x.into_iter()
         .map(|(_, x)| 
@@ -227,6 +250,8 @@ fn geom_multilinestring(x: List) -> Robj {
 }
 
 #[extendr]
+/// @export
+/// @rdname geometry
 fn geom_multilinestrings(x: List) -> Robj {
     x.into_iter()
         .map(|(_, x)| geom_multilinestring(List::try_from(x).unwrap()))

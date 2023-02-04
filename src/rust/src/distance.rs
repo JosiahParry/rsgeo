@@ -10,6 +10,12 @@ use geo::{EuclideanDistance, HaversineDistance, GeodesicDistance, VincentyDistan
 
 
 #[extendr]
+/// Distance calculations 
+/// 
+/// @param x a single `point` or list of points `rs_POINT`
+/// @param y a single `point` or list of points `rs_POINT`
+///@export
+/// @rdname distance
 fn euclidean_distance_matrix(x: List, y:List) -> RMatrix<f64> {
     let nr = x.len();
     let nc = y.len();
@@ -31,8 +37,6 @@ fn euclidean_distance_matrix(x: List, y:List) -> RMatrix<f64> {
 }
 
 fn euclidean_distance_impl(x: Geometry, y: &Geometry) -> f64 {
-
-
     match x {
         Geometry::Point(x) => e_dist_pnt(x, y),
         Geometry::MultiPoint(x) => e_dist_mpnt(x, y),
@@ -42,10 +46,11 @@ fn euclidean_distance_impl(x: Geometry, y: &Geometry) -> f64 {
         Geometry::MultiPolygon(x) => e_dist_mpoly(x, y),
         _ => 0.,
     }
-
 }
 
 #[extendr]
+///@export
+/// @rdname distance
 fn euclidean_distance_pairwise(x: List, y: List) -> Vec<f64> {
 
     x.into_iter()
@@ -66,6 +71,8 @@ fn euclidean_distances(x: Robj, y: List) -> Vec<f64> {
 }
 
 #[extendr]
+///@export
+/// @rdname distance
 fn euclidean_distance(x: Robj, y: Robj) -> f64 {
 
     let x: Geom = x.into(); 
@@ -147,6 +154,8 @@ fn e_dist_mpoly(x: MultiPolygon, y: &Geometry) -> f64 {
 
 //// Haversine distance 
 #[extendr]
+///@export
+/// @rdname distance
 fn haversine_distances(x: Robj, y: List) -> Vec<f64> {
 
     let x: Geom = x.try_into().unwrap();
@@ -160,6 +169,8 @@ fn haversine_distances(x: Robj, y: List) -> Vec<f64> {
 }
 
 #[extendr]
+///@export
+/// @rdname distance
 fn haversine_distance(x: Robj, y: Robj) -> f64 {
     let x: Geom = x.into(); 
     let y: Geom = y.into(); 
@@ -172,6 +183,8 @@ fn haversine_distance(x: Robj, y: Robj) -> f64 {
 }
 
 #[extendr]
+///@export
+/// @rdname distance
 fn haversine_distance_matrix(x: List, y: List) -> RMatrix<f64> {
     let nr = x.len();
     let nc = y.len();
@@ -198,6 +211,8 @@ fn haversine_distance_matrix(x: List, y: List) -> RMatrix<f64> {
 
 //// Geodesic distance 
 #[extendr]
+///@export
+/// @rdname distance
 fn geodesic_distances(x: Robj, y: List) -> Vec<f64> {
 
     let x: Geom = x.try_into().unwrap();
@@ -211,6 +226,8 @@ fn geodesic_distances(x: Robj, y: List) -> Vec<f64> {
 }
 
 #[extendr]
+///@export
+/// @rdname distance
 fn geodesic_distance(x: Robj, y: Robj) -> f64 {
     let x: Geom = x.into(); 
     let y: Geom = y.into(); 
@@ -223,6 +240,8 @@ fn geodesic_distance(x: Robj, y: Robj) -> f64 {
 }
 
 #[extendr]
+///@export
+/// @rdname distance
 fn geodesic_distance_matrix(x: List, y: List) -> RMatrix<f64> {
     let nr = x.len();
     let nc = y.len();
@@ -249,6 +268,8 @@ fn geodesic_distance_matrix(x: List, y: List) -> RMatrix<f64> {
 
 //// Haversine distance 
 #[extendr]
+///@export
+/// @rdname distance
 fn vincenty_distances(x: Robj, y: List) -> Vec<f64> {
 
     let x: Geom = x.try_into().unwrap();
@@ -262,6 +283,8 @@ fn vincenty_distances(x: Robj, y: List) -> Vec<f64> {
 }
 
 #[extendr]
+///@export
+///@rdname distance
 fn vincenty_distance(x: Robj, y: Robj) -> f64 {
     let x: Geom = x.into(); 
     let y: Geom = y.into(); 
@@ -274,6 +297,8 @@ fn vincenty_distance(x: Robj, y: Robj) -> f64 {
 }
 
 #[extendr]
+///@export
+/// @rdname distance
 fn vincenty_distance_matrix(x: List, y: List) -> RMatrix<f64> {
     let nr = x.len();
     let nc = y.len();

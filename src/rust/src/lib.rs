@@ -2,7 +2,7 @@
 mod utils;
 
 mod geoms;
-use geoms::get_geoms_metadata;
+use geoms::{get_geoms_metadata, to_pntr};
 
 mod area;
 use area::get_area_metadata;
@@ -25,6 +25,9 @@ use union::get_union_metadata;
 
 mod conversion;
 use conversion::get_conversion_metadata;
+
+mod simplification;
+use simplification::get_simplification_metadata;
 
 
 pub mod types;
@@ -230,6 +233,7 @@ fn matrix_to_coords(x: RMatrix<f64>) -> Vec<Coord> {
 // MISC algos -------
 
 /// Find centroid
+/// @param x an object of class `point`
 ///@export
 #[extendr]
 fn centroid(x: Robj) -> Robj {
@@ -242,6 +246,17 @@ fn centroid(x: Robj) -> Robj {
 
 }
 
+
+/// @rdname centroid
+/// @export
+#[extendr]
+fn centroids(x: List) -> Robj {
+    x.into_iter()
+        .map(|(_, robj)| centroid(robj))
+        .collect::<List>()
+        .set_attrib("class", "rs_POINT")
+        .unwrap()
+}
 
 /// Haversine Destination
 ///@export
@@ -314,7 +329,7 @@ fn chaikin_smoothing(x: Robj, niter: f64) -> Robj {
         _ => {Geom::from(line_string![])}
     };
 
-    r![ExternalPtr::new(res)].set_attrib("class", "point").unwrap()    
+    to_pntr(res)
 
 }
 
@@ -328,7 +343,10 @@ extendr_module! {
     mod rsgeo;
     fn linestring_to_points;
     fn centroid;
+    fn centroids;
     fn haversine_destination;
+    fn haversine_intermediate;
+    fn chaikin_smoothing;
     use area;
     use geoms;
     use length;
@@ -337,4 +355,5 @@ extendr_module! {
     use boundary;
     use union;
     use conversion;
+    use simplification;
 }
