@@ -31,6 +31,9 @@ use simplification::get_simplification_metadata;
 
 
 pub mod types;
+mod io;
+use io::get_io_metadata;
+
 use extendr_api::prelude::*;
 use extendr_api::wrapper::{ExternalPtr, RMatrix};
 use geo::{coord, Centroid, HaversineDestination, HaversineIntermediate, ChaikinSmoothing};
@@ -356,4 +359,5 @@ extendr_module! {
     use union;
     use conversion;
     use simplification;
+    use io;
 }

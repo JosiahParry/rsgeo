@@ -108,6 +108,25 @@ bench::mark(
 )
 ```
 
+Union geometries with `union_geoms()`
+
+```{r}
+plot(union_geoms(rs_polys))
+```
+
+
+Find the closest point to a geometry
+
+```{r}
+close_pnt <- closest_point(
+  rs_polys[[1]], 
+  geom_point(800000, 2090000)
+)
+
+plot(rs_polys[[1]])
+plot(close_pnt, pch = 15, add = TRUE)
+```
+
 Find the haversine destination of a point, bearing, and distance. 
 
 ```{r}
@@ -117,8 +136,6 @@ bench::mark(
   check = FALSE
 )
 ```
-
-
 
 
 ```{r}
@@ -145,6 +162,17 @@ Utilize the chaikin smoothing algorithm with 5 iterations.
 ```{r}
 region <- rs_polys[[2]]
 plot(chaikin_smoothing(region, 5))
+```
+
+Find extreme coordinates with `extreme_coords()`
+
+
+```{r}
+france <- union_geoms(rs_polys)
+
+
+plot(france)
+plot(extreme_coords(france), add = TRUE, pch = 15)
 ```
 
 

@@ -3,11 +3,17 @@
 \name{simplify_geom}
 \alias{simplify_geom}
 \alias{simplify_geoms}
+\alias{simplify_vw_geom}
+\alias{simplify_vw_geoms}
 \title{Simplfiy Geometries}
 \usage{
 simplify_geom(x, epsilon)
 
 simplify_geoms(x, epsilon)
+
+simplify_vw_geom(x, epsilon)
+
+simplify_vw_geoms(x, epsilon)
 }
 \description{
 Simplfiy Geometries

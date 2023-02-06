@@ -1,5 +1,5 @@
 use extendr_api::prelude::*;
-use geo::{Geometry, Simplify, SimplifyVW, SimplifyVWPreserve};
+use geo::{Geometry, Simplify, SimplifyVW};
 use crate::geoms::*;
 use crate::types::Geom;
 

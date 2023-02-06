@@ -2,7 +2,7 @@ use crate::geoms::*;
 use crate::types::Geom;
 use extendr_api::prelude::*;
 
-use geo::{Bearing, Point};
+use geo::{Bearing, Point, ClosestPoint, Closest};
 
 
 /// Calculate Bearing
@@ -42,9 +42,36 @@ fn bearings(x: Robj, y: List) -> Vec<f64> {
 
 }
 
+#[extendr]
+/// Find the closest point 
+/// 
+/// @param x a single geometry
+/// @param y a `point`
+/// 
+/// @export
+fn closest_point(x: Robj, y: Robj) -> Robj {
+
+    let res = Geom::from(x).geom
+        .closest_point(
+            &Geom::from(y).geom.try_into().unwrap()
+        );
+
+    match res {
+        Closest::SinglePoint(res) => to_pntr(Geom::from(res)),
+        Closest::Intersection(res) => to_pntr(Geom::from(res)),
+        // id like a better approach here
+        Closest::Indeterminate => Robj::from(extendr_api::NA_LOGICAL)
+    }
+
+}
+
+
+
+
 extendr_module! {
     mod query;
     fn bearing;
     fn bearings;
+    fn closest_point;
 }
 

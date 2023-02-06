@@ -64,8 +64,8 @@ bench::mark(
 #> # A tibble: 2 × 6
 #>   expression      min   median `itr/sec` mem_alloc `gc/sec`
 #>   <bch:expr> <bch:tm> <bch:tm>     <dbl> <bch:byt>    <dbl>
-#> 1 rust         89.4µs  94.38µs    10377.    3.82KB     0   
-#> 2 sf            1.3ms   1.36ms      724.  745.35KB     8.40
+#> 1 rust        82.49µs 100.16µs     9759.    3.82KB     0   
+#> 2 sf           1.32ms   1.48ms      678.  745.35KB     8.42
 ```
 
 Find centroids
@@ -79,8 +79,8 @@ bench::mark(
 #> # A tibble: 2 × 6
 #>   expression                  min   median `itr/sec` mem_alloc `gc/sec`
 #>   <bch:expr>             <bch:tm> <bch:tm>     <dbl> <bch:byt>    <dbl>
-#> 1 centroids(rs_polys)    215.41µs  264.5µs     3576.    3.81KB     9.40
-#> 2 sf::st_centroid(polys)   2.41ms    2.5ms      394.  756.52KB     6.57
+#> 1 centroids(rs_polys)    207.42µs    285µs     3261.    3.81KB    10.2 
+#> 2 sf::st_centroid(polys)   2.44ms    2.6ms      381.  756.52KB     6.39
 ```
 
 Extract points as matrix
@@ -121,8 +121,8 @@ bench::mark(
 #> # A tibble: 2 × 6
 #>   expression      min   median `itr/sec` mem_alloc `gc/sec`
 #>   <bch:expr> <bch:tm> <bch:tm>     <dbl> <bch:byt>    <dbl>
-#> 1 rust       245.63µs 264.65µs     3751.     108KB     10.4
-#> 2 sf           2.82ms   2.87ms      346.     352KB      0
+#> 1 rust        254.2µs 274.25µs     3599.     108KB     8.55
+#> 2 sf           2.94ms   3.08ms      324.     352KB     2.03
 ```
 
 Simplify a geometry
@@ -146,9 +146,31 @@ bench::mark(
 #> # A tibble: 2 × 6
 #>   expression      min   median `itr/sec` mem_alloc `gc/sec`
 #>   <bch:expr> <bch:tm> <bch:tm>     <dbl> <bch:byt>    <dbl>
-#> 1 rust         5.27ms   5.43ms      184.       4KB     0   
-#> 2 sf           7.74ms   7.98ms      124.    1.23MB     4.22
+#> 1 rust         5.44ms   5.58ms      179.       4KB     0   
+#> 2 sf            8.1ms   8.49ms      118.    1.23MB     4.21
 ```
+
+Union geometries with `union_geoms()`
+
+``` r
+plot(union_geoms(rs_polys))
+```
+
+<img src="man/figures/README-unnamed-chunk-12-1.png" width="100%" />
+
+Find the closest point to a geometry
+
+``` r
+close_pnt <- closest_point(
+  rs_polys[[1]], 
+  geom_point(800000, 2090000)
+)
+
+plot(rs_polys[[1]])
+plot(close_pnt, pch = 15, add = TRUE)
+```
+
+<img src="man/figures/README-unnamed-chunk-13-1.png" width="100%" />
 
 Find the haversine destination of a point, bearing, and distance.
 
@@ -161,8 +183,8 @@ bench::mark(
 #> # A tibble: 2 × 6
 #>   expression      min   median `itr/sec` mem_alloc `gc/sec`
 #>   <bch:expr> <bch:tm> <bch:tm>     <dbl> <bch:byt>    <dbl>
-#> 1 rust         2.38µs    3.2µs   289051.    6.23KB      0  
-#> 2 Cpp         15.91µs   17.1µs    54735.   11.45MB     32.9
+#> 1 rust         2.38µs   3.57µs   271097.    3.22KB      0  
+#> 2 Cpp         16.44µs  17.79µs    51747.   11.45MB     31.1
 ```
 
 ``` r
@@ -174,7 +196,7 @@ plot(origin)
 plot(destination, col = "blue", add = TRUE)
 ```
 
-<img src="man/figures/README-unnamed-chunk-13-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-15-1.png" width="100%" />
 
 Find intermediate point.
 
@@ -186,7 +208,7 @@ plot(destination, add = TRUE, col = "red")
 plot(middle, add = TRUE, col = "blue")
 ```
 
-<img src="man/figures/README-unnamed-chunk-14-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-16-1.png" width="100%" />
 
 Utilize the chaikin smoothing algorithm with 5 iterations.
 
@@ -195,7 +217,19 @@ region <- rs_polys[[2]]
 plot(chaikin_smoothing(region, 5))
 ```
 
-<img src="man/figures/README-unnamed-chunk-15-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-17-1.png" width="100%" />
+
+Find extreme coordinates with `extreme_coords()`
+
+``` r
+france <- union_geoms(rs_polys)
+
+
+plot(france)
+plot(extreme_coords(france), add = TRUE, pch = 15)
+```
+
+<img src="man/figures/README-unnamed-chunk-18-1.png" width="100%" />
 
 #### Notes
 

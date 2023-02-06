@@ -1,9 +1,11 @@
 use crate::types::Geom;
+use crate::geoms::to_pntr;
 use extendr_api::prelude::*;
 use extendr_api::Robj;
+
 //use crate::geoms::from_list;
-use geo_types::{Geometry, Polygon};
-use geo::{BoundingRect, ConcaveHull, polygon, ConvexHull};
+use geo_types::{Geometry, Polygon, Point};
+use geo::{BoundingRect, ConcaveHull, polygon, ConvexHull, Extremes};
 
 
 
@@ -54,9 +56,33 @@ fn convex_hull(x: Robj) -> Robj {
     r![ExternalPtr::new(res)].set_attrib("class", "polygon").unwrap()
 }
 
+
+/// Find extremes
+/// @param x a geometry
+/// @export
+#[extendr]
+fn extreme_coords(x: Robj) -> Robj {
+    let res = Geom::from(x).geom.extremes().unwrap();
+
+    
+    List::from_names_and_values(
+        ["x_min", "x_max", "y_min", "y_max"],
+        [
+            to_pntr(Geom::from(Point::from(res.x_min.coord))), 
+            to_pntr(Geom::from(Point::from(res.x_max.coord))), 
+            to_pntr(Geom::from(Point::from(res.y_min.coord))), 
+            to_pntr(Geom::from(Point::from(res.y_max.coord)))
+            ]
+    ).unwrap()
+    .set_attrib("class", "rs_POINT")
+    .unwrap()
+}
+
+
 extendr_module! {
     mod boundary;
     fn bounding_rectangle;
     fn concave_hull;
     fn convex_hull;
+    fn extreme_coords;
 }

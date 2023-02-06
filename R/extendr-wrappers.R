@@ -128,6 +128,14 @@ bearing <- function(x, y) .Call(wrap__bearing, x, y)
 #'@export
 bearings <- function(x, y) .Call(wrap__bearings, x, y)
 
+#' Find the closest point 
+#' 
+#' @param x a single geometry
+#' @param y a `point`
+#' 
+#' @export
+closest_point <- function(x, y) .Call(wrap__closest_point, x, y)
+
 #'@export
 #' @rdname distance
 euclidean_distance <- function(x, y) .Call(wrap__euclidean_distance, x, y)
@@ -188,6 +196,11 @@ concave_hull <- function(x, concavity) .Call(wrap__concave_hull, x, concavity)
 
 convex_hull <- function(x) .Call(wrap__convex_hull, x)
 
+#' Find extremes
+#' @param x a geometry
+#' @export
+extreme_coords <- function(x) .Call(wrap__extreme_coords, x)
+
 #'@export
 union_geoms <- function(x) .Call(wrap__union_geoms, x)
 
@@ -202,6 +215,26 @@ simplify_geom <- function(x, epsilon) .Call(wrap__simplify_geom, x, epsilon)
 #' @export
 #' @rdname simplify_geom
 simplify_geoms <- function(x, epsilon) .Call(wrap__simplify_geoms, x, epsilon)
+
+#' @export
+#' @rdname simplify_geom
+simplify_vw_geom <- function(x, epsilon) .Call(wrap__simplify_vw_geom, x, epsilon)
+
+#' @export
+#' @rdname simplify_geom
+simplify_vw_geoms <- function(x, epsilon) .Call(wrap__simplify_vw_geoms, x, epsilon)
+
+wkt_to_geom <- function(x) .Call(wrap__wkt_to_geom, x)
+
+wkt_from_geom <- function(x) .Call(wrap__wkt_from_geom, x)
+
+wkt_to_geoms <- function(x) .Call(wrap__wkt_to_geoms, x)
+
+wkt_from_geoms <- function(x) .Call(wrap__wkt_from_geoms, x)
+
+wkt_from <- function(x) .Call(wrap__wkt_from, x)
+
+read_geojson <- function(file) .Call(wrap__read_geojson, file)
 
 
 # nolint end
