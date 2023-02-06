@@ -6,7 +6,8 @@ use crate::types::Geom;
 
 use crate::to_pntr;
 use rayon::prelude::*;
-
+use serde_json::Map;
+use serde_json::Value;
 
 
 
@@ -65,7 +66,70 @@ pub fn read_geojson(file: &str) -> List {
 
 
 
+#[extendr]
+pub fn read_geojson_string(geojson_str: String) -> List {
+
+    //let file = std::fs::File::open(file).expect("geojson file to be found");
+    //let geojson_str = std::fs::read_to_string(file).unwrap();
+    let geojson = geojson_str.parse::<GeoJson>().unwrap();
+
+    // read only the geometry
+    // it doesn't assign the proper class. i suspect this can be fixed on the 
+    // r side quickly
+    // adapted / stolen directly from https://github.com/urschrei/geojson_example/blob/master/src/owned.rs
+    let res = match geojson {
+        GeoJson::FeatureCollection(collection) => collection
+            .features.into_par_iter()
+            .map(|geo| 
+                Geometry::try_from(geo.geometry.unwrap()).unwrap()
+        ).collect::<Vec<Geometry>>(),
+        GeoJson::Feature(feature) => {
+            vec![Geometry::try_from(feature.geometry.unwrap()).unwrap()]
+        },
+
+        GeoJson::Geometry(geom) => {
+            vec![Geometry::try_from(geom).unwrap()]
+        }
+    };
+
+    res.into_iter()
+        .map(|geom| to_pntr(Geom::from(geom)))
+        .collect::<List>()
+
+}
+
+
+#[extendr]
+pub fn read_geojson_props(file: &str) -> Robj {
+
+    //let file = std::fs::File::open(file).expect("geojson file to be found");
+    let geojson_str = std::fs::read_to_string(file).unwrap();
+    let geojson = geojson_str.parse::<GeoJson>().unwrap();
+
+    let res = match geojson {
+        GeoJson::FeatureCollection(collection) => collection
+            .features.into_par_iter()
+            .map(|feat| feat.properties.unwrap())
+            .collect::<Vec<Map<String, Value>>>(),
+        GeoJson::Feature(feature) => {
+            vec![feature.properties.unwrap()]
+        },
+
+        GeoJson::Geometry(geom) => {
+            vec![]
+        }
+    };
+
+    to_robj(&res).unwrap()
+
+
+
+}
+
+
 extendr_module! {
     mod geojsonimpl;
     fn read_geojson;
+    fn read_geojson_string;
+    fn read_geojson_props;
 }

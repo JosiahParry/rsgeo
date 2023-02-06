@@ -407,6 +407,7 @@ dependencies = [
  "ndarray",
  "rayon",
  "rstar",
+ "serde_json",
  "wkt",
 ]
 
