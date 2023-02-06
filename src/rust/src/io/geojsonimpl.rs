@@ -39,6 +39,8 @@ pub fn read_geojson(file: &str) -> List {
     let geojson = geojson_str.parse::<GeoJson>().unwrap();
 
     // read only the geometry
+    // it doesn't assign the proper class. i suspect this can be fixed on the 
+    // r side quickly
     // adapted / stolen directly from https://github.com/urschrei/geojson_example/blob/master/src/owned.rs
     let res = match geojson {
         GeoJson::FeatureCollection(collection) => collection
