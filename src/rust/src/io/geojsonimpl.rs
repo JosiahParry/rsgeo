@@ -119,6 +119,8 @@ pub fn read_geojson_props(file: &str) -> Robj {
         }
     };
 
+
+    
     // pull first element to find the keys 
     let x1 = res[0].clone();
     // collect keys into vec of string
@@ -153,50 +155,51 @@ pub fn read_geojson_props(file: &str) -> Robj {
 
     }
 
-    // cast rest to Robj
-    let res = to_robj(&res).unwrap();
-    let res = List::try_from(res).unwrap();
 
-    let mut res_vec: Vec<Vec<Robj>> = Vec::with_capacity(n);
+    // // this is where i cut out the parts
+    // let mut res_vec: Vec<Vec<Robj>> = Vec::with_capacity(n);
 
-    // instantiate vectors 
-    for _ in 0..(nn) {
-        res_vec.push(Vec::with_capacity(nn))
+    // // instantiate vectors 
+    // for _ in 0..(nn) {
+    //     res_vec.push(Vec::with_capacity(nn))
+    // }
+
+
+    let mut res_vec: Vec<Robj> = Vec::with_capacity(nn);
+
+    for (i, key) in keys.clone().into_iter().enumerate() {
+        // let col_iter = res.iter()
+        // .map(|x| parse_value(x[key]));
+
+        let ctype = col_types[i];
+
+        let col = match ctype {
+            "double" => Doubles::from_iter(
+                res.iter().map(|x| Rfloat::try_from(x[key].as_f64()).unwrap_or(Rfloat::na()))
+            ).into_robj(),
+            "character" => Strings::from_iter(
+                res.iter().map(|x| Rstr::try_from(x[key].as_str().unwrap_or(&Rstr::na())).unwrap_or(Rstr::na()))
+            ).into_robj(),
+            "logical" => Logicals::from_iter(
+                res.iter().map(|x| Rbool::try_from(x[key].as_bool().unwrap()).unwrap_or(Rbool::na()))
+
+            ).into_robj(),
+            _ => List::from_iter(
+                res.iter().map(|x| to_robj(&x[key]).unwrap())
+            ).into_robj()
+        };
+
+        res_vec.push(col)
     }
 
-    // fill vectors
-    for i in 0..(n) {
-        let xi = List::try_from(res[i].to_owned()).unwrap();
-        for j in 0..(nn) {
-            let val = xi[j].to_owned();
-            res_vec[j].push(val)
-        }
-    }
 
-    let res_vec = res_vec.into_iter().enumerate()
-        .map(|(i, col)| {
-            let ctype = col_types[i];
-                match ctype {
-                    "double" => Doubles::from_iter(col.into_iter().map(|xi| Rfloat::try_from(xi).unwrap())).into_robj(),
-                    "character" => Strings::from_iter(
-                        col.into_iter().map(|xi| Rstr::try_from(xi.as_str().unwrap_or(&Rstr::na())).unwrap())
-                    )
-                        .into_robj(),
-                    "logical" => Logicals::from_iter(col.into_iter().map(|xi| Rbool::try_from(xi).unwrap())).into_robj(),
-                    &_ =>  Logicals::from_iter(
-                        col.into_iter().map(|_| Rbool::na_value())
-                    )
-                        .into_robj(),
-                    
-                }
-        }).collect::<Vec<Robj>>();
 
-    let res = List::from_names_and_values(keys, res_vec).unwrap();
-
+    
 
     let index = (1..n+1).map(|i| i as i32).collect::<Vec<i32>>();
+    let res = List::from_names_and_values(keys, res_vec).unwrap();
+        
     res.set_attrib("class", "data.frame").unwrap()
-
         .set_attrib("row.names", index).unwrap()
 
 
@@ -220,3 +223,5 @@ fn match_type(x: &Map<String, Value>) -> Vec<&str> {
         }
     ).collect::<Vec<&str>>()
 }
+
+
