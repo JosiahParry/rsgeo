@@ -1,17 +1,14 @@
 use extendr_api::{ExternalPtr, Robj};
 // create an enum of geo-types
-use geo_types::{Line, Rect, Point, Polygon, LineString, Geometry, MultiPoint, MultiPolygon, MultiLineString};
+use geo_types::{
+    Geometry, Line, LineString, MultiLineString, MultiPoint, MultiPolygon, Point, Polygon, Rect,
+};
 use std::fmt;
-
-
-
 
 #[derive(Debug, Clone)]
 pub struct Geom {
-    pub geom: Geometry
+    pub geom: Geometry,
 }
-
-
 
 impl fmt::Display for Geom {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
@@ -21,11 +18,10 @@ impl fmt::Display for Geom {
 
 // FROM geo-types to Geom
 impl From<Geometry> for Geom {
-    fn from(geom: Geometry) -> Self {
-        Geom { geom: geom }
+    fn from(geo: Geometry) -> Self {
+        Geom { geom: geo }
     }
 }
-
 
 impl From<Point> for Geom {
     fn from(pnt: Point) -> Self {
@@ -41,14 +37,12 @@ impl From<MultiPoint> for Geom {
     }
 }
 
-
 impl From<Polygon> for Geom {
     fn from(poly: Polygon) -> Self {
         let x: Geometry = poly.into();
         Geom { geom: x }
     }
 }
-
 
 impl From<MultiPolygon> for Geom {
     fn from(poly: MultiPolygon) -> Self {
@@ -85,26 +79,20 @@ impl From<Line> for Geom {
     }
 }
 
-
 impl From<ExternalPtr<Geom>> for Geom {
     fn from(pntr: ExternalPtr<Geom>) -> Self {
         let geo = pntr.geom.clone();
-        Geom {
-            geom: geo
-        }
+        Geom { geom: geo }
     }
 }
 
 impl From<Robj> for Geom {
     fn from(robj: Robj) -> Self {
-        let robj: ExternalPtr<Geom> = robj
-            .try_into()
-            .unwrap();
+        let robj: ExternalPtr<Geom> = robj.try_into().unwrap();
         let robj: Geom = robj.into();
         robj
     }
 }
-
 
 // TO geo-types from Geom
 impl From<Geom> for Polygon {
@@ -114,7 +102,6 @@ impl From<Geom> for Polygon {
         x
     }
 }
-
 
 impl From<Geom> for LineString {
     fn from(geom: Geom) -> Self {

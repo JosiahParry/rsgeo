@@ -19,7 +19,6 @@ use distance::get_distance_metadata;
 mod boundary;
 use boundary::get_boundary_metadata;
 
-
 mod union;
 use union::get_union_metadata;
 
@@ -29,26 +28,20 @@ use conversion::get_conversion_metadata;
 mod simplification;
 use simplification::get_simplification_metadata;
 
-
-pub mod types;
 mod io;
+pub mod types;
 use io::get_io_metadata;
 
+use crate::types::Geom;
 use extendr_api::prelude::*;
 use extendr_api::wrapper::{ExternalPtr, RMatrix};
-use geo::{coord, Centroid, HaversineDestination, HaversineIntermediate, ChaikinSmoothing};
-use crate::types::Geom;
-use ndarray::{Array2, ShapeBuilder};
+use geo::{coord, Centroid, ChaikinSmoothing, HaversineDestination, HaversineIntermediate};
 use geo_types::line_string;
+use ndarray::{Array2, ShapeBuilder};
 
-use geo::geometry::{Point, LineString, Coord, Geometry};
+use geo::geometry::{Coord, Geometry, Point};
 
-
-
-
-
-
-// This is the equivalent of the union method 
+// This is the equivalent of the union method
 // #[extendr (use_try_from = true)]
 // fn points_to_multipoint(x: List) -> Robj {
 //     let n = x.len();
@@ -64,14 +57,11 @@ use geo::geometry::{Point, LineString, Coord, Geometry};
 //     r![res].set_attrib("class", "multipoint").unwrap()
 // }
 
-
-
-
 // LINE ------
 
 // #[extendr(use_try_from = true)]
 // fn rs_line(xy1: Doubles, xy2: Doubles) -> Robj {
-//     let l1 = xy1.len(); 
+//     let l1 = xy1.len();
 //     let l2 =  xy2.len();
 //     if l1 != 2 { panic!("Coordinates must be length 2 only") };
 //     if l2 != 2 { panic!("Coordinates must be length 2 only") };
@@ -89,34 +79,28 @@ use geo::geometry::{Point, LineString, Coord, Geometry};
 //     res
 // }
 
-
 // linestring to points
 ///@export
-#[extendr]
-fn linestring_to_points(x: Robj) -> Robj {
-    let xi: ExternalPtr<LineString> = x.to_owned().try_into().unwrap();
-    let line = &*xi;
-    let pnts = line.to_owned().into_points();
-    let mut res : Vec<Robj> = Vec::with_capacity(pnts.len());
+// #[extendr]
+// fn linestring_to_points(x: Robj) -> Robj {
+//     let xi: ExternalPtr<LineString> = x.to_owned().try_into().unwrap();
+//    // let line = &*xi;
+//     //let pnts = line.to_owned().into_points();
 
-    for i in 0..((pnts.len()) - 1) {
-        let pnt = pnts[i]; 
-        let pnt_pntr = ExternalPtr::new(pnt);
-        let pnt_pntr = r![pnt_pntr].set_attrib("class", "point").unwrap();
-        res.push(pnt_pntr);
-    }
+//     xi.into_points()
+//         .into_iter()
+//         .map(|x| r![ExternalPtr::new(x)].set_attrib("class", "point").unwrap())
+//         .collect::<List>()
+//         .set_attrib("class", "rs_POINT")
+//         .unwrap()
 
-    let r_res = List::from_values(res);
-    let r_res = r_res.set_attrib("class", "rs_POINT").unwrap();
-    r_res
-
-}
+// }
 
 // TODO - need to convert to Coords
 
 // MULTILINESTRING ---------------------------------------------------------
 
-// extract linestring pointers into Vec<LineString> 
+// extract linestring pointers into Vec<LineString>
 // this will also be helpful for polygons too
 // Takes rs_LINESTRINGs
 // fn linestrings_to_vec(x: List) -> Vec<LineString> {
@@ -135,23 +119,19 @@ fn linestring_to_points(x: Robj) -> Robj {
 //     linestrings
 // }
 
-
 // take R list of linestrings and convert to multilinestring
 // fn linestrings_to_multilinestring(x: List) -> Robj {
 //     let lines = linestrings_to_vec(x);
-//     let res =  ExternalPtr::new(MultiLineString::new(lines));    
+//     let res =  ExternalPtr::new(MultiLineString::new(lines));
 
 //     r![res].set_attrib("class", "multilinestring").unwrap()
 // }
 
-
-
-
 // // INTERSECTIONS -------
 // #[extendr]
 // fn intersect_poly_poly(lhs: Robj, rhs: Robj) -> Rbool {
-//     let xpoly: ExternalPtr<Polygon> = lhs.try_into().unwrap(); 
-//     let ypoly: ExternalPtr<Polygon> = rhs.try_into().unwrap(); 
+//     let xpoly: ExternalPtr<Polygon> = lhs.try_into().unwrap();
+//     let ypoly: ExternalPtr<Polygon> = rhs.try_into().unwrap();
 
 //     Rbool::from(xpoly.intersects(&*ypoly))
 
@@ -161,7 +141,7 @@ fn linestring_to_points(x: Robj) -> Robj {
 // Tried without cloning. same speed. It must be the claiming ownership?
 // or the deparsing. idk intersect_poly_poly is SOOO much faster than c
 // but the loop is slower idk
-// man idfk 
+// man idfk
 // #[extendr]
 // fn intersect_poly_polys(lhs: Robj, rhs: List) -> Logicals {
 //     let n = rhs.len();
@@ -175,7 +155,6 @@ fn linestring_to_points(x: Robj) -> Robj {
 //     res
 
 // }
-
 
 // Intersect wrapper
 
@@ -200,38 +179,32 @@ fn linestring_to_points(x: Robj) -> Robj {
 
 // Helpers -----------------------------------------------------------------
 
-
 // internal function to cast an R matrix to ndarray (2 dimensions)
-fn mat_to_rs(x: RMatrix<f64>) ->  Array2<f64> {
+fn mat_to_rs(x: RMatrix<f64>) -> Array2<f64> {
     let nrow = x.nrows();
     let ncol = x.ncols();
     let mat_dat = x.data().to_owned();
-    let res = Array2::from_shape_vec((nrow, ncol).f(), mat_dat).unwrap();
-    res
+    Array2::from_shape_vec((nrow, ncol).f(), mat_dat).unwrap()
 }
-
 
 // First, I need to take a matrix and convert into coordinates
 fn matrix_to_coords(x: RMatrix<f64>) -> Vec<Coord> {
     let nrow = x.nrows();
     let ncol = x.ncols();
 
-    if ncol != 2 { 
-        panic!("Matrix should have only 2 columns for x and y coordinates, respectively.") 
+    if ncol != 2 {
+        panic!("Matrix should have only 2 columns for x and y coordinates, respectively.")
     }
 
-    let n = nrow.clone(); 
+    //let n = nrow.clone();
     let mut coords: Vec<Coord> = Vec::with_capacity(nrow);
 
-    for i in 0..n {
+    for i in 0..nrow {
         let crd = coord! {x: x[[i, 0]], y: x[[i, 1]]};
         coords.push(crd);
     }
     coords
 }
-
-
-
 
 // MISC algos -------
 
@@ -245,10 +218,10 @@ fn centroid(x: Robj) -> Robj {
 
     let res: Geom = res.into();
 
-    r![ExternalPtr::new(res)].set_attrib("class", "point").unwrap()
-
+    r![ExternalPtr::new(res)]
+        .set_attrib("class", "point")
+        .unwrap()
 }
-
 
 /// @rdname centroid
 /// @export
@@ -272,8 +245,9 @@ fn haversine_destination(x: Robj, bearing: f64, distance: f64) -> Robj {
 
     let res = Geom::from(point);
 
-    r![ExternalPtr::new(res)].set_attrib("class", "point").unwrap()
-
+    r![ExternalPtr::new(res)]
+        .set_attrib("class", "point")
+        .unwrap()
 }
 
 /// Haversine Intermediate
@@ -289,62 +263,43 @@ fn haversine_intermediate(x: Robj, y: Robj, distance: f64) -> Robj {
     let point = x.haversine_intermediate(&y, distance);
     let res = Geom::from(point);
 
-    r![ExternalPtr::new(res)].set_attrib("class", "point").unwrap()
-
+    r![ExternalPtr::new(res)]
+        .set_attrib("class", "point")
+        .unwrap()
 }
 
 /// Chaikin Smoothing
 ///@export
 #[extendr]
 fn chaikin_smoothing(x: Robj, niter: f64) -> Robj {
-
     let x: Geom = x.try_into().unwrap();
     let x = x.geom;
 
     let res = match x {
-        Geometry::LineString(x) => {
-            Geom::from(x.chaikin_smoothing(niter as usize))
-        },
-        Geometry::MultiLineString(x) => {
-            Geom::from(x.chaikin_smoothing(niter as usize))
-        },
-        Geometry::MultiPolygon(x) => {
-            Geom::from(x.chaikin_smoothing(niter as usize))
-        },
-        Geometry::Polygon(x) => {
-            Geom::from(x.chaikin_smoothing(niter as usize))
-        },
+        Geometry::LineString(x) => Geom::from(x.chaikin_smoothing(niter as usize)),
+        Geometry::MultiLineString(x) => Geom::from(x.chaikin_smoothing(niter as usize)),
+        Geometry::MultiPolygon(x) => Geom::from(x.chaikin_smoothing(niter as usize)),
+        Geometry::Polygon(x) => Geom::from(x.chaikin_smoothing(niter as usize)),
         // these types will return themselves
-        Geometry::Point(x) => {
-            Geom::from(x)
-        },
-        Geometry::MultiPoint(x) => {
-            Geom::from(x)
-        },
-        Geometry::Rect(x) => {
-            Geom::from(x)
-        },
-        Geometry::Line(x) => {
-            Geom::from(x)
-        },
+        Geometry::Point(x) => Geom::from(x),
+        Geometry::MultiPoint(x) => Geom::from(x),
+        Geometry::Rect(x) => Geom::from(x),
+        Geometry::Line(x) => Geom::from(x),
 
-        
-        _ => {Geom::from(line_string![])}
+        _ => Geom::from(line_string![]),
     };
 
     to_pntr(res)
-
 }
 
-
 // ---------------------------------------------------------------------------------
- 
+
 // Macro to generate exports.
 // This ensures exported functions are registered with R.
 // See corresponding C code in `entrypoint.c`.
 extendr_module! {
     mod rsgeo;
-    fn linestring_to_points;
+    //fn linestring_to_points;
     fn centroid;
     fn centroids;
     fn haversine_destination;
@@ -353,7 +308,7 @@ extendr_module! {
     use area;
     use geoms;
     use length;
-    use query; 
+    use query;
     use distance;
     use boundary;
     use union;

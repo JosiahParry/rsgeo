@@ -1,13 +1,12 @@
-use wkt::TryFromWkt;
+use geo_types::Geometry;
 use wkt::ToWkt;
-use geo_types::{Geometry};
+use wkt::TryFromWkt;
 //use std::io::Read;
 use extendr_api::prelude::*;
-use extendr_api::{Robj, Strings, extendr};
+use extendr_api::{extendr, Robj, Strings};
 
 use crate::to_pntr;
 use crate::types::Geom;
-
 
 #[extendr]
 pub fn wkt_to_geom(x: &str) -> Robj {
@@ -17,10 +16,7 @@ pub fn wkt_to_geom(x: &str) -> Robj {
 
 #[extendr]
 pub fn wkt_to_geoms(x: Strings) -> List {
-    x.into_iter()
-        .map(|x| wkt_to_geom(x.as_str()))
-        .collect::<List>()
-
+    x.iter().map(|x| wkt_to_geom(x.as_str())).collect::<List>()
 }
 #[extendr]
 pub fn wkt_from_geom(x: Robj) -> Strings {
@@ -28,10 +24,10 @@ pub fn wkt_from_geom(x: Robj) -> Strings {
     Strings::from(res)
 }
 
-
 #[extendr]
 pub fn wkt_from_geoms(x: List) -> Strings {
-    let all_wkt = x.into_iter()
+    let all_wkt = x
+        .into_iter()
         .map(|(_, robj)| Geom::from(robj).geom.to_wkt().to_string());
 
     Strings::from_iter(all_wkt)

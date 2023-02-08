@@ -6,10 +6,9 @@
 
 // pub trait Geometrize {
 //     //https://www.dictionary.com/browse/geometrize
-//     fn as_geom(self) -> Geom; 
+//     fn as_geom(self) -> Geom;
 //     //fn as_points_from_mat(self) -> Vec<Geom>;
 // }
-
 
 // impl Geometrize for RMatrix<f64>  {
 //     fn as_points_from_mat(self) -> Vec<Geom> {
@@ -27,15 +26,12 @@
 
 // impl Aggregate for Vec<Geometry> {
 //     fn aggregate(self) -> () {
-//         let x = self; 
+//         let x = self;
 //         match x {
 //             Vec<Point> => MultiPoint::new(x)
 //         };
 //     }
 // }
-
-
-
 
 // #[extendr]
 // fn euclidean_distance_matrix(x: List, y:List) -> RMatrix<f64> {
@@ -50,12 +46,9 @@
 //             .map(|y| euclidean_distance_impl(x.geom.clone(), &y.geom))
 //             .collect::<Vec<f64>>())
 //         .collect::<Vec<Vec<f64>>>();
-    
 
 //     RMatrix::new_matrix(
 //         nr, nc,
 //         | r, c | res_vec[r][c]
 //     )
 // }
-
-
