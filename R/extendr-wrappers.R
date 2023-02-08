@@ -232,9 +232,13 @@ wkt_to_geoms <- function(x) .Call(wrap__wkt_to_geoms, x)
 
 wkt_from_geoms <- function(x) .Call(wrap__wkt_from_geoms, x)
 
-wkt_from <- function(x) .Call(wrap__wkt_from, x)
-
 read_geojson <- function(file) .Call(wrap__read_geojson, file)
+
+read_geojson_string <- function(geojson_str) .Call(wrap__read_geojson_string, geojson_str)
+
+read_geojson_props <- function(file) .Call(wrap__read_geojson_props, file)
+
+read_geojsonl <- function(file) .Call(wrap__read_geojsonl, file)
 
 
 # nolint end

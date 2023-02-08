@@ -4,6 +4,8 @@ use geo_types::{Line, Rect, Point, Polygon, LineString, Geometry, MultiPoint, Mu
 use std::fmt;
 
 
+
+
 #[derive(Debug, Clone)]
 pub struct Geom {
     pub geom: Geometry
