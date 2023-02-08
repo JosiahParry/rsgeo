@@ -139,7 +139,7 @@ fn read_geojsonl(file: &str) -> Robj {
 
     rprintln!("we haven't processed yet");
 
-    // parallely collect data into a vec of tuples going through the file one line at a time
+    //parallely collect data into a vec of tuples going through the file one line at a time
     let res = f
         .par_bridge()
         .flat_map(|line| {
@@ -149,7 +149,7 @@ fn read_geojsonl(file: &str) -> Robj {
             match geojson {
                 GeoJson::FeatureCollection(collection) => collection
                     .features
-                    .into_par_iter()
+                    .into_iter()
                     .map(|feat| {
                         // extract the properties and the geometry at once
                         let props = feat.properties.unwrap();
@@ -173,41 +173,79 @@ fn read_geojsonl(file: &str) -> Robj {
         })
         .collect::<Vec<(Map<String, Value>, Geometry)>>();
 
-    rprintln!("processed file");
+    //let mut res_props: Arc<Mutex<Vec<Map<String, Value>>>> =  Arc::new(Mutex::new(Vec::new()));
+    //let mut res_geos: Vec<Geometry> = Vec::new();
 
-    // iterate to grab geometries
-    let geoms = res
-        .par_iter()
-        .map(|x| x.1.to_owned())
-        .collect::<Vec<Geometry<f64>>>();
+    // let res_props = f
+    //     .by_ref()
+    //     .par_bridge()
+    //     .flat_map(|line| {
+    //         let geojson_str = line.unwrap();
+    //         let geojson = geojson_str.parse::<GeoJson>().unwrap();
 
-    rprintln!("collected geoms");
-    rprintln!("{}", geoms.len());
-    rprintln!("{:?}", geoms[0]);
+    //         match geojson {
+    //             GeoJson::FeatureCollection(collection) => collection
+    //                 .features
+    //                 .into_par_iter()
+    //                 .map(|feat| feat.properties.unwrap())
+    //                 .collect::<Vec<Map<String, Value>>>(),
+    //             GeoJson::Feature(feature) => {
+    //                 vec![feature.properties.unwrap()]
+    //             }
 
-    let geoms = geoms.into_iter().map(Geom::from).collect::<Vec<Geom>>();
+    //             GeoJson::Geometry(_geom) => {
+    //                 vec![]
+    //             }
+    //         }
+    //     })
+    //     .collect::<Vec<Map<String, Value>>>();
 
-    rprintln!("now a Vec<Geom>");
-    rprintln!("{:?}", geoms[0]);
+    // let res_geos = f
+    //     .par_bridge()
+    //     .flat_map(|line| {
+    //         let geojson_str = line.unwrap();
+    //         let geojson = geojson_str.parse::<GeoJson>().unwrap();
 
-    let geoms = geoms.into_iter().map(to_pntr).collect::<List>();
+    //         match geojson {
+    //             GeoJson::FeatureCollection(collection) => collection
+    //                 .features
+    //                 .into_par_iter()
+    //                 .map(|geo| Geometry::try_from(geo.geometry.unwrap()).unwrap())
+    //                 .collect::<Vec<Geometry>>(),
+    //             GeoJson::Feature(feature) => {
+    //                 vec![Geometry::try_from(feature.geometry.unwrap()).unwrap()]
+    //             }
 
-    rprintln!("now List of pointers");
-    let geoms = to_robj(&geoms).unwrap();
-
-    rprintln!("geoms are now in a Robj");
-
-    //let geoms = geoms.as_robj().to_owned();
-
+    //             GeoJson::Geometry(geom) => {
+    //                 vec![Geometry::try_from(geom).unwrap()]
+    //             }
+    //         }
+    //     })
+    //     .collect::<Vec<Geometry>>();
     let prop_maps = res
-        .into_par_iter()
-        .map(|x| x.0)
+        .par_iter()
+        .map(|x| x.0.to_owned())
         .collect::<Vec<Map<String, Value>>>();
 
-    rprintln!("collected properties");
+    rprintln!("properties extracted");
 
-    //let mut res_vec = process_properties(prop_maps);
     let (mut res_vec, mut keys) = process_properties(prop_maps);
+
+    rprintln!("properties processed into vec<robj>");
+
+    // // convert to list of pointers
+    let geoms = res
+        .into_iter()
+        .map(|x| x.1.to_owned())
+        .collect::<Vec<Geometry<f64>>>()
+        .into_iter()
+        .map(|x| to_pntr(Geom::from(x)))
+        .collect::<List>()
+        .set_attrib("class", "rs_GEOMETRYCOLLECT")
+        .unwrap();
+
+
+    
     res_vec.push(geoms);
 
     keys.push(String::from("geometry"));

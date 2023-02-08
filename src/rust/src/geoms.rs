@@ -252,19 +252,20 @@ pub fn from_list(x: List) -> Vec<Geom> {
 
 // helpers to cast to the proper external pointer
 pub fn to_pntr(x: Geom) -> Robj {
-    let geom = x.geom.clone();
-    let pntr = ExternalPtr::new(x);
-    let cls = match geom {
-        Geometry::Point(_geom) => "point",
-        Geometry::MultiPoint(_geom) => "multipoint",
-        Geometry::LineString(_geom) => "linestring",
-        Geometry::MultiLineString(_geom) => "multilinestring",
-        Geometry::Polygon(_geom) => "polygon",
-        Geometry::MultiPolygon(_geom) => "multipolygon",
+    let cls = match x.geom {
+        Geometry::Point(ref _geom) => "point",
+        Geometry::MultiPoint(ref _geom) => "multipoint",
+        Geometry::LineString(ref _geom) => "linestring",
+        Geometry::MultiLineString(ref _geom) => "multilinestring",
+        Geometry::Polygon(ref _geom) => "polygon",
+        Geometry::MultiPolygon(ref _geom) => "multipolygon",
         _ => "",
     };
 
-    r![pntr].set_attrib("class", cls).unwrap()
+    ExternalPtr::new(x)
+        .as_robj()
+        .set_attrib("class", cls)
+        .unwrap()
 }
 
 // Macro to generate exports
