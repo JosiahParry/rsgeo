@@ -8,23 +8,34 @@ use extendr_api::{extendr, Robj, Strings};
 use crate::to_pntr;
 use crate::types::Geom;
 
+
 #[extendr]
+/// WKT translation
+/// 
+/// @export
+/// @rdname wkt
 pub fn wkt_to_geom(x: &str) -> Robj {
     let x = Geometry::try_from_wkt_str(x).unwrap();
     to_pntr(Geom::from(x))
 }
 
 #[extendr]
+/// @rdname wkt
+/// @export
 pub fn wkt_to_geoms(x: Strings) -> List {
     x.iter().map(|x| wkt_to_geom(x.as_str())).collect::<List>()
 }
 #[extendr]
+/// @rdname wkt
+/// @export
 pub fn wkt_from_geom(x: Robj) -> Strings {
     let res = Geom::from(x).geom.to_wkt().to_string();
     Strings::from(res)
 }
 
 #[extendr]
+/// @rdname wkt
+/// @export
 pub fn wkt_from_geoms(x: List) -> Strings {
     let all_wkt = x
         .into_iter()

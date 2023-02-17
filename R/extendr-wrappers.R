@@ -11,9 +11,6 @@
 #' @useDynLib rsgeo, .registration = TRUE
 NULL
 
-#'@export
-linestring_to_points <- function(x) .Call(wrap__linestring_to_points, x)
-
 #' Find centroid
 #' @param x an object of class `point`
 #'@export
@@ -35,6 +32,8 @@ haversine_intermediate <- function(x, y, distance) .Call(wrap__haversine_interme
 #'@export
 chaikin_smoothing <- function(x, niter) .Call(wrap__chaikin_smoothing, x, niter)
 
+determine_geoms_class <- function(x) .Call(wrap__determine_geoms_class, x)
+
 #'@export
 signed_area <- function(x) .Call(wrap__signed_area, x)
 
@@ -48,7 +47,7 @@ geodesic_signed_area <- function(x) .Call(wrap__geodesic_signed_area, x)
 geodesic_unsigned_area <- function(x) .Call(wrap__geodesic_unsigned_area, x)
 
 #' Create geometry
-#' 
+#'
 #' @export
 #' @rdname geometry
 geom_point <- function(x, y) .Call(wrap__geom_point, x, y)
@@ -57,7 +56,11 @@ geom_point <- function(x, y) .Call(wrap__geom_point, x, y)
 #' @rdname geometry
 geom_points <- function(x) .Call(wrap__geom_points, x)
 
-#' Create a list of points 
+#' @export
+#' @rdname geometry
+geom_points_xy <- function(x, y) .Call(wrap__geom_points_xy, x, y)
+
+#' Create a list of points
 #' Given a matrix of x, y coordinates, create a list of points
 #' @export
 #' @rdname geometry
@@ -114,13 +117,13 @@ geodesic_length <- function(x) .Call(wrap__geodesic_length, x)
 vincenty_length <- function(x) .Call(wrap__vincenty_length, x)
 
 #' Calculate Bearing
-#' 
+#'
 #' @param x an object of class `point`
 #' @param y for `bearing()` an object of class `point`. For `bearings()` an object of class `rs_POINT`
-#' 
+#'
 #' @returns
 #' A vector of doubles of the calculated bearing for between x and y
-#' 
+#'
 #' @export
 bearing <- function(x, y) .Call(wrap__bearing, x, y)
 
@@ -128,11 +131,11 @@ bearing <- function(x, y) .Call(wrap__bearing, x, y)
 #'@export
 bearings <- function(x, y) .Call(wrap__bearings, x, y)
 
-#' Find the closest point 
-#' 
+#' Find the closest point
+#'
 #' @param x a single geometry
 #' @param y a `point`
-#' 
+#'
 #' @export
 closest_point <- function(x, y) .Call(wrap__closest_point, x, y)
 
@@ -146,8 +149,8 @@ euclidean_distances <- function(x, y) .Call(wrap__euclidean_distances, x, y)
 #' @rdname distance
 euclidean_distance_pairwise <- function(x, y) .Call(wrap__euclidean_distance_pairwise, x, y)
 
-#' Distance calculations 
-#' 
+#' Distance calculations
+#'
 #' @param x a single `point` or list of points `rs_POINT`
 #' @param y a single `point` or list of points `rs_POINT`
 #'@export
@@ -190,11 +193,46 @@ vincenty_distances <- function(x, y) .Call(wrap__vincenty_distances, x, y)
 #' @rdname distance
 vincenty_distance_matrix <- function(x, y) .Call(wrap__vincenty_distance_matrix, x, y)
 
+#' @export
+#' @rdname boundaries
+bounding_box <- function(x) .Call(wrap__bounding_box, x)
+
+#' Compute Geometric Boundaries 
+#' 
+#' @export
+#' @rdname boundaries
+#' @param x a rust geometry either a scalar or a vector for functions ending in `s`. See "Details" for more. 
+#'
+#' @details
+#' 
+#' - `bounding_box()` returns a named list of x and y maximums and minimums
+#' - `bounding_rectangle()` returns a polygon of the bounding rectangle
+#' - `convex_hull()` returns a polygon of the convex hull
+#' - `concave_hull()` returns a polygon of the specified concavity
+#' 
+#' Each function, with the exception of `bounding_box()` has a plural version ending 
+#' with an `s` which is vectorized over `x`. 
 bounding_rectangle <- function(x) .Call(wrap__bounding_rectangle, x)
 
+#' @export
+#' @rdname boundaries
+bounding_rectangles <- function(x) .Call(wrap__bounding_rectangles, x)
+
+#' @export
+#' @rdname boundaries
 concave_hull <- function(x, concavity) .Call(wrap__concave_hull, x, concavity)
 
+#' @export
+#' @rdname boundaries
+concave_hulls <- function(x, concavity) .Call(wrap__concave_hulls, x, concavity)
+
+#' @export
+#' @rdname boundaries
 convex_hull <- function(x) .Call(wrap__convex_hull, x)
+
+#' @export
+#' @rdname boundaries
+convex_hulls <- function(x) .Call(wrap__convex_hulls, x)
 
 #' Find extremes
 #' @param x a geometry
@@ -224,21 +262,85 @@ simplify_vw_geom <- function(x, epsilon) .Call(wrap__simplify_vw_geom, x, epsilo
 #' @rdname simplify_geom
 simplify_vw_geoms <- function(x, epsilon) .Call(wrap__simplify_vw_geoms, x, epsilon)
 
+#' WKT translation
+#' 
+#' @export
+#' @rdname wkt
 wkt_to_geom <- function(x) .Call(wrap__wkt_to_geom, x)
 
+#' @rdname wkt
+#' @export
 wkt_from_geom <- function(x) .Call(wrap__wkt_from_geom, x)
 
+#' @rdname wkt
+#' @export
 wkt_to_geoms <- function(x) .Call(wrap__wkt_to_geoms, x)
 
+#' @rdname wkt
+#' @export
 wkt_from_geoms <- function(x) .Call(wrap__wkt_from_geoms, x)
 
-read_geojson <- function(file) .Call(wrap__read_geojson, file)
+read_geojson_features <- function(file) .Call(wrap__read_geojson_features, file)
 
 read_geojson_string <- function(geojson_str) .Call(wrap__read_geojson_string, geojson_str)
 
 read_geojson_props <- function(file) .Call(wrap__read_geojson_props, file)
 
 read_geojsonl <- function(file) .Call(wrap__read_geojsonl, file)
+
+read_props <- function(file) .Call(wrap__read_props, file)
+
+read_gj_props <- function(file) .Call(wrap__read_gj_props, file)
+
+read_props_string <- function(file) .Call(wrap__read_props_string, file)
+
+#' Create an rstar RTree from a vector of geometry
+#' @param x a vector of rust geometry 
+#' @export 
+rstar_rtree <- function(x) .Call(wrap__rstar_rtree, x)
+
+print_aabb <- function(x) invisible(.Call(wrap__print_aabb, x))
+
+locate_in_envelope <- function(rtree, geom) .Call(wrap__locate_in_envelope, rtree, geom)
+
+intersection_candidates <- function(x, y) .Call(wrap__intersection_candidates, x, y)
+
+#' @export
+#' @rdname predicates
+contains <- function(x, y) .Call(wrap__contains, x, y)
+
+#' Spatial Predicates
+#' @export
+#' @rdname predicates
+contains_sparse <- function(x, y) .Call(wrap__contains_sparse, x, y)
+
+#' @export
+#' @rdname predicates
+contains_pairwise <- function(x, y) .Call(wrap__contains_pairwise, x, y)
+
+#' @export
+#' @rdname predicates
+intersects_sparse <- function(x, y) .Call(wrap__intersects_sparse, x, y)
+
+#' @export
+#' @rdname predicates
+intersects <- function(x, y) .Call(wrap__intersects, x, y)
+
+#' @export
+#' @rdname predicates
+intersects_pairwise <- function(x, y) .Call(wrap__intersects_pairwise, x, y)
+
+#' @export
+#' @rdname predicates
+within <- function(x, y) .Call(wrap__within, x, y)
+
+#' @export
+#' @rdname predicates
+within_sparse <- function(x, y) .Call(wrap__within_sparse, x, y)
+
+#' @export
+#' @rdname predicates
+within_pairwise <- function(x, y) .Call(wrap__within_pairwise, x, y)
 
 
 # nolint end

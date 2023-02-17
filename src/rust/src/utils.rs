@@ -1,54 +1,32 @@
-// use crate::types::Geom;
-// use extendr_api::prelude::*;
-// use geo::BooleanOps;
-// use geo_types::geometry::*;
-//use extendr_api::wrapper::{};
+use extendr_api::prelude::*;
 
-// pub trait Geometrize {
-//     //https://www.dictionary.com/browse/geometrize
-//     fn as_geom(self) -> Geom;
-//     //fn as_points_from_mat(self) -> Vec<Geom>;
-// }
+pub fn geom_class(cls: &str) -> [String; 3] {
+    let cls = cls.to_uppercase();
+    let geom_class = "rs_".to_owned() + cls.as_str();
+    
+    [geom_class, String::from("vctrs_vctr"), String::from("list")]
+}
 
-// impl Geometrize for RMatrix<f64>  {
-//     fn as_points_from_mat(self) -> Vec<Geom> {
-//         //crate::geoms::geom_points_matrix(self)
-//     }
-// }
+#[extendr]
+pub fn determine_geoms_class(x: Robj) -> [String; 3] {
+    let x: List = x.try_into().unwrap();
 
-// extendr_module! {
-//     mod utils;
-// }
+    let class = x[0].class().unwrap().nth(0).unwrap();
 
-// pub trait Aggregate {
-//     fn aggregate(self) -> ();
-// }
+    let all_identical = x.iter().all(|(_, robj)| robj.class().unwrap().nth(0).unwrap() == class);
 
-// impl Aggregate for Vec<Geometry> {
-//     fn aggregate(self) -> () {
-//         let x = self;
-//         match x {
-//             Vec<Point> => MultiPoint::new(x)
-//         };
-//     }
-// }
+    let class = if all_identical { 
+        x[0].class().unwrap().nth(0).unwrap() 
+    } else {
+        "geometrycollection"
+    };
 
-// #[extendr]
-// fn euclidean_distance_matrix(x: List, y:List) -> RMatrix<f64> {
-//     let nr = x.len();
-//     let nc = y.len();
+    geom_class(class)
+}
 
-//     let xg = from_list(x);
-//     let yg = from_list(y);
+extendr_module! {
+    mod utils;
+    fn determine_geoms_class;
+//    fn geom_class;
+}
 
-//     let res_vec = xg.into_iter()
-//         .map(|x| yg.to_owned().into_iter()
-//             .map(|y| euclidean_distance_impl(x.geom.clone(), &y.geom))
-//             .collect::<Vec<f64>>())
-//         .collect::<Vec<Vec<f64>>>();
-
-//     RMatrix::new_matrix(
-//         nr, nc,
-//         | r, c | res_vec[r][c]
-//     )
-// }

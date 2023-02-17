@@ -3,6 +3,7 @@
 \name{geom_point}
 \alias{geom_point}
 \alias{geom_points}
+\alias{geom_points_xy}
 \alias{geom_points_matrix}
 \alias{geom_multipoint}
 \alias{geom_multipoints}
@@ -19,6 +20,8 @@
 geom_point(x, y)
 
 geom_points(x)
+
+geom_points_xy(x, y)
 
 geom_points_matrix(x)
 

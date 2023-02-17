@@ -16,7 +16,7 @@ format_rsgeom <- function(x, width = NULL, ...) {
 
   msg <- sub(paste(geom_types, collapse = "|"), "", msg)
   if (nchar(msg) > width) {
-    msg <- paste0(substr(msg, 1, width - 6), "....")
+    msg <- paste0(substr(msg, 1, width - 6), "...")
   }
 
   formatC(msg)
@@ -46,6 +46,8 @@ print_rsgeoms <- function(x, width = NULL) {
 
 
 # individual printing
+#' Printing and formatting
+#' @rdname print
 #' @export
 print.point <- print_rsgeom
 #' @export
@@ -64,14 +66,17 @@ print.multilinestring <- print_rsgeom
 print.rs_POINT <- print_rsgeoms
 #' @export
 print.rs_MULTIPOINT <- print_rsgeoms
-#' @export
-print.rs_POLYGON <- print_rsgeoms
+# #' @export
+#print.rs_POLYGON <- print_rsgeoms
 #' @export
 print.rs_MULTIPOLYGON <- print_rsgeoms
 #' @export
 print.rs_LINESTRING <- print_rsgeoms
 #' @export
 print.rs_MULTILINESTRING  <- print_rsgeoms
+#' @export
+print.rs_GEOMETRYCOLLECTION  <- print_rsgeoms
+
 
 
 
@@ -106,5 +111,43 @@ format.rs_LINESTRING <- format_rsgeoms
 format.rs_MULTILINESTRING  <- format_rsgeoms
 #' @export
 format.rs_GEOMETRYCOLLECTION <- format_rsgeoms
+
+
+
+# vec_ptype_abbr.vctrs_percent
+
+# vctrs abbreviation  -----------------------------------------------------
+#' Internal vet
+#' @import vctrs
+#' @keywords internal
+#' @name vector-compatibility
+NULL
+#' @export
+vec_ptype_abbr.point <- function(x, ...) "point"
+#' @export
+vec_ptype_abbr.multipoint <- function(x, ...) "mpnt"
+#' @export
+vec_ptype_abbr.linestring <- function(x, ...) "lnstr"
+#' @export
+vec_ptype_abbr.multilinestring <- function(x, ...) "mlnst"
+#' @export
+vec_ptype_abbr.polygon <- function(x, ...) "poly"
+#' @export
+vec_ptype_abbr.multipolygon <- function(x, ...) "mpoly"
+#' @export
+vec_ptype_abbr.rs_POINT <- function(x, ...) "POINT"
+#' @export
+vec_ptype_abbr.rs_MULTIPOINT <- function(x, ...) "MPNT"
+#' @export
+vec_ptype_abbr.rs_LINESTRING <- function(x, ...) "LNSTR"
+#' @export
+vec_ptype_abbr.rs_MULTILINESTRING <- function(x, ...) "MLNST"
+#' @export
+vec_ptype_abbr.rs_POLYGON <- function(x, ...) "POLY"
+#' @export
+vec_ptype_abbr.rs_MULTIPOLYGON <- function(x, ...) "MPOLY"
+#' @export
+vec_ptype_abbr.rs_GEOMETRYCOLLECTION <- function(x, ...) "GEOMS"
+
 
 

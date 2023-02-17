@@ -1,5 +1,6 @@
 // module imports
 mod utils;
+use utils::get_utils_metadata;
 
 mod geoms;
 use geoms::{get_geoms_metadata, to_pntr};
@@ -32,6 +33,12 @@ mod io;
 pub mod types;
 use io::get_io_metadata;
 
+mod spatial_index;
+use spatial_index::get_spatial_index_metadata;
+
+mod topology;
+use topology::get_topology_metadata;
+
 use crate::types::Geom;
 use extendr_api::prelude::*;
 use extendr_api::wrapper::{ExternalPtr, RMatrix};
@@ -40,102 +47,6 @@ use geo_types::line_string;
 use ndarray::{Array2, ShapeBuilder};
 
 use geo::geometry::{Coord, Geometry, Point};
-
-// This is the equivalent of the union method
-// #[extendr (use_try_from = true)]
-// fn points_to_multipoint(x: List) -> Robj {
-//     let n = x.len();
-//     let mut points: Vec<Point> = Vec::with_capacity(n);
-//     for i in 0..(n) {
-//         let xi: ExternalPtr<Point>= x[i].to_owned().try_into().unwrap();
-//         let point = *xi;
-//         points.push(point);
-//     }
-
-//     let mpnt = MultiPoint::new(points);
-//     let res = ExternalPtr::new(mpnt);
-//     r![res].set_attrib("class", "multipoint").unwrap()
-// }
-
-// LINE ------
-
-// #[extendr(use_try_from = true)]
-// fn rs_line(xy1: Doubles, xy2: Doubles) -> Robj {
-//     let l1 = xy1.len();
-//     let l2 =  xy2.len();
-//     if l1 != 2 { panic!("Coordinates must be length 2 only") };
-//     if l2 != 2 { panic!("Coordinates must be length 2 only") };
-//     // this is how you get a `Doubles` into a Vec<f64>
-//     //let v1: Vec<f64> =  xy1.iter().map(|x| x.0).collect();
-//     let x1: f64 = xy1[0].0;
-//     let y1: f64 = xy1[1].0;
-//     let x2 = xy2[0].0;
-//     let y2 = xy2[1].0;
-//     let c1 = coord!{x: x1, y: y1};
-//     let c2 = coord!{x: x2, y: y2};
-//     let line = Line::new(c1, c2);
-//     let res = ExternalPtr::new(line);
-//     let res = r![res].set_attrib("class", "line").unwrap();
-//     res
-// }
-
-// linestring to points
-///@export
-// #[extendr]
-// fn linestring_to_points(x: Robj) -> Robj {
-//     let xi: ExternalPtr<LineString> = x.to_owned().try_into().unwrap();
-//    // let line = &*xi;
-//     //let pnts = line.to_owned().into_points();
-
-//     xi.into_points()
-//         .into_iter()
-//         .map(|x| r![ExternalPtr::new(x)].set_attrib("class", "point").unwrap())
-//         .collect::<List>()
-//         .set_attrib("class", "rs_POINT")
-//         .unwrap()
-
-// }
-
-// TODO - need to convert to Coords
-
-// MULTILINESTRING ---------------------------------------------------------
-
-// extract linestring pointers into Vec<LineString>
-// this will also be helpful for polygons too
-// Takes rs_LINESTRINGs
-// fn linestrings_to_vec(x: List) -> Vec<LineString> {
-
-//     let n = x.len();
-//     let mut linestrings: Vec<LineString> = Vec::with_capacity(n);
-
-//     for i in 0..(n - 1) {
-//         let pntr = x[i].to_owned();
-//         let xi: ExternalPtr<LineString> = pntr.to_owned().try_into().unwrap();
-//         let line = &*xi;
-//         let line = line.to_owned();
-//         linestrings.push(line);
-//     }
-
-//     linestrings
-// }
-
-// take R list of linestrings and convert to multilinestring
-// fn linestrings_to_multilinestring(x: List) -> Robj {
-//     let lines = linestrings_to_vec(x);
-//     let res =  ExternalPtr::new(MultiLineString::new(lines));
-
-//     r![res].set_attrib("class", "multilinestring").unwrap()
-// }
-
-// // INTERSECTIONS -------
-// #[extendr]
-// fn intersect_poly_poly(lhs: Robj, rhs: Robj) -> Rbool {
-//     let xpoly: ExternalPtr<Polygon> = lhs.try_into().unwrap();
-//     let ypoly: ExternalPtr<Polygon> = rhs.try_into().unwrap();
-
-//     Rbool::from(xpoly.intersects(&*ypoly))
-
-// }
 
 // This is so much slower than the 1 - 1 and so much slower than geos
 // Tried without cloning. same speed. It must be the claiming ownership?
@@ -218,9 +129,7 @@ fn centroid(x: Robj) -> Robj {
 
     let res: Geom = res.into();
 
-    r![ExternalPtr::new(res)]
-        .set_attrib("class", "point")
-        .unwrap()
+   to_pntr(res)
 }
 
 /// @rdname centroid
@@ -230,7 +139,7 @@ fn centroids(x: List) -> Robj {
     x.into_iter()
         .map(|(_, robj)| centroid(robj))
         .collect::<List>()
-        .set_attrib("class", "rs_POINT")
+        .set_attrib("class", crate::utils::geom_class("point"))
         .unwrap()
 }
 
@@ -263,9 +172,7 @@ fn haversine_intermediate(x: Robj, y: Robj, distance: f64) -> Robj {
     let point = x.haversine_intermediate(&y, distance);
     let res = Geom::from(point);
 
-    r![ExternalPtr::new(res)]
-        .set_attrib("class", "point")
-        .unwrap()
+    to_pntr(res)
 }
 
 /// Chaikin Smoothing
@@ -292,6 +199,7 @@ fn chaikin_smoothing(x: Robj, niter: f64) -> Robj {
     to_pntr(res)
 }
 
+
 // ---------------------------------------------------------------------------------
 
 // Macro to generate exports.
@@ -305,6 +213,7 @@ extendr_module! {
     fn haversine_destination;
     fn haversine_intermediate;
     fn chaikin_smoothing;
+    use utils; 
     use area;
     use geoms;
     use length;
@@ -315,4 +224,6 @@ extendr_module! {
     use conversion;
     use simplification;
     use io;
+    use spatial_index;
+    use topology;
 }

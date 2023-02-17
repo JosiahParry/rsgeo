@@ -27,8 +27,39 @@ use geojson::GeoJson;
 // }
 
 #[extendr]
-pub fn read_geojson(file: &str) -> List {
+pub fn read_gj_props(file: &str) -> Robj {
+    let file = std::fs::File::open(file).expect("geojson file to be found");
+    let reader = BufReader::new(file);
+
+    rprintln!("BufReader created");
+
+    let data = geojson::FeatureReader::from_reader(reader);
+    let res = data
+        .features()
+        .par_bridge()
+        .into_par_iter()
+        .map(|feat| feat.unwrap().properties.unwrap())
+        .collect::<Vec<Map<String, Value>>>();
+    
+    rprintln!("results collected into vec of hashmaps");
+
+    let n = res.len();
+    let (res_vec, keys) = process_properties(res);
+
+    let index = (1..n + 1).map(|i| i as i32).collect::<Vec<i32>>();
+    let res = List::from_names_and_values(keys, res_vec).unwrap();
+
+    res.set_attrib("class", "data.frame")
+        .unwrap()
+        .set_attrib("row.names", index)
+        .unwrap()
+}
+
+#[extendr]
+pub fn read_geojson_features(file: &str) -> List {
     //let file = std::fs::File::open(file).expect("geojson file to be found");
+
+    // this reads the entire thing into a string this cannot be efficient
     let geojson_str = std::fs::read_to_string(file).unwrap();
     let geojson = geojson_str.parse::<GeoJson>().unwrap();
 
@@ -118,6 +149,68 @@ pub fn read_geojson_props(file: &str) -> Robj {
         .unwrap()
 }
 
+
+#[extendr]
+pub fn read_props(file: &str) -> Robj {
+
+    let file = std::fs::File::open(file)
+        .expect("this to work");
+
+    let reader = BufReader::new(file);
+
+    let data = geojson::FeatureReader::from_reader(reader);
+
+    let res = data
+        .features()
+       // .par_bridge()
+      //  .into_par_iter()
+        .map(|feat| feat.unwrap().properties.unwrap())
+        .collect::<Vec<Map<String, Value>>>();
+
+   // rprintln!("no problem here no");
+    let n = res.len();
+    let (res_vec, keys) = process_properties(res);
+
+    let index = (1..n + 1).map(|i| i as i32).collect::<Vec<i32>>();
+    let res = List::from_names_and_values(keys, res_vec).unwrap();
+
+    res.set_attrib("class", "data.frame")
+        .unwrap()
+        .set_attrib("row.names", index)
+        .unwrap()
+}
+
+
+#[extendr]
+pub fn read_props_string(file: &str) -> Robj {
+
+    let file = std::fs::File::open(file)
+        .expect("this to work");
+
+    let reader = BufReader::new(file);
+
+    let data = geojson::FeatureReader::from_reader(reader);
+
+    let res = data
+        .features()
+       // .par_bridge()
+      //  .into_par_iter()
+        .map(|feat| feat.unwrap().properties.unwrap())
+        .collect::<Vec<Map<String, Value>>>();
+
+   // rprintln!("no problem here no");
+    let n = res.len();
+    let (res_vec, keys) = process_props(res);
+
+    let index = (1..n + 1).map(|i| i as i32).collect::<Vec<i32>>();
+    let res = List::from_names_and_values(keys, res_vec).unwrap();
+
+    res.set_attrib("class", "data.frame")
+        .unwrap()
+        .set_attrib("row.names", index)
+        .unwrap()
+}
+
 fn match_type(x: &Map<String, Value>) -> Vec<&str> {
     x.values()
         .map(|val| match val {
@@ -129,8 +222,11 @@ fn match_type(x: &Map<String, Value>) -> Vec<&str> {
         .collect::<Vec<&str>>()
 }
 
-use std::io::prelude::*;
 
+
+use std::io::BufReader;
+//use std::io::BufReader;
+use std::io::prelude::*;
 #[extendr]
 fn read_geojsonl(file: &str) -> Robj {
     let file = std::fs::File::open(file).unwrap();
@@ -241,7 +337,7 @@ fn read_geojsonl(file: &str) -> Robj {
         .into_iter()
         .map(|x| to_pntr(Geom::from(x)))
         .collect::<List>()
-        .set_attrib("class", "rs_GEOMETRYCOLLECT")
+        .set_attrib("class", crate::utils::geom_class("geometrycollection"))
         .unwrap();
 
 
@@ -261,25 +357,30 @@ fn read_geojsonl(file: &str) -> Robj {
         .unwrap()
 }
 
-// struct GeoJsonLine {
-//     vals: Map<String, Value>,
-//     geometry: Geometry,
-// }
 
-fn process_properties(res: Vec<Map<String, Value>>) -> (Vec<Robj>, Vec<String>) {
+
+pub fn process_properties(res: Vec<Map<String, Value>>) -> (Vec<Robj>, Vec<String>) {
     // pull first element to find the keys
     let x1 = res[0].clone();
+   // rprintln!("pulled first element");
     // collect keys into vec of string
     let keys = x1.keys().collect::<Vec<&String>>();
-
+    //rprintln!("have first element keys");
     //let n = res.len(); // number row
     let nn = keys.len(); // number cols
 
     //let mut col_types: Vec<&str> = Vec::with_capacity(nn);
     let mut col_types = match_type(&res[0]);
+   //rprintln!("matches col types for first element");
 
     for obs in res.iter().skip(1) {
+
+        rprintln!("inner loop accessed");
+
         let keys_i = match_type(obs);
+
+        rprintln!("keys matched");
+        
 
         let which_unknown = col_types
             .iter()
@@ -288,11 +389,14 @@ fn process_properties(res: Vec<Map<String, Value>>) -> (Vec<Robj>, Vec<String>) 
             .map(|(index, _)| index)
             .collect::<Vec<usize>>();
 
+        rprintln!("identified which keys are unknown");
         // if all aren't true break
         if which_unknown.is_empty() {
+            rprintln!("loop broken");
             break;
         }
 
+        rprintln!("filling unknown types");
         // if not fill the types
         for i in which_unknown.into_iter() {
             col_types[i] = keys_i[i];
@@ -301,22 +405,36 @@ fn process_properties(res: Vec<Map<String, Value>>) -> (Vec<Robj>, Vec<String>) 
 
     let mut res_vec: Vec<Robj> = Vec::with_capacity(nn);
 
-    for (i, key) in keys.clone().into_iter().enumerate() {
-        let ctype = col_types[i];
+    rprintln!("next loop reached. creating R type columns");
 
+    for (i, key) in keys.clone().into_iter().enumerate() {
+        
+        let ctype = col_types[i];
+        //rprintln!("column {} being processed has type {}", i, ctype);
         let col = match ctype {
             "double" => Doubles::from_iter(
                 res.iter()
-                    .map(|x| Rfloat::try_from(x[key].as_f64()).unwrap_or(Rfloat::na())),
+                    .map(|x| 
+                        Rfloat::try_from(x[key].as_f64()).unwrap_or(Rfloat::na())),
             )
             .into_robj(),
-            "character" => Strings::from_iter(res.iter().map(|x| {
-                Rstr::try_from(x[key].as_str().unwrap_or(&Rstr::na())).unwrap_or(Rstr::na())
+            "character" => Strings::from_iter(
+                res
+                    .iter()
+                    .map(|x| { // dies here
+                        Rstr::try_from(
+                            x[key]
+                                .as_str()
+                                .unwrap_or(&Rstr::na()))
+                                .unwrap_or(Rstr::na()
+                        )
             }))
             .into_robj(),
             "logical" => Logicals::from_iter(
                 res.iter()
-                    .map(|x| Rbool::try_from(x[key].as_bool().unwrap()).unwrap_or(Rbool::na())),
+                    .map(|x| 
+                        Rbool::try_from(x[key].as_bool().unwrap()).unwrap_or(Rbool::na())
+                    ),
             )
             .into_robj(),
             _ => List::from_iter(res.iter().map(|x| to_robj(&x[key]).unwrap())).into_robj(),
@@ -324,6 +442,98 @@ fn process_properties(res: Vec<Map<String, Value>>) -> (Vec<Robj>, Vec<String>) 
 
         res_vec.push(col)
     }
+
+    rprintln!("R columns created and pushed to `res_vec`");
+
+    let keys = keys
+        .into_iter()
+        .map(|key| key.to_owned())
+        .collect::<Vec<String>>();
+    (res_vec, keys)
+}
+
+
+
+pub fn process_props(res: Vec<Map<String, Value>>) -> (Vec<Robj>, Vec<String>) {
+    // pull first element to find the keys
+    let x1 = res[0].clone();
+   // rprintln!("pulled first element");
+    // collect keys into vec of string
+    let keys = x1.keys().collect::<Vec<&String>>();
+    //rprintln!("have first element keys");
+    //let n = res.len(); // number row
+    let nn = keys.len(); // number cols
+
+    //let mut col_types: Vec<&str> = Vec::with_capacity(nn);
+    let mut col_types = match_type(&res[0]);
+   //rprintln!("matches col types for first element");
+
+    for obs in res.iter().skip(1) {
+
+        rprintln!("inner loop accessed");
+
+        let keys_i = match_type(obs);
+
+        rprintln!("keys matched");
+        
+
+        let which_unknown = col_types
+            .iter()
+            .enumerate() //now you have indexes :)
+            .filter(|(_index, col)| **col == "idfk")
+            .map(|(index, _)| index)
+            .collect::<Vec<usize>>();
+
+        rprintln!("identified which keys are unknown");
+        // if all aren't true break
+        if which_unknown.is_empty() {
+            rprintln!("loop broken");
+            break;
+        }
+
+        rprintln!("filling unknown types");
+        // if not fill the types
+        for i in which_unknown.into_iter() {
+            col_types[i] = keys_i[i];
+        }
+    }
+
+    let mut res_vec: Vec<Robj> = Vec::with_capacity(nn);
+
+    rprintln!("next loop reached. creating R type columns");
+
+    for (i, key) in keys.clone().into_iter().enumerate() {
+        
+        let ctype = col_types[i];
+        //rprintln!("column {} being processed has type {}", i, ctype);
+        let col = match ctype {
+            "double" => Doubles::from_iter(
+                res.iter()
+                    .map(|x| 
+                        Rfloat::try_from(x[key].as_f64()).unwrap_or(Rfloat::na())),
+            )
+            .into_robj(),
+            "character" => Strings::from_iter(
+                res
+                    .iter()
+                    .map(|x| { // dies here
+                        x[key].to_string()
+            }))
+            .into_robj(),
+            "logical" => Logicals::from_iter(
+                res.iter()
+                    .map(|x| 
+                        Rbool::try_from(x[key].as_bool().unwrap()).unwrap_or(Rbool::na())
+                    ),
+            )
+            .into_robj(),
+            _ => List::from_iter(res.iter().map(|x| to_robj(&x[key]).unwrap())).into_robj(),
+        };
+
+        res_vec.push(col)
+    }
+
+    rprintln!("R columns created and pushed to `res_vec`");
 
     let keys = keys
         .into_iter()
@@ -334,8 +544,11 @@ fn process_properties(res: Vec<Map<String, Value>>) -> (Vec<Robj>, Vec<String>) 
 
 extendr_module! {
     mod geojsonimpl;
-    fn read_geojson;
+    fn read_geojson_features;
     fn read_geojson_string;
     fn read_geojson_props;
     fn read_geojsonl;
+    fn read_props;
+    fn read_gj_props;
+    fn read_props_string;
 }

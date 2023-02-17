@@ -1,58 +1,84 @@
 #' Convert geo-type to sfg or sfc object
 #' @param x a rust geo-type
 #' @export
-as_sf <- function(x) UseMethod("as_sf")
+as_sfg <- function(x) UseMethod("as_sfg")
 
 # to sfg objects
 #' @export
-as_sf.point <- function(x) sf::st_point(geom_to_r(x))
+as_sfg.point <- function(x) structure(
+  geom_to_r(x),
+  class = c("XY", "POINT", "sfg")
+  )
 
 #' @export
-as_sf.multipoint <- function(x) sf::st_multipoint(geom_to_r(x))
+as_sfg.multipoint <- function(x) {
+  res <- geom_to_r(x)
+
+  structure(
+    res,
+    dim = dim(res),
+    class = c("XY", "MULTIPOINT", "sfg")
+  )
+
+}
 
 #' @export
-as_sf.linestring <- function(x) sf::st_linestring(geom_to_r(x))
+as_sfg.linestring <- function(x) {
+  res <- geom_to_r(x)
+
+  structure(
+    res,
+    dim = dim(res),
+    class = c("XY", "LINESTRING", "sfg")
+  )
+
+}
 
 #' @export
-as_sf.polygon <- function(x) sf::st_polygon(geom_to_r(x))
+as_sfg.polygon <- function(x) {
+  structure(
+    geom_to_r(x),
+    class = c("XY", "POLYGON", "sfg")
+  )
+}
 
 #' @export
-as_sf.multipolygon <- function(x) sf::st_multipolygon(geom_to_r(x))
+as_sfg.multipolygon <- function(x) {
+  structure(
+    geom_to_r(x),
+    class = c("XY", "MULTIPOLYGON", "sfg")
+  )
+}
 
 
 # to sfc objects
-#' @export
-as_sf.rs_POINT <- function(x) {
-  x <- geoms_to_r(x)
-  sf::st_sfc(lapply(x, sf::st_point))
+st_as_sfc.rs_POINT <- function(x) {
+  sf::st_sfc(lapply(x, as_sfg))
 }
 
-#' @export
-as_sf.rs_MULTIPOINT <- function(x) {
-  x <- geoms_to_r(x)
-  sf::st_sfc(lapply(x, sf::st_multipoint))
+st_as_sfc.rs_MULTIPOINT <- function(x) {
+  sf::st_sfc(lapply(x, as_sfg))
 }
 
-#' @export
-as_sf.rs_POLYGON <- function(x) {
-  x <- geoms_to_r(x)
-  sf::st_sfc(lapply(x, sf::st_polygon))
+st_as_sfc.rs_POLYGON <- function(x) {
+  sf::st_sfc(lapply(x, as_sfg))
 }
 
-#' @export
-as_sf.rs_MULTIPOLYGON <- function(x) {
-  x <- geoms_to_r(x)
-  sf::st_sfc(lapply(x, sf::st_multipolygon))
+
+st_as_sfc.rs_MULTIPOLYGON <- function(x) {
+  sf::st_sfc(lapply(x, as_sfg))
 }
 
-#' @export
-as_sf.rs_LINESTRING <- function(x) {
-  x <- geoms_to_r(x)
-  sf::st_sfc(lapply(x, sf::st_linestring))
+
+st_as_sfc.rs_LINESTRING <- function(x) {
+  sf::st_sfc(lapply(x, as_sfg))
 }
 
-#' @export
-as_sf.rs_MULTILINESTRING <- function(x) {
-  x <- geoms_to_r(x)
-  sf::st_sfc(lapply(x, sf::st_multilinestring))
+st_as_sfc.rs_MULTILINESTRING <- function(x) {
+  sf::st_sfc(lapply(x, as_sfg))
+}
+
+
+st_as_sfc.rs_GEOMETRYCOLLECTION <- function(x) {
+  sf::st_sfc(lapply(x, as_sfg))
 }
