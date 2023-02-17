@@ -1,6 +1,5 @@
 # 6 geometry types supported
 # (Multi) Point, LineString, and Polygon
-
 format_rsgeom <- function(x, width = NULL, ...) {
 
   if (is.null(width)) width <- options("width")[["width"]]
@@ -26,58 +25,6 @@ format_rsgeom <- function(x, width = NULL, ...) {
 format_rsgeoms <- function(x, width = NULL, ...) {
   vapply(x, format, character(1), width = width)
 }
-
-print_rsgeom <- function(x, width = NULL) {
-
-  msg <- format_rsgeom(x, width)
-  cat(msg)
-  invisible(x)
-}
-
-
-print_rsgeoms <- function(x, width = NULL) {
-  for (i in seq_along(x)) {
-    print_rsgeom(x[[i]], width = width)
-    cat("\n")
-  }
-  invisible(x)
-}
-
-
-
-# individual printing
-#' Printing and formatting
-#' @rdname print
-#' @export
-print.point <- print_rsgeom
-#' @export
-print.multipoint <- print_rsgeom
-#' @export
-print.polygon <- print_rsgeom
-#' @export
-print.multipolygon <- print_rsgeom
-#' @export
-print.linestring <- print_rsgeom
-#' @export
-print.multilinestring <- print_rsgeom
-
-# multi printing
-#' @export
-print.rs_POINT <- print_rsgeoms
-#' @export
-print.rs_MULTIPOINT <- print_rsgeoms
-# #' @export
-#print.rs_POLYGON <- print_rsgeoms
-#' @export
-print.rs_MULTIPOLYGON <- print_rsgeoms
-#' @export
-print.rs_LINESTRING <- print_rsgeoms
-#' @export
-print.rs_MULTILINESTRING  <- print_rsgeoms
-#' @export
-print.rs_GEOMETRYCOLLECTION  <- print_rsgeoms
-
-
 
 
 # formatting --------------------------------------------------------------
@@ -149,5 +96,58 @@ vec_ptype_abbr.rs_MULTIPOLYGON <- function(x, ...) "MPOLY"
 #' @export
 vec_ptype_abbr.rs_GEOMETRYCOLLECTION <- function(x, ...) "GEOMS"
 
+
+
+
+
+
+
+
+print_rsgeom <- function(x, width = NULL) {
+
+  msg <- format_rsgeom(x, width)
+  cat(msg)
+  invisible(x)
+}
+
+# vctrs handles this for me
+# print_rsgeoms <- function(x, width = NULL) {
+#   for (i in seq_along(x)) {
+#     print_rsgeom(x[[i]], width = width)
+#     cat("\n")
+#   }
+#   invisible(x)
+# }
+# individual printing
+#' Printing and formatting
+#' @rdname print
+#' @export
+print.point <- print_rsgeom
+#' @export
+print.multipoint <- print_rsgeom
+#' @export
+print.polygon <- print_rsgeom
+#' @export
+print.multipolygon <- print_rsgeom
+#' @export
+print.linestring <- print_rsgeom
+#' @export
+print.multilinestring <- print_rsgeom
+#'
+#' # multi printing
+#' #' @export
+#' print.rs_POINT <- print_rsgeoms
+#' #' @export
+#' print.rs_MULTIPOINT <- print_rsgeoms
+#' # #' @export
+#' #print.rs_POLYGON <- print_rsgeoms
+#' #' @export
+#' print.rs_MULTIPOLYGON <- print_rsgeoms
+#' #' @export
+#' print.rs_LINESTRING <- print_rsgeoms
+#' #' @export
+#' print.rs_MULTILINESTRING  <- print_rsgeoms
+#' #' @export
+#' print.rs_GEOMETRYCOLLECTION  <- print_rsgeoms
 
 

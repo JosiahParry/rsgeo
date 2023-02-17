@@ -280,6 +280,24 @@ wkt_to_geoms <- function(x) .Call(wrap__wkt_to_geoms, x)
 #' @export
 wkt_from_geoms <- function(x) .Call(wrap__wkt_from_geoms, x)
 
+#' Convert to and from WKB
+#' 
+#' @export
+#' @rdname wkb
+wkb_from_geom <- function(x) .Call(wrap__wkb_from_geom, x)
+
+#' @export
+#' @rdname wkb
+wkb_from_geoms <- function(x) .Call(wrap__wkb_from_geoms, x)
+
+#' @export
+#' @rdname wkb
+wkb_to_geom <- function(x) .Call(wrap__wkb_to_geom, x)
+
+#' @export
+#' @rdname wkb
+wkb_to_geoms <- function(x) .Call(wrap__wkb_to_geoms, x)
+
 read_geojson_features <- function(file) .Call(wrap__read_geojson_features, file)
 
 read_geojson_string <- function(geojson_str) .Call(wrap__read_geojson_string, geojson_str)

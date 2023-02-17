@@ -7,8 +7,7 @@ pub fn geom_class(cls: &str) -> [String; 3] {
     [geom_class, String::from("vctrs_vctr"), String::from("list")]
 }
 
-#[extendr]
-pub fn determine_geoms_class(x: Robj) -> [String; 3] {
+pub fn determine_geoms_class(x: &Robj) -> [String; 3] {
     let x: List = x.try_into().unwrap();
 
     let class = x[0].class().unwrap().nth(0).unwrap();
@@ -26,7 +25,5 @@ pub fn determine_geoms_class(x: Robj) -> [String; 3] {
 
 extendr_module! {
     mod utils;
-    fn determine_geoms_class;
-//    fn geom_class;
 }
 
