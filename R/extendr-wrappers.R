@@ -362,5 +362,23 @@ within_sparse <- function(x, y) .Call(wrap__within_sparse, x, y)
 #' @rdname predicates
 within_pairwise <- function(x, y) .Call(wrap__within_pairwise, x, y)
 
+expand_multipolygon <- function(x) .Call(wrap__expand_multipolygon, x)
+
+expand_multilinestring <- function(x) .Call(wrap__expand_multilinestring, x)
+
+expand_multipoint <- function(x) .Call(wrap__expand_multipoint, x)
+
+expand_polygon <- function(x) .Call(wrap__expand_polygon, x)
+
+expand_linestring <- function(x) .Call(wrap__expand_linestring, x)
+
+cast_points_line <- function(x) .Call(wrap__cast_points_line, x)
+
+cast_points_multipoint <- function(x) .Call(wrap__cast_points_multipoint, x)
+
+cast_lines_multilinestring <- function(x) .Call(wrap__cast_lines_multilinestring, x)
+
+cast_lines_polygon <- function(x) .Call(wrap__cast_lines_polygon, x)
+
 
 # nolint end

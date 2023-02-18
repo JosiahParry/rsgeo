@@ -1,8 +1,3 @@
-geom_collection <- function(x = list()) {
-  structure(x, class = c("rs_GEOMETRYCOLLECTION", "vctrs_vctr", "list"))
-}
-
-
 
 ptype_geom <- function(type) {
   type <- tolower(type)
@@ -50,93 +45,123 @@ ptype_geoms <- function(type) {
 # '
 
 # lhs to rhs
+#' @export
 vec_ptype2.rs_LINESTRING.rs_MULTILINESTRING <- function(x, y, ...) {
   ptype_geoms("GEOMETRYCOLLECTION")
 }
+#' @export
 vec_ptype2.rs_LINESTRING.rs_MULTIPOINT <- function(x, y, ...) {
   ptype_geoms("GEOMETRYCOLLECTION")
 }
+#' @export
 vec_ptype2.rs_LINESTRING.rs_MULTIPOLYGON <- function(x, y, ...) {
   ptype_geoms("GEOMETRYCOLLECTION")
 }
+#' @export
 vec_ptype2.rs_LINESTRING.rs_POINT <- function(x, y, ...) {
   ptype_geoms("GEOMETRYCOLLECTION")
 }
+#' @export
 vec_ptype2.rs_LINESTRING.rs_POLYGON <- function(x, y, ...) {
   ptype_geoms("GEOMETRYCOLLECTION")
 }
+#' @export
 vec_ptype2.rs_MULTILINESTRING.rs_LINESTRING <- function(x, y, ...) {
   ptype_geoms("GEOMETRYCOLLECTION")
 }
+#' @export
 vec_ptype2.rs_MULTILINESTRING.rs_MULTIPOINT <- function(x, y, ...) {
   ptype_geoms("GEOMETRYCOLLECTION")
 }
+#' @export
 vec_ptype2.rs_MULTILINESTRING.rs_MULTIPOLYGON <- function(x, y, ...) {
   ptype_geoms("GEOMETRYCOLLECTION")
 }
+#' @export
 vec_ptype2.rs_MULTILINESTRING.rs_POINT <- function(x, y, ...) {
   ptype_geoms("GEOMETRYCOLLECTION")
 }
+#' @export
 vec_ptype2.rs_MULTILINESTRING.rs_POLYGON <- function(x, y, ...) {
   ptype_geoms("GEOMETRYCOLLECTION")
 }
+#' @export
 vec_ptype2.rs_MULTIPOINT.rs_LINESTRING <- function(x, y, ...) {
   ptype_geoms("GEOMETRYCOLLECTION")
 }
+#' @export
 vec_ptype2.rs_MULTIPOINT.rs_MULTILINESTRING <- function(x, y, ...) {
   ptype_geoms("GEOMETRYCOLLECTION")
 }
+#' @export
 vec_ptype2.rs_MULTIPOINT.rs_MULTIPOLYGON <- function(x, y, ...) {
   ptype_geoms("GEOMETRYCOLLECTION")
 }
+#' @export
 vec_ptype2.rs_MULTIPOINT.rs_POINT <- function(x, y, ...) {
   ptype_geoms("GEOMETRYCOLLECTION")
 }
+#' @export
 vec_ptype2.rs_MULTIPOINT.rs_POLYGON <- function(x, y, ...) {
   ptype_geoms("GEOMETRYCOLLECTION")
 }
+#' @export
 vec_ptype2.rs_MULTIPOLYGON.rs_LINESTRING <- function(x, y, ...) {
   ptype_geoms("GEOMETRYCOLLECTION")
 }
+#' @export
 vec_ptype2.rs_MULTIPOLYGON.rs_MULTILINESTRING <- function(x, y, ...) {
   ptype_geoms("GEOMETRYCOLLECTION")
 }
+#' @export
 vec_ptype2.rs_MULTIPOLYGON.rs_MULTIPOINT <- function(x, y, ...) {
   ptype_geoms("GEOMETRYCOLLECTION")
 }
+#' @export
 vec_ptype2.rs_MULTIPOLYGON.rs_POINT <- function(x, y, ...) {
   ptype_geoms("GEOMETRYCOLLECTION")
 }
+#' @export
 vec_ptype2.rs_MULTIPOLYGON.rs_POLYGON <- function(x, y, ...) {
   ptype_geoms("GEOMETRYCOLLECTION")
 }
+#' @export
 vec_ptype2.rs_POINT.rs_LINESTRING <- function(x, y, ...) {
   ptype_geoms("GEOMETRYCOLLECTION")
 }
+#' @export
 vec_ptype2.rs_POINT.rs_MULTILINESTRING <- function(x, y, ...) {
   ptype_geoms("GEOMETRYCOLLECTION")
 }
+#' @export
 vec_ptype2.rs_POINT.rs_MULTIPOINT <- function(x, y, ...) {
   ptype_geoms("GEOMETRYCOLLECTION")
 }
+#' @export
 vec_ptype2.rs_POINT.rs_MULTIPOLYGON <- function(x, y, ...) {
   ptype_geoms("GEOMETRYCOLLECTION")
 }
+#' @export
 vec_ptype2.rs_POINT.rs_POLYGON <- function(x, y, ...) {
   ptype_geoms("GEOMETRYCOLLECTION")
 }
+#' @export
 vec_ptype2.rs_POLYGON.rs_LINESTRING <- function(x, y, ...) {
   ptype_geoms("GEOMETRYCOLLECTION")
 }
+#' @export
 vec_ptype2.rs_POLYGON.rs_MULTILINESTRING <- function(x, y, ...) {
   ptype_geoms("GEOMETRYCOLLECTION")
 }
+#' @export
 vec_ptype2.rs_POLYGON.rs_MULTIPOINT <- function(x, y, ...) {
   ptype_geoms("GEOMETRYCOLLECTION")
 }
+#' @export
 vec_ptype2.rs_POLYGON.rs_MULTIPOLYGON <- function(x, y, ...) {
   ptype_geoms("GEOMETRYCOLLECTION")
 }
+#' @export
 vec_ptype2.rs_POLYGON.rs_POINT <- function(x, y, ...) {
   ptype_geoms("GEOMETRYCOLLECTION")
 }
@@ -151,94 +176,123 @@ vec_ptype2.rs_POLYGON.rs_POINT <- function(x, y, ...) {
 #
 # glue::glue(glue_template, .open = "{{", .close = "}}") |> clipr::write_clip()
 
-
+#' @export
 vec_cast.rs_LINESTRING.rs_MULTILINESTRING <- function(x, y, ...) {
   restore_geoms(x)
 }
+#' @export
 vec_cast.rs_LINESTRING.rs_MULTIPOINT <- function(x, y, ...) {
   restore_geoms(x)
 }
+#' @export
 vec_cast.rs_LINESTRING.rs_MULTIPOLYGON <- function(x, y, ...) {
   restore_geoms(x)
 }
+#' @export
 vec_cast.rs_LINESTRING.rs_POINT <- function(x, y, ...) {
   restore_geoms(x)
 }
+#' @export
 vec_cast.rs_LINESTRING.rs_POLYGON <- function(x, y, ...) {
   restore_geoms(x)
 }
+#' @export
 vec_cast.rs_MULTILINESTRING.rs_LINESTRING <- function(x, y, ...) {
   restore_geoms(x)
 }
+#' @export
 vec_cast.rs_MULTILINESTRING.rs_MULTIPOINT <- function(x, y, ...) {
   restore_geoms(x)
 }
+#' @export
 vec_cast.rs_MULTILINESTRING.rs_MULTIPOLYGON <- function(x, y, ...) {
   restore_geoms(x)
 }
+#' @export
 vec_cast.rs_MULTILINESTRING.rs_POINT <- function(x, y, ...) {
   restore_geoms(x)
 }
+#' @export
 vec_cast.rs_MULTILINESTRING.rs_POLYGON <- function(x, y, ...) {
   restore_geoms(x)
 }
+#' @export
 vec_cast.rs_MULTIPOINT.rs_LINESTRING <- function(x, y, ...) {
   restore_geoms(x)
 }
+#' @export
 vec_cast.rs_MULTIPOINT.rs_MULTILINESTRING <- function(x, y, ...) {
   restore_geoms(x)
 }
+#' @export
 vec_cast.rs_MULTIPOINT.rs_MULTIPOLYGON <- function(x, y, ...) {
   restore_geoms(x)
 }
+#' @export
 vec_cast.rs_MULTIPOINT.rs_POINT <- function(x, y, ...) {
   restore_geoms(x)
 }
+#' @export
 vec_cast.rs_MULTIPOINT.rs_POLYGON <- function(x, y, ...) {
   restore_geoms(x)
 }
+#' @export
 vec_cast.rs_MULTIPOLYGON.rs_LINESTRING <- function(x, y, ...) {
   restore_geoms(x)
 }
+#' @export
 vec_cast.rs_MULTIPOLYGON.rs_MULTILINESTRING <- function(x, y, ...) {
   restore_geoms(x)
 }
+#' @export
 vec_cast.rs_MULTIPOLYGON.rs_MULTIPOINT <- function(x, y, ...) {
   restore_geoms(x)
 }
+#' @export
 vec_cast.rs_MULTIPOLYGON.rs_POINT <- function(x, y, ...) {
   restore_geoms(x)
 }
+#' @export
 vec_cast.rs_MULTIPOLYGON.rs_POLYGON <- function(x, y, ...) {
   restore_geoms(x)
 }
+#' @export
 vec_cast.rs_POINT.rs_LINESTRING <- function(x, y, ...) {
   restore_geoms(x)
 }
+#' @export
 vec_cast.rs_POINT.rs_MULTILINESTRING <- function(x, y, ...) {
   restore_geoms(x)
 }
+#' @export
 vec_cast.rs_POINT.rs_MULTIPOINT <- function(x, y, ...) {
   restore_geoms(x)
 }
+#' @export
 vec_cast.rs_POINT.rs_MULTIPOLYGON <- function(x, y, ...) {
   restore_geoms(x)
 }
+#' @export
 vec_cast.rs_POINT.rs_POLYGON <- function(x, y, ...) {
   restore_geoms(x)
 }
+#' @export
 vec_cast.rs_POLYGON.rs_LINESTRING <- function(x, y, ...) {
   restore_geoms(x)
 }
+#' @export
 vec_cast.rs_POLYGON.rs_MULTILINESTRING <- function(x, y, ...) {
   restore_geoms(x)
 }
+#' @export
 vec_cast.rs_POLYGON.rs_MULTIPOINT <- function(x, y, ...) {
   restore_geoms(x)
 }
+#' @export
 vec_cast.rs_POLYGON.rs_MULTIPOLYGON <- function(x, y, ...) {
   restore_geoms(x)
 }
+#' @export
 vec_cast.rs_POLYGON.rs_POINT <- function(x, y, ...) {
   restore_geoms(x)
 }
@@ -269,17 +323,30 @@ c._geoms <- function(...) {
 }
 
 
+#' @export
 c.point <- c._geom
+#' @export
 c.multipoint <- c._geom
+#' @export
 c.linestring <- c._geom
+#' @export
 c.multilinestring <- c._geom
+#' @export
 c.polygon <- c._geom
+#' @export
 c.multipolygon <- c._geom
 
+#' @export
 c.rs_POINT <- c._geoms
+#' @export
 c.rs_MULTIPOINT <- c._geoms
+#' @export
 c.rs_POLYGON <- c._geoms
+#' @export
 c.rs_MULTIPOLYGON <- c._geoms
+#' @export
 c.rs_LINESTRING <- c._geoms
+#' @export
 c.rs_MULTILINESTRING <- c._geoms
+#' @export
 c.rs_GEOMETRYCOLLECTION <- c._geoms

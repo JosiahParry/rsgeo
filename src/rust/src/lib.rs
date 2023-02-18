@@ -39,6 +39,9 @@ use spatial_index::get_spatial_index_metadata;
 mod topology;
 use topology::get_topology_metadata;
 
+mod casting;
+use casting::get_casting_metadata;
+
 use crate::types::Geom;
 use extendr_api::prelude::*;
 use extendr_api::wrapper::{ExternalPtr, RMatrix};
@@ -226,4 +229,5 @@ extendr_module! {
     use io;
     use spatial_index;
     use topology;
+    use casting;
 }
