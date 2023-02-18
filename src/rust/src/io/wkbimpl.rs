@@ -6,7 +6,7 @@ use crate::{types::Geom, geoms::from_list};
 use crate::to_pntr;
 
 #[extendr]
-/// Convert to and from WKB
+/// WKB Translation
 /// 
 /// @export
 /// @rdname wkb

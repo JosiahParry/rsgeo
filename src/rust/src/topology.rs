@@ -45,7 +45,7 @@ fn contains_sparse(x: List, y: List) -> List {
 
 #[extendr]
 /// @export
-/// @rdname predicates
+/// @rdname predicates  
 fn contains(x: Robj, y: List) -> Vec<bool> {
     let x = Geom::from(x);
     let y = from_list(y);
@@ -208,8 +208,8 @@ extendr_module! {
     fn contains; // vectorized along y
     fn contains_sparse; 
     fn contains_pairwise;
-    fn intersects_sparse;
     fn intersects;
+    fn intersects_sparse;
     fn intersects_pairwise;
     fn within;
     fn within_sparse;

@@ -119,18 +119,25 @@ print_rsgeom <- function(x, width = NULL) {
 #   invisible(x)
 # }
 # individual printing
+
 #' Printing and formatting
+#'
 #' @rdname print
 #' @export
 print.point <- print_rsgeom
+#' @rdname print
 #' @export
 print.multipoint <- print_rsgeom
+#' @rdname print
 #' @export
 print.polygon <- print_rsgeom
+#' @rdname print
 #' @export
 print.multipolygon <- print_rsgeom
+#' @rdname print
 #' @export
 print.linestring <- print_rsgeom
+#' @rdname print
 #' @export
 print.multilinestring <- print_rsgeom
 #'

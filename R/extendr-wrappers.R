@@ -32,7 +32,9 @@ haversine_intermediate <- function(x, y, distance) .Call(wrap__haversine_interme
 #'@export
 chaikin_smoothing <- function(x, niter) .Call(wrap__chaikin_smoothing, x, niter)
 
-determine_geoms_class <- function(x) .Call(wrap__determine_geoms_class, x)
+null_pntr <- function() .Call(wrap__null_pntr)
+
+restore_geoms <- function(x) .Call(wrap__restore_geoms, x)
 
 #'@export
 signed_area <- function(x) .Call(wrap__signed_area, x)
@@ -280,7 +282,7 @@ wkt_to_geoms <- function(x) .Call(wrap__wkt_to_geoms, x)
 #' @export
 wkt_from_geoms <- function(x) .Call(wrap__wkt_from_geoms, x)
 
-#' Convert to and from WKB
+#' WKB Translation
 #' 
 #' @export
 #' @rdname wkb
@@ -324,7 +326,7 @@ locate_in_envelope <- function(rtree, geom) .Call(wrap__locate_in_envelope, rtre
 intersection_candidates <- function(x, y) .Call(wrap__intersection_candidates, x, y)
 
 #' @export
-#' @rdname predicates
+#' @rdname predicates  
 contains <- function(x, y) .Call(wrap__contains, x, y)
 
 #' Spatial Predicates
@@ -338,11 +340,11 @@ contains_pairwise <- function(x, y) .Call(wrap__contains_pairwise, x, y)
 
 #' @export
 #' @rdname predicates
-intersects_sparse <- function(x, y) .Call(wrap__intersects_sparse, x, y)
+intersects <- function(x, y) .Call(wrap__intersects, x, y)
 
 #' @export
 #' @rdname predicates
-intersects <- function(x, y) .Call(wrap__intersects, x, y)
+intersects_sparse <- function(x, y) .Call(wrap__intersects_sparse, x, y)
 
 #' @export
 #' @rdname predicates

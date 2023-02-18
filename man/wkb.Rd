@@ -5,7 +5,7 @@
 \alias{wkb_from_geoms}
 \alias{wkb_to_geom}
 \alias{wkb_to_geoms}
-\title{Convert to and from WKB}
+\title{WKB Translation}
 \usage{
 wkb_from_geom(x)
 
@@ -16,5 +16,5 @@ wkb_to_geom(x)
 wkb_to_geoms(x)
 }
 \description{
-Convert to and from WKB
+WKB Translation
 }

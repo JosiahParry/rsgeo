@@ -1,5 +1,5 @@
 Package: rsgeo
-Title: What the Package Does (One Line, Title Case)
+Title: An Interface to Rust's 'geo-types' Library
 Version: 0.0.0.9000
 Authors@R: 
     person("Josiah", "Parry", , "josiah.parry@gmail.com", role = c("aut", "cre"),
@@ -12,6 +12,7 @@ Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.3
 Imports: 
     pillar,
+    rlang,
     vctrs
 Suggests: 
     sf

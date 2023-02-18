@@ -4,8 +4,8 @@
 \alias{contains}
 \alias{contains_sparse}
 \alias{contains_pairwise}
-\alias{intersects_sparse}
 \alias{intersects}
+\alias{intersects_sparse}
 \alias{intersects_pairwise}
 \alias{within}
 \alias{within_sparse}
@@ -18,9 +18,9 @@ contains_sparse(x, y)
 
 contains_pairwise(x, y)
 
-intersects_sparse(x, y)
-
 intersects(x, y)
+
+intersects_sparse(x, y)
 
 intersects_pairwise(x, y)
 
