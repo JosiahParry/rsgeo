@@ -6,6 +6,11 @@ use crate::utils::{geom_class};
 use crate::geoms::from_list;
 
 
+
+//# cast 1 : 1 
+//# expand 1 : many
+//# combine many : 1 
+
 // multis to the single varietys 
 #[extendr]
 fn expand_multipolygon(x: Robj) -> Robj {
@@ -50,7 +55,7 @@ fn expand_multilinestring(x: Robj) -> Robj {
 }
 
 // primitives to components
-// polygon to linestrings
+// polygon to linestring
 
 #[extendr]
 fn expand_polygon(x: Robj) -> Robj {
@@ -172,4 +177,5 @@ extendr_module! {
     fn cast_points_multipoint;
     fn cast_lines_multilinestring;
     fn cast_lines_polygon;
+    fn cast_multiline_polygon;
 }
