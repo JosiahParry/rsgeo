@@ -90,6 +90,7 @@ fn expand_linestring(x: Robj) -> Robj {
 extendr_module! {
     mod expand;
     fn expand_linestring;
+    
     fn expand_multipolygon;
     fn expand_multilinestring;
     fn expand_multipoint;
