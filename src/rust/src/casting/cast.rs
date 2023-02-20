@@ -109,6 +109,8 @@ fn cast_polygon_multipolygon(x: Robj) -> Robj {
 
 fn cast_polygon_linestring(x: Robj) -> Robj {
     let x = Polygon::try_from(Geom::from(x).geom).unwrap();
+
+    // TODO possibly only return the exterrior ring
     let pnts = x
         .coords_iter()
         .map(|x| Point::from(x))

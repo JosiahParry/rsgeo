@@ -87,12 +87,95 @@ fn expand_linestring(x: Robj) -> Robj {
 }
 
 
+// Expansion Hierarchy
+// MultiPolygon -> Polygon
+// (Polygon -> LineString) OR (MultiLineString -> LineString)
+// LineString -> Point
+
+#[extendr]
+fn expand_linestrings(x: List) -> List {
+    x
+        .into_iter()
+        .map(|(_, robj)| {
+            if robj.is_null() {
+                Robj::from(extendr_api::NULL)
+            } else {
+                expand_linestring(robj)
+            }
+        })
+        .collect::<List>()
+}
+
+
+#[extendr]
+fn expand_multipolygons(x: List) -> List {
+    x
+        .into_iter()
+        .map(|(_, robj)| {
+            if robj.is_null() {
+                Robj::from(extendr_api::NULL)
+            } else {
+                expand_multipolygon(robj)
+            }
+        })
+        .collect::<List>()
+}
+
+
+#[extendr]
+fn expand_multilinestrings(x: List) -> List {
+    x
+        .into_iter()
+        .map(|(_, robj)| {
+            if robj.is_null() {
+                Robj::from(extendr_api::NULL)
+            } else {
+                expand_multilinestring(robj)
+            }
+        })
+        .collect::<List>()
+}
+
+
+#[extendr]
+fn expand_multipoints(x: List) -> List {
+    x
+        .into_iter()
+        .map(|(_, robj)| {
+            if robj.is_null() {
+                Robj::from(extendr_api::NULL)
+            } else {
+                expand_multipoint(robj)
+            }
+        })
+        .collect::<List>()
+}
+
+
+#[extendr]
+fn expand_polygons(x: List) -> List {
+    x
+        .into_iter()
+        .map(|(_, robj)| {
+            if robj.is_null() {
+                Robj::from(extendr_api::NULL)
+            } else {
+                expand_polygon(robj)
+            }
+        })
+        .collect::<List>()
+}
+
 extendr_module! {
     mod expand;
     fn expand_linestring;
-    
+    fn expand_linestrings;
     fn expand_multipolygon;
+    fn expand_multipolygons;
     fn expand_multilinestring;
+    fn expand_multilinestrings;
     fn expand_multipoint;
+    fn expand_multipoints;
     fn expand_polygon;
+    fn expand_polygons;
 }

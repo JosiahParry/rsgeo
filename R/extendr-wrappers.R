@@ -388,13 +388,23 @@ cast_multipolygons <- function(x, to) .Call(wrap__cast_multipolygons, x, to)
 
 expand_linestring <- function(x) .Call(wrap__expand_linestring, x)
 
+expand_linestrings <- function(x) .Call(wrap__expand_linestrings, x)
+
 expand_multipolygon <- function(x) .Call(wrap__expand_multipolygon, x)
+
+expand_multipolygons <- function(x) .Call(wrap__expand_multipolygons, x)
 
 expand_multilinestring <- function(x) .Call(wrap__expand_multilinestring, x)
 
+expand_multilinestrings <- function(x) .Call(wrap__expand_multilinestrings, x)
+
 expand_multipoint <- function(x) .Call(wrap__expand_multipoint, x)
 
+expand_multipoints <- function(x) .Call(wrap__expand_multipoints, x)
+
 expand_polygon <- function(x) .Call(wrap__expand_polygon, x)
+
+expand_polygons <- function(x) .Call(wrap__expand_polygons, x)
 
 
 # nolint end
