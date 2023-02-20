@@ -2,6 +2,8 @@
 # (Multi) Point, LineString, and Polygon
 format_rsgeom <- function(x, width = NULL, ...) {
 
+  if (is.null(x)) return(format(NULL))
+
   if (is.null(width)) width <- options("width")[["width"]]
   msg <- capture.output(print_geom(x))
   geom_types <- c(
@@ -104,7 +106,7 @@ vec_ptype_abbr.rs_GEOMETRYCOLLECTION <- function(x, ...) "GEOMS"
 
 
 print_rsgeom <- function(x, width = NULL) {
-
+  if (is.null(x)) return(invisible(x))
   msg <- format_rsgeom(x, width)
   cat(msg)
   invisible(x)

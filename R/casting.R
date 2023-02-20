@@ -3,6 +3,7 @@ cast_geoms <- function(x, to) {
 }
 
 .cast_geom <- function(x, to) {
+  to <- tolower(to)
   cls <- class(x)
   f <- switch(
     cls,
@@ -21,6 +22,20 @@ cast_geoms <- function(x, to) {
 }
 
 
-# pnts <- geom_points_xy(runif(100), runif(100))
-#
-# cast_points(pnts, "MULTIPOINT")
+.cast_geoms <- function(x, to) {
+
+  to <- tolower(to)
+  cls <- tolower(class(x))
+
+  f <- switch(
+    cls,
+    "rs_point" = cast_points,
+    "rs_multipoint" = cast_multipoints,
+    "rs_linestring" = cast_linestrings,
+    "rs_multilinestring" = cast_multilinestrings,
+    "rs_polygon" = cast_polygons,
+    "rs_multipolygon" = cast_multipolygons
+    )
+
+  res <- f(x, to)
+}

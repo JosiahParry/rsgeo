@@ -1,6 +1,7 @@
 
 # Custom tibble printing method
 format_pillar_value <- function(x, width = NULL, ...) {
+  if (is.null(x)) return(format(NA))
   msg <- capture.output(print_geom(x))
   geom_types <- c(
     "Point",

@@ -33,7 +33,8 @@ fn cast_point(x: Robj, to: &str) -> Robj {
     match to {
         "point" => x,
         "multipoint" => cast_point_multipoint(x),
-        &_ => Robj::from(extendr_api::NA_LOGICAL) // if not matched return  self
+        &_ => Robj::from(extendr_api::NULL) // if not matched return  self
+        
     }
 }
 
@@ -81,7 +82,7 @@ fn cast_multipoint(x: Robj, to: &str) -> Robj {
         "multipolygon" => cast_multipoint_multipolygon(x),
         "linestring" => cast_multipoint_linestring(x),
         "multilinestring" => cast_multipoint_multilinestring(x),
-        &_ => Robj::from(extendr_api::NA_LOGICAL)
+        &_ =>  Robj::from(extendr_api::NULL)
 
     }
 }
@@ -133,7 +134,7 @@ fn cast_polygon(x: Robj, to: &str) -> Robj {
         "multipoint" => cast_polygon_multipoint(x),
         "linestring" => cast_polygon_linestring(x),
         "multilinestring" => cast_polygon_multilinestring(x),
-        &_ => Robj::from(extendr_api::NA_LOGICAL)
+        &_ => Robj::from(extendr_api::NULL)
     }
 }
 
@@ -168,7 +169,7 @@ fn cast_multipolygon(x: Robj, to: &str) -> Robj {
         "multipolygon" => x,
         "multipoint" => cast_multipolygon_multipoint(x),
         "multilinestring" => cast_multipolygon_multilinestring(x),
-        &_ => Robj::from(extendr_api::NA_LOGICAL)
+        &_ =>  Robj::from(extendr_api::NULL)
     }
 }
 
@@ -202,7 +203,7 @@ fn cast_linestring(x: Robj, to: &str) -> Robj {
         "multipoint" => cast_linestring_multipoint(x),
         "multilinestring" => cast_linestring_multilinestring(x),
         "polygon" => cast_linestring_polygon(x),
-        &_ => Robj::from(extendr_api::NA_LOGICAL)
+        &_ =>  Robj::from(extendr_api::NULL)
     }
 }
 
@@ -243,7 +244,7 @@ fn cast_multilinestring(x: Robj, to: &str) -> Robj {
         "multilinestring" => x,
         "multipoint" => cast_multilinestring_multipoint(x),
         "multipolygon" => cast_multilinestring_multipolygon(x),
-        &_ => Robj::from(extendr_api::NA_LOGICAL)
+        &_ => Robj::from(extendr_api::NULL)
     }
 }
 
