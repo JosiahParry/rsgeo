@@ -362,6 +362,32 @@ within_sparse <- function(x, y) .Call(wrap__within_sparse, x, y)
 #' @rdname predicates
 within_pairwise <- function(x, y) .Call(wrap__within_pairwise, x, y)
 
+cast_point <- function(x, to) .Call(wrap__cast_point, x, to)
+
+cast_points <- function(x, to) .Call(wrap__cast_points, x, to)
+
+cast_multipoint <- function(x, to) .Call(wrap__cast_multipoint, x, to)
+
+cast_multipoints <- function(x, to) .Call(wrap__cast_multipoints, x, to)
+
+cast_linestring <- function(x, to) .Call(wrap__cast_linestring, x, to)
+
+cast_linestrings <- function(x, to) .Call(wrap__cast_linestrings, x, to)
+
+cast_multilinestring <- function(x, to) .Call(wrap__cast_multilinestring, x, to)
+
+cast_multilinestrings <- function(x, to) .Call(wrap__cast_multilinestrings, x, to)
+
+cast_polygon <- function(x, to) .Call(wrap__cast_polygon, x, to)
+
+cast_polygons <- function(x, to) .Call(wrap__cast_polygons, x, to)
+
+cast_multipolygon <- function(x, to) .Call(wrap__cast_multipolygon, x, to)
+
+cast_multipolygons <- function(x, to) .Call(wrap__cast_multipolygons, x, to)
+
+expand_linestring <- function(x) .Call(wrap__expand_linestring, x)
+
 expand_multipolygon <- function(x) .Call(wrap__expand_multipolygon, x)
 
 expand_multilinestring <- function(x) .Call(wrap__expand_multilinestring, x)
@@ -369,16 +395,6 @@ expand_multilinestring <- function(x) .Call(wrap__expand_multilinestring, x)
 expand_multipoint <- function(x) .Call(wrap__expand_multipoint, x)
 
 expand_polygon <- function(x) .Call(wrap__expand_polygon, x)
-
-expand_linestring <- function(x) .Call(wrap__expand_linestring, x)
-
-cast_points_line <- function(x) .Call(wrap__cast_points_line, x)
-
-cast_points_multipoint <- function(x) .Call(wrap__cast_points_multipoint, x)
-
-cast_lines_multilinestring <- function(x) .Call(wrap__cast_lines_multilinestring, x)
-
-cast_lines_polygon <- function(x) .Call(wrap__cast_lines_polygon, x)
 
 
 # nolint end

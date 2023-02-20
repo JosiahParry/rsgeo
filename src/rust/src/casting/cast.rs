@@ -3,14 +3,13 @@ use geo::CoordsIter;
 use geo_types::{MultiPolygon, MultiPoint, MultiLineString, Polygon, LineString, Point};
 use crate::types::Geom;
 use crate::to_pntr;
-use crate::geoms::from_list;
+use crate::utils::geom_class;
 
 
 
 //# cast 1 : 1 
 //# expand 1 : many
 //# combine many : 1 
-
 
 // CASTING ------------------------------------------------------------------------
 //                      to_point to_multipoint to_polygon to_multipolygon to_linestring to_multilinestring
@@ -249,88 +248,83 @@ fn cast_multilinestring(x: Robj, to: &str) -> Robj {
 }
 
 
-// COMBINE ------------------------------------------------------------------------
-
-// building primitives up
-// vec points -> Line
-// vec points -> multipoint
+// For vectors, not scalars
 #[extendr]
-fn combine_points_line(x: List) -> Robj {
-    let x = from_list(x)
+fn cast_points(x: List, to: &str) -> Robj {
+    x
         .into_iter()
-        .map(|x| Point::try_from(x.geom).unwrap())
-        .collect::<Vec<Point>>();
-
-    to_pntr(Geom::from(LineString::from(x)))
+        .map(|(_, x)| cast_point(x, to))
+        .collect::<List>()
+        .set_attrib("class", geom_class(to))
+        .unwrap()
 }
 
-#[extendr]
-fn combine_points_multipoint(x: List) -> Robj {
-    let x = from_list(x)
-    .into_iter()
-    .map(|x| Point::try_from(x.geom).unwrap())
-    .collect::<Vec<Point>>();
 
-    to_pntr(Geom::from(MultiPoint::from(x)))
-}
-
-// vec lines -> polygon
-// vec lines -> multiline
 #[extendr]
-fn combine_lines_polygon(x: List) -> Robj {
-    let x = from_list(x)
+fn cast_linestrings(x: List, to: &str) -> Robj {
+    x
         .into_iter()
-        .map(|x| LineString::try_from(x.geom).unwrap())
-        .collect::<Vec<LineString>>();
-
-        // shoot do i need to handle winding here? 
-        // assuming the user has the widning correct here
-    let n = x.len();
-    let exterior = x[0].clone();
-    let interior = if n > 1 {
-        x[1..n].to_owned()
-    } else {
-        vec![]
-    };
-
-    to_pntr(Geom::from(Polygon::new(exterior, interior)))
+        .map(|(_, x)| cast_linestring(x, to))
+        .collect::<List>()
+        .set_attrib("class", geom_class(to))
+        .unwrap()
 }
 
-// #[extendr]
-// fn cast_lines_multilinestring(x: List) -> Robj {
-//     let x = from_list(x)
-//         .into_iter()
-//         .map(|x| LineString::try_from(x.geom).unwrap())
-//         .collect::<Vec<LineString>>();
+#[extendr]
+fn cast_multipoints(x: List, to: &str) -> Robj {
+    x
+        .into_iter()
+        .map(|(_, x)| cast_multipoint(x, to))
+        .collect::<List>()
+        .set_attrib("class", geom_class(to))
+        .unwrap()
+}
 
-//         to_pntr(Geom::from(MultiLineString::new(x)))
-// }
 
-// #[extendr]
-// fn cast_multiline_polygon(x: Robj) -> Robj {
-//     let x = MultiLineString::try_from(Geom::from(x).geom).unwrap().0;
-    
-//     let n = x.len();
-//     let exterior = x[0].clone();
-//     let interior = if n > 1 {
-//         x[1..n].to_owned()
-//     } else {
-//         vec![]
-//     };
+#[extendr]
+fn cast_multilinestrings(x: List, to: &str) -> Robj {
+    x
+        .into_iter()
+        .map(|(_, x)| cast_multilinestring(x, to))
+        .collect::<List>()
+        .set_attrib("class", geom_class(to))
+        .unwrap()
+}
 
-//     to_pntr(Geom::from(Polygon::new(exterior, interior)))
-// }
+#[extendr]
+fn cast_polygons(x: List, to: &str) -> Robj {
+    x
+        .into_iter()
+        .map(|(_, x)| cast_polygon(x, to))
+        .collect::<List>()
+        .set_attrib("class", geom_class(to))
+        .unwrap()
+}
 
-// multiline -> polygon
-// polygons -> multipolygon
+#[extendr]
+fn cast_multipolygons(x: List, to: &str) -> Robj {
+    x
+        .into_iter()
+        .map(|(_, x)| cast_multipolygon(x, to))
+        .collect::<List>()
+        .set_attrib("class", geom_class(to))
+        .unwrap()
+}
+
 
 
 extendr_module! {
     mod cast;
     fn cast_point;
+    fn cast_points;
     fn cast_multipoint;
+    fn cast_multipoints;
     fn cast_linestring;
+    fn cast_linestrings;
     fn cast_multilinestring;
+    fn cast_multilinestrings;
     fn cast_polygon;
+    fn cast_polygons;
     fn cast_multipolygon;
+    fn cast_multipolygons;
 }
