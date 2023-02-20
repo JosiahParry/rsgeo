@@ -1,16 +1,11 @@
 use extendr_api::prelude::*;
-use geo_types::{MultiPolygon, MultiPoint, MultiLineString, Polygon, LineString, Point};
+use geo_types::*;
+use crate::utils::geom_class;
 use crate::types::Geom;
 use crate::to_pntr;
-use crate::utils::{geom_class};
-use crate::geoms::from_list;
 
 
-
-//# cast 1 : 1 
-//# expand 1 : many
-//# combine many : 1 
-
+// EXPAND -------------------------------------------------------------------------
 // multis to the single varietys 
 #[extendr]
 fn expand_multipolygon(x: Robj) -> Robj {
@@ -92,90 +87,11 @@ fn expand_linestring(x: Robj) -> Robj {
 }
 
 
-// building primitives up
-// vec points -> Line
-// vec points -> multipoint
-#[extendr]
-fn cast_points_line(x: List) -> Robj {
-    let x = from_list(x)
-        .into_iter()
-        .map(|x| Point::try_from(x.geom).unwrap())
-        .collect::<Vec<Point>>();
-
-    to_pntr(Geom::from(LineString::from(x)))
-}
-
-#[extendr]
-fn cast_points_multipoint(x: List) -> Robj {
-    let x = from_list(x)
-    .into_iter()
-    .map(|x| Point::try_from(x.geom).unwrap())
-    .collect::<Vec<Point>>();
-
-    to_pntr(Geom::from(MultiPoint::from(x)))
-}
-
-// vec lines -> polygon
-// vec lines -> multiline
-#[extendr]
-fn cast_lines_polygon(x: List) -> Robj {
-    let x = from_list(x)
-        .into_iter()
-        .map(|x| LineString::try_from(x.geom).unwrap())
-        .collect::<Vec<LineString>>();
-
-        // shoot do i need to handle winding here? 
-        // assuming the user has the widning correct here
-    let n = x.len();
-    let exterior = x[0].clone();
-    let interior = if n > 1 {
-        x[1..n].to_owned()
-    } else {
-        vec![]
-    };
-
-    to_pntr(Geom::from(Polygon::new(exterior, interior)))
-}
-
-#[extendr]
-fn cast_lines_multilinestring(x: List) -> Robj {
-    let x = from_list(x)
-        .into_iter()
-        .map(|x| LineString::try_from(x.geom).unwrap())
-        .collect::<Vec<LineString>>();
-
-        to_pntr(Geom::from(MultiLineString::new(x)))
-}
-
-#[extendr]
-fn cast_multiline_polygon(x: Robj) -> Robj {
-    let x = MultiLineString::try_from(Geom::from(x).geom).unwrap().0;
-    
-    let n = x.len();
-    let exterior = x[0].clone();
-    let interior = if n > 1 {
-        x[1..n].to_owned()
-    } else {
-        vec![]
-    };
-
-    to_pntr(Geom::from(Polygon::new(exterior, interior)))
-}
-
-// multiline -> polygon
-// polygons -> multipolygon
-
-
 extendr_module! {
-    mod casting;
+    mod expand;
+    fn expand_linestring;
     fn expand_multipolygon;
     fn expand_multilinestring;
     fn expand_multipoint;
     fn expand_polygon;
-    fn expand_linestring;
-    fn cast_points_line;
-    fn cast_points_multipoint;
-    fn cast_lines_multilinestring;
-    fn cast_lines_polygon;
-    fn cast_multiline_polygon;
 }
