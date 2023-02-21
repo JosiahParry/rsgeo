@@ -31,7 +31,7 @@ fn null_pntr() -> Robj {
 
 // 
 #[extendr]
-fn restore_geoms(x: Robj) -> Robj {
+pub fn restore_geoms(x: Robj) -> Robj {
     let class_to_set = determine_geoms_class(&x);
     x.set_attrib("class", class_to_set)
         .unwrap()

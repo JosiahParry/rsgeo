@@ -1,6 +1,6 @@
 use extendr_api::prelude::*;
 use geo::{
-    point, BooleanOps, Geometry, LineString, MultiLineString, MultiPoint, MultiPolygon, Point,
+    BooleanOps, Geometry, LineString, MultiLineString, MultiPoint, MultiPolygon, Point,
     Polygon, RemoveRepeatedPoints,
 };
 
@@ -14,23 +14,20 @@ use rstar::{ParentNode, RTree, RTreeNode};
 #[extendr]
 ///@export
 fn union_geoms(x: List) -> Robj {
-    let geom_type = x.class().unwrap();
+    let mut geom_type = x.class().unwrap();
     let x = from_list(x);
     let x: Vec<Geometry> = x.into_iter().map(|x| x.geom).collect();
 
     //match geom_type
-    let geo_type: String = geom_type
-        .into_iter()
-        .filter(|cls| cls.contains("rs_"))
-        .collect();
-
-    let res = match geo_type.as_str() {
+    let geo_type = geom_type.nth(0).unwrap();
+    
+    let res = match geo_type {
         "rs_POINT" => {
             let x = x
                 .into_iter()
                 .map(|x| Point::try_from(x).unwrap())
                 .collect::<Vec<Point>>();
-            Geometry::from(union_point(x))
+            to_pntr(Geometry::from(union_point(x)).into())
         }
 
         "rs_POLYGON" => {
@@ -38,7 +35,7 @@ fn union_geoms(x: List) -> Robj {
                 .into_iter()
                 .map(|x| Polygon::try_from(x).unwrap())
                 .collect::<Vec<Polygon>>();
-            Geometry::from(union_polygon(x))
+            to_pntr(Geometry::from(union_polygon(x)).into())
         }
 
         "rs_MULTIPOLYGON" => {
@@ -46,7 +43,7 @@ fn union_geoms(x: List) -> Robj {
                 .into_iter()
                 .map(|x| MultiPolygon::try_from(x).unwrap())
                 .collect::<Vec<MultiPolygon>>();
-            Geometry::from(union_multipolygon(x))
+            to_pntr(Geometry::from(union_multipolygon(x)).into())
         }
 
         "rs_MULTIPOINT" => {
@@ -54,26 +51,28 @@ fn union_geoms(x: List) -> Robj {
                 .into_iter()
                 .map(|x| MultiPoint::try_from(x).unwrap())
                 .collect::<Vec<MultiPoint>>();
-            Geometry::from(union_multipoint(x))
+            to_pntr(Geometry::from(union_multipoint(x)).into())
         }
         "rs_LINESTRING" => {
             let x = x
                 .into_iter()
                 .map(|x| LineString::try_from(x).unwrap())
                 .collect::<Vec<LineString>>();
-            Geometry::from(union_linestring(x))
+            to_pntr(Geometry::from(union_linestring(x)).into())
         }
         "rs_MULTILINESTRING" => {
             let x = x
                 .into_iter()
                 .map(|x| MultiLineString::try_from(x).unwrap())
                 .collect::<Vec<MultiLineString>>();
-            Geometry::from(union_multilinestring(x))
+            to_pntr(Geom::from(Geometry::from(union_multilinestring(x))))
         }
-        _ => point!(x: 1.0, y: 1.0).into(),
+        _ => Robj::from(extendr_api::NULL)
     };
 
-    to_pntr(Geom::from(res))
+    let lst = List::from_values(vec![res]);
+    crate::utils::restore_geoms(lst.into())
+
 }
 
 //#[extendr]
