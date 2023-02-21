@@ -12,7 +12,8 @@ use rstar::primitives::GeomWithData;
 use rstar::{ParentNode, RTree, RTreeNode};
 
 #[extendr]
-///@export
+/// @export
+/// @rdname combine_geoms
 fn union_geoms(x: List) -> Robj {
     let mut geom_type = x.class().unwrap();
     let x = from_list(x);
@@ -70,8 +71,10 @@ fn union_geoms(x: List) -> Robj {
         _ => Robj::from(extendr_api::NULL)
     };
 
-    let lst = List::from_values(vec![res]);
-    crate::utils::restore_geoms(lst.into())
+
+    
+    //let lst = List::from_values(&[res]);
+    crate::utils::restore_geoms(list!(res).into())
 
 }
 

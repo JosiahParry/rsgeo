@@ -241,7 +241,8 @@ convex_hulls <- function(x) .Call(wrap__convex_hulls, x)
 #' @export
 extreme_coords <- function(x) .Call(wrap__extreme_coords, x)
 
-#'@export
+#' @export
+#' @rdname combine_geoms
 union_geoms <- function(x) .Call(wrap__union_geoms, x)
 
 geom_to_r <- function(x) .Call(wrap__geom_to_r, x)
@@ -405,6 +406,18 @@ expand_multipoints <- function(x) .Call(wrap__expand_multipoints, x)
 expand_polygon <- function(x) .Call(wrap__expand_polygon, x)
 
 expand_polygons <- function(x) .Call(wrap__expand_polygons, x)
+
+combine_points <- function(x) .Call(wrap__combine_points, x)
+
+combine_multipoints <- function(x) .Call(wrap__combine_multipoints, x)
+
+combine_linestrings <- function(x) .Call(wrap__combine_linestrings, x)
+
+combine_multilinestrings <- function(x) .Call(wrap__combine_multilinestrings, x)
+
+combine_polygons <- function(x) .Call(wrap__combine_polygons, x)
+
+combine_multipolygons <- function(x) .Call(wrap__combine_multipolygons, x)
 
 
 # nolint end
