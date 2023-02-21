@@ -22,8 +22,10 @@ pub fn wkt_to_geom(x: &str) -> Robj {
 #[extendr]
 /// @rdname wkt
 /// @export
-pub fn wkt_to_geoms(x: Strings) -> List {
-    x.iter().map(|x| wkt_to_geom(x.as_str())).collect::<List>()
+pub fn wkt_to_geoms(x: Strings) -> Robj {
+    let res = x.iter().map(|x| wkt_to_geom(x.as_str())).collect::<List>();
+
+    crate::utils::restore_geoms(res.into())
 }
 #[extendr]
 /// @rdname wkt

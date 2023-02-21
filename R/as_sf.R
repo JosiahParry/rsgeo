@@ -35,6 +35,19 @@ as_sfg.linestring <- function(x) {
 }
 
 #' @export
+as_sfg.multilinestring <- function(x) {
+  res <- geom_to_r(x)
+
+  structure(
+    res,
+    dim = dim(res),
+    class = c("XY", "MULTILINESTRING", "sfg")
+  )
+
+}
+
+
+#' @export
 as_sfg.polygon <- function(x) {
   structure(
     geom_to_r(x),

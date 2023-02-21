@@ -9,7 +9,7 @@ plot.polygon <- function(x, ...) plot_rsgeom(x, ...)
 plot.multipolygon <- function(x, ...) plot_rsgeom(x, ...)
 
 #' @export
-plot.point <- function(x, ...) plot_rsgemo(x, ...)
+plot.point <- function(x, ...) plot_rsgeom(x, ...)
 
 #' @export
 plot.multipoint <- function(x, ...) plot_rsgeom(x, ...)

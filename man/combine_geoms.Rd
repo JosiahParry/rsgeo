@@ -13,5 +13,31 @@ union_geoms(x)
 \item{x}{a vector of geometries}
 }
 \description{
-Combine geometries
+Given a vector of geometries combine them into a single geometry.
+}
+\details{
+\subsection{\code{combine_geoms()}}{
+
+\code{combine_geoms()} combines a vector of geometries into a vector of lenght one
+their \code{MULTI} counterpart.
+\itemize{
+\item \code{rs_POINT} and \code{rs_MULTIPOINT} -> \code{rs_MULTIPOINT}
+\item \code{rs_LINESTRING} and \code{rs_MULTILINESTRING} -> \code{rs_MULTILINESTRING}
+\item \code{rs_POLYGON} and \code{rs_MULTIPOLYGON} -> \code{rs_MULTIPOLYGON}
+\item \code{rs_GEOMETRYCOLLECTION} is not supported
+}
+}
+
+\subsection{\code{union_geoms()}}{
+
+\code{union_geoms()} creates a union of all geometries
+\itemize{
+\item \code{rs_POINT} - combines and removes repeated points
+\item \code{rs_MULTIPOINT} - combines and does not remove repeated points
+\item \code{rs_LINESTRING} - combines and  removes duplicated points
+\item \code{rs_MULTILINESTRING} - combines and removes duplicated points
+\item \code{rs_POLYGON} - unions geometries
+\item \code{rs_MULTIPOLYGON} - unions geometries
+}
+}
 }

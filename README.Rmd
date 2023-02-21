@@ -40,7 +40,7 @@ head(rs_polys)
 Cast geometries to sf
 
 ```{r}
-as_sf(rs_polys)
+sf::st_as_sfc(rs_polys)
 ```
 
 
@@ -81,7 +81,7 @@ Calculate a distance matrix
 
 ```{r}
 pnts <- centroids(rs_polys)
-pnts_sf <- as_sf(pnts)
+pnts_sf <- sf::st_as_sfc(pnts)
 
 bench::mark(
   rust = euclidean_distance_matrix(pnts, pnts),
@@ -172,9 +172,71 @@ france <- union_geoms(rs_polys)
 
 
 plot(france)
-plot(extreme_coords(france), add = TRUE, pch = 15)
+plot(extreme_coords(france[[1]]), add = TRUE, pch = 15)
 ```
 
+Get bounding rectangles
+
+```{r}
+rects <- bounding_rectangles(rs_polys)
+plot(rects)
+```
+
+Convext hulls
+
+```{r}
+convex_hulls(rs_polys) |> 
+  plot()
+```
+
+Cast geometries
+
+```{r}
+lns <- cast_geoms(rs_polys, "linestring")
+head(lns)
+```
+
+Expand into constituent geometries. 
+
+```{r}
+expand_geoms(rs_polys, flat = TRUE) |> 
+  head()
+```
+
+Combine geometries into a single geometry
+
+```{r}
+combine_geoms(lns)
+```
+
+Union geometries
+
+```{r}
+plot(union_geoms(rs_polys))
+```
+
+
+Spatial predicates 
+
+```{r}
+x <- rs_polys[1:5]
+intersects_sparse(x, rs_polys)
+```
+
+
+Convert to and from wkb and wkt
+
+```{r}
+wkt <- wkt_from_geoms(x)
+wkt_to_geoms(wkt)
+```
+
+```{r}
+wkb <- wkb_from_geoms(x)
+head(wkb[[1]])
+
+wkb_to_geoms(wkb)
+```
 
 
 #### Notes

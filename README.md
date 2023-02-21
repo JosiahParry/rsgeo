@@ -13,6 +13,11 @@ is no support for CRS at this moment.
 ``` r
 # remotes::install_github("josiahparry/rsgeo")
 library(rsgeo)
+#> 
+#> Attaching package: 'rsgeo'
+#> The following object is masked from 'package:base':
+#> 
+#>     within
 ```
 
 Create geometries from sf objects
@@ -28,18 +33,19 @@ polys <- guerry[["geometry"]] |>
 rs_polys <- as_rsgeom(polys)
 
 head(rs_polys)
-#> (Polygon { exterior: LineString([Coord { x: 801150.0, y: 2092615.0 }, Coor....
-#> (Polygon { exterior: LineString([Coord { x: 729326.0, y: 2521619.0 }, Coor....
-#> (Polygon { exterior: LineString([Coord { x: 710830.0, y: 2137350.0 }, Coor....
-#> (Polygon { exterior: LineString([Coord { x: 882701.0, y: 1920024.0 }, Coor....
-#> (Polygon { exterior: LineString([Coord { x: 886504.0, y: 1922890.0 }, Coor....
-#> (Polygon { exterior: LineString([Coord { x: 747008.0, y: 1925789.0 }, Coor....
+#> <rs_POLYGON[6]>
+#> [1] (Polygon { exterior: LineString([Coord { x: 801150.0, y: 2092615.0 }, Coor...
+#> [2] (Polygon { exterior: LineString([Coord { x: 729326.0, y: 2521619.0 }, Coor...
+#> [3] (Polygon { exterior: LineString([Coord { x: 710830.0, y: 2137350.0 }, Coor...
+#> [4] (Polygon { exterior: LineString([Coord { x: 882701.0, y: 1920024.0 }, Coor...
+#> [5] (Polygon { exterior: LineString([Coord { x: 886504.0, y: 1922890.0 }, Coor...
+#> [6] (Polygon { exterior: LineString([Coord { x: 747008.0, y: 1925789.0 }, Coor...
 ```
 
 Cast geometries to sf
 
 ``` r
-as_sf(rs_polys)
+sf::st_as_sfc(rs_polys)
 #> Geometry set for 116 features 
 #> Geometry type: POLYGON
 #> Dimension:     XY
@@ -64,8 +70,8 @@ bench::mark(
 #> # A tibble: 2 × 6
 #>   expression      min   median `itr/sec` mem_alloc `gc/sec`
 #>   <bch:expr> <bch:tm> <bch:tm>     <dbl> <bch:byt>    <dbl>
-#> 1 rust        82.49µs 100.16µs     9759.    3.82KB     0   
-#> 2 sf           1.32ms   1.48ms      678.  745.35KB     8.42
+#> 1 rust        83.27µs   87.7µs    11213.    3.82KB      0  
+#> 2 sf           1.31ms   1.38ms      721.  745.35KB     10.6
 ```
 
 Find centroids
@@ -79,8 +85,8 @@ bench::mark(
 #> # A tibble: 2 × 6
 #>   expression                  min   median `itr/sec` mem_alloc `gc/sec`
 #>   <bch:expr>             <bch:tm> <bch:tm>     <dbl> <bch:byt>    <dbl>
-#> 1 centroids(rs_polys)    207.42µs    285µs     3261.    3.81KB    10.2 
-#> 2 sf::st_centroid(polys)   2.44ms    2.6ms      381.  756.52KB     6.39
+#> 1 centroids(rs_polys)     200.6µs 245.71µs     3741.    3.82KB    15.1 
+#> 2 sf::st_centroid(polys)    2.4ms   2.49ms      396.  756.52KB     6.38
 ```
 
 Extract points as matrix
@@ -112,7 +118,7 @@ Calculate a distance matrix
 
 ``` r
 pnts <- centroids(rs_polys)
-pnts_sf <- as_sf(pnts)
+pnts_sf <- sf::st_as_sfc(pnts)
 
 bench::mark(
   rust = euclidean_distance_matrix(pnts, pnts),
@@ -121,8 +127,8 @@ bench::mark(
 #> # A tibble: 2 × 6
 #>   expression      min   median `itr/sec` mem_alloc `gc/sec`
 #>   <bch:expr> <bch:tm> <bch:tm>     <dbl> <bch:byt>    <dbl>
-#> 1 rust        254.2µs 274.25µs     3599.     108KB     8.55
-#> 2 sf           2.94ms   3.08ms      324.     352KB     2.03
+#> 1 rust       165.48µs 181.63µs     5464.     108KB    12.6 
+#> 2 sf           2.83ms   2.88ms      344.     352KB     2.02
 ```
 
 Simplify a geometry
@@ -146,8 +152,8 @@ bench::mark(
 #> # A tibble: 2 × 6
 #>   expression      min   median `itr/sec` mem_alloc `gc/sec`
 #>   <bch:expr> <bch:tm> <bch:tm>     <dbl> <bch:byt>    <dbl>
-#> 1 rust         5.44ms   5.58ms      179.       4KB     0   
-#> 2 sf            8.1ms   8.49ms      118.    1.23MB     4.21
+#> 1 rust         3.61ms   3.82ms      262.       4KB     0   
+#> 2 sf           7.75ms   8.05ms      124.    1.23MB     2.07
 ```
 
 Union geometries with `union_geoms()`
@@ -183,8 +189,8 @@ bench::mark(
 #> # A tibble: 2 × 6
 #>   expression      min   median `itr/sec` mem_alloc `gc/sec`
 #>   <bch:expr> <bch:tm> <bch:tm>     <dbl> <bch:byt>    <dbl>
-#> 1 rust         2.38µs   3.57µs   271097.    3.22KB      0  
-#> 2 Cpp         16.44µs  17.79µs    51747.   11.45MB     31.1
+#> 1 rust         2.34µs   3.03µs   307755.    3.23KB      0  
+#> 2 Cpp         15.66µs  17.38µs    51943.   11.45MB     46.8
 ```
 
 ``` r
@@ -226,10 +232,120 @@ france <- union_geoms(rs_polys)
 
 
 plot(france)
-plot(extreme_coords(france), add = TRUE, pch = 15)
+plot(extreme_coords(france[[1]]), add = TRUE, pch = 15)
 ```
 
 <img src="man/figures/README-unnamed-chunk-18-1.png" width="100%" />
+
+Get bounding rectangles
+
+``` r
+rects <- bounding_rectangles(rs_polys)
+plot(rects)
+```
+
+<img src="man/figures/README-unnamed-chunk-19-1.png" width="100%" />
+
+Convext hulls
+
+``` r
+convex_hulls(rs_polys) |> 
+  plot()
+```
+
+<img src="man/figures/README-unnamed-chunk-20-1.png" width="100%" />
+
+Cast geometries
+
+``` r
+lns <- cast_geoms(rs_polys, "linestring")
+head(lns)
+#> <rs_LINESTRING[6]>
+#> [1] (LineString([Coord { x: 801150.0, y: 2092615.0 }, Coord { x: 800669.0, y: ...
+#> [2] (LineString([Coord { x: 729326.0, y: 2521619.0 }, Coord { x: 729320.0, y: ...
+#> [3] (LineString([Coord { x: 710830.0, y: 2137350.0 }, Coord { x: 711746.0, y: ...
+#> [4] (LineString([Coord { x: 882701.0, y: 1920024.0 }, Coord { x: 882408.0, y: ...
+#> [5] (LineString([Coord { x: 886504.0, y: 1922890.0 }, Coord { x: 885733.0, y: ...
+#> [6] (LineString([Coord { x: 747008.0, y: 1925789.0 }, Coord { x: 746630.0, y: ...
+```
+
+Expand into constituent geometries.
+
+``` r
+expand_geoms(rs_polys, flat = TRUE) |> 
+  head()
+#> <rs_LINESTRING[6]>
+#> [1] (LineString([Coord { x: 801150.0, y: 2092615.0 }, Coord { x: 800669.0, y: ...
+#> [2] (LineString([Coord { x: 729326.0, y: 2521619.0 }, Coord { x: 729320.0, y: ...
+#> [3] (LineString([Coord { x: 647667.0, y: 2468296.0 }, Coord { x: 647777.0, y: ...
+#> [4] (LineString([Coord { x: 710830.0, y: 2137350.0 }, Coord { x: 711746.0, y: ...
+#> [5] (LineString([Coord { x: 882701.0, y: 1920024.0 }, Coord { x: 882408.0, y: ...
+#> [6] (LineString([Coord { x: 886504.0, y: 1922890.0 }, Coord { x: 885733.0, y: ...
+```
+
+Combine geometries into a single geometry
+
+``` r
+combine_geoms(lns)
+#> <rs_MULTILINESTRING[1]>
+#> [1] (MultiLineString([LineString([Coord { x: 801150.0, y: 2092615.0 }, Coord {...
+```
+
+Union geometries
+
+``` r
+plot(union_geoms(rs_polys))
+```
+
+<img src="man/figures/README-unnamed-chunk-24-1.png" width="100%" />
+
+Spatial predicates
+
+``` r
+x <- rs_polys[1:5]
+intersects_sparse(x, rs_polys)
+#> [[1]]
+#> [1] 94 50  1 92 48
+#> 
+#> [[2]]
+#> [1]  63   2   7  80  98  78  81 101
+#> 
+#> [[3]]
+#> [1] 77 84  3 20 94 27 53
+#> 
+#> [[4]]
+#> [1]   4   5  30 109 107
+#> 
+#> [[5]]
+#> [1]  4  5 48 30
+```
+
+Convert to and from wkb and wkt
+
+``` r
+wkt <- wkt_from_geoms(x)
+wkt_to_geoms(wkt)
+#> <rs_POLYGON[5]>
+#> [1] (Polygon { exterior: LineString([Coord { x: 801150.0, y: 2092615.0 }, Coor...
+#> [2] (Polygon { exterior: LineString([Coord { x: 729326.0, y: 2521619.0 }, Coor...
+#> [3] (Polygon { exterior: LineString([Coord { x: 710830.0, y: 2137350.0 }, Coor...
+#> [4] (Polygon { exterior: LineString([Coord { x: 882701.0, y: 1920024.0 }, Coor...
+#> [5] (Polygon { exterior: LineString([Coord { x: 886504.0, y: 1922890.0 }, Coor...
+```
+
+``` r
+wkb <- wkb_from_geoms(x)
+head(wkb[[1]])
+#> [1] 01 03 00 00 00 01
+
+wkb_to_geoms(wkb)
+#> <rs_POLYGON[5]>
+#> [1] (Polygon { exterior: LineString([Coord { x: 801150.0, y: 2092615.0 }, Coor...
+#> [2] (Polygon { exterior: LineString([Coord { x: 729326.0, y: 2521619.0 }, Coor...
+#> [3] (Polygon { exterior: LineString([Coord { x: 710830.0, y: 2137350.0 }, Coor...
+#> [4] (Polygon { exterior: LineString([Coord { x: 882701.0, y: 1920024.0 }, Coor...
+#> [5] (Polygon { exterior: LineString([Coord { x: 886504.0, y: 1922890.0 }, Coor...
+```
 
 #### Notes
 
