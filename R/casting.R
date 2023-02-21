@@ -14,7 +14,7 @@
 
   res <- f(x, to)
 
-  if (is.null(res)) warning("Cannot convert `", cls, "` to `", to, "`", call. = FALSE)
+  if (is.null(res)) warning("Cannot cast `", cls, "` to `", to, "`", call. = FALSE)
   res
 }
 
@@ -35,7 +35,7 @@
 
   res <- f(x, to)
 
-  if (any(is.na(res))) warning("Cannot convert `", cls, "` to `", to, "`", call. = FALSE)
+  if (any(is.na(res))) warning("Cannot cast `", cls, "` to `", to, "`", call. = FALSE)
 
   res
 }

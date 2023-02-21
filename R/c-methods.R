@@ -306,7 +306,7 @@ scalar_types <- c("point", "multipoint", "polygon",
 c._geom <- function(...) {
   elements <- NextMethod()
   if (!all(vapply(elements, inherits, logical(1), scalar_types))) {
-    rlang::abort("All elements must be a `geo-types` primitive")
+    stop("All elements must be a `geo-types` primitive", call. = FALSE)
   }
 
   restore_geoms(elements)
@@ -314,10 +314,10 @@ c._geom <- function(...) {
 
 # for vectors. this is atrocious code
 c._geoms <- function(...) {
-  elems <- rlang::list2(...)
+  elems <- list(...)
   elems <- c(elems, recursive = TRUE)
   if (!all(vapply(elems, inherits, logical(1), scalar_types))) {
-    rlang::abort("All elements must be a `geo-types` primitive")
+    stop("All elements must be a `geo-types` primitive", call. = FALSE)
   }
   restore_geoms(elems)
 }
