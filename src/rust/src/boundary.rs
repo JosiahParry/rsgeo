@@ -9,9 +9,8 @@ use geo::{polygon, BoundingRect, ConcaveHull, ConvexHull, Extremes};
 use geo_types::{Geometry, Point, Polygon};
 
 #[extendr]
-/// @export
-/// @rdname boundaries
-fn bounding_box(x: Robj) -> List {
+fn bounding_box_(x: Robj) -> List {
+
     let x: Geom = x.try_into().unwrap();
 
     let rect = x.geom.bounding_rect().unwrap();
@@ -25,6 +24,7 @@ fn bounding_box(x: Robj) -> List {
     )
     .unwrap()
 }
+
 
 #[extendr]
 /// Compute Geometric Boundaries 
@@ -150,7 +150,7 @@ fn extreme_coords(x: Robj) -> Robj {
 
 extendr_module! {
     mod boundary;
-    fn bounding_box;
+    fn bounding_box_;
     fn bounding_rectangle;
     fn bounding_rectangles;
     fn concave_hull;

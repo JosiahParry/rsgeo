@@ -113,13 +113,13 @@ print_rsgeom <- function(x, width = NULL) {
 }
 
 # vctrs handles this for me
-# print_rsgeoms <- function(x, width = NULL) {
-#   for (i in seq_along(x)) {
-#     print_rsgeom(x[[i]], width = width)
-#     cat("\n")
-#   }
-#   invisible(x)
-# }
+print_rsgeoms <- function(x, n = Inf, width = NULL) {
+  for (i in 1:min(length(x), n)) {
+    print_rsgeom(x[[i]], width = width)
+    cat("\n")
+  }
+  invisible(x)
+}
 # individual printing
 
 #' Printing and formatting
@@ -143,7 +143,7 @@ print.linestring <- print_rsgeom
 #' @export
 print.multilinestring <- print_rsgeom
 #'
-#' # multi printing
+# multi printing
 #' #' @export
 #' print.rs_POINT <- print_rsgeoms
 #' #' @export
