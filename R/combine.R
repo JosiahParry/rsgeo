@@ -26,7 +26,6 @@
 #'
 #' @param x a vector of geometries
 #' @export
-#'
 combine_geoms <- function(x) {
   cls <- tolower(class(x)[1])
   cls <- substr(cls, 4, nchar(cls))

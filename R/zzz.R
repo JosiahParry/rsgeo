@@ -33,7 +33,7 @@ assign_methods <- function(pkg, f, fx) {
   # vctrs::s3_register("sf::st_as_sfc", "rs_MULTIPOINT")
   # vctrs::s3_register("sf::st_as_sfc", "rs_LINESTRING")
   # vctrs::s3_register("sf::st_as_sfc", "rs_MULTILINESTRING")
-  # vctrs::s3_register("sf::st_as_sfc", "rs_GEOMETRYCOLLECTION")
+  vctrs::s3_register("sf::st_as_sfc", "rs_GEOMETRYCOLLECTION")
   # vctrs::s3_register("sf::is_geometry", "rs_POINT")
   # vctrs::s3_register("sf::is_geometry", "rs_MULTIPOINT")
   # vctrs::s3_register("sf::is_geometry", "rs_POLYGON")
@@ -51,5 +51,7 @@ assign_methods <- function(pkg, f, fx) {
   register_method("sf::st_bbox")
   assign_methods("sf", "st_precision", rs_prec)
   assign_methods("sdf", "bounding_box", bounding_box)
+  assign_methods("sdf", "union_geometry", union_geoms)
+  assign_methods("sdf", "combine_geometry", combine_geoms)
   #vctrs::s3_register("dplyr::dplyr_col_select", "sdf")
 }

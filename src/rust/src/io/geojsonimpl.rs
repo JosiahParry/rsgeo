@@ -180,27 +180,27 @@ pub fn read_props(file: &str) -> Robj {
         .unwrap()
 }
 
-
 #[extendr]
-pub fn read_props_string(file: &str) -> Robj {
+pub fn read_props_string(geojson_str: String) -> Robj {
+    let geojson = geojson_str.parse::<GeoJson>().unwrap();
 
-    let file = std::fs::File::open(file)
-        .expect("this to work");
+    let res = match geojson {
+        GeoJson::FeatureCollection(collection) => collection
+            .features
+            .into_par_iter()
+            .map(|feat| feat.properties.unwrap())
+            .collect::<Vec<Map<String, Value>>>(),
+        GeoJson::Feature(feature) => {
+            vec![feature.properties.unwrap()]
+        }
 
-    let reader = BufReader::new(file);
+        GeoJson::Geometry(_geom) => {
+            vec![]
+        }
+    };
 
-    let data = geojson::FeatureReader::from_reader(reader);
-
-    let res = data
-        .features()
-       // .par_bridge()
-      //  .into_par_iter()
-        .map(|feat| feat.unwrap().properties.unwrap())
-        .collect::<Vec<Map<String, Value>>>();
-
-   // rprintln!("no problem here no");
     let n = res.len();
-    let (res_vec, keys) = process_props(res);
+    let (res_vec, keys) = process_properties(res);
 
     let index = (1..n + 1).map(|i| i as i32).collect::<Vec<i32>>();
     let res = List::from_names_and_values(keys, res_vec).unwrap();
@@ -210,6 +210,8 @@ pub fn read_props_string(file: &str) -> Robj {
         .set_attrib("row.names", index)
         .unwrap()
 }
+
+
 
 fn match_type(x: &Map<String, Value>) -> Vec<&str> {
     x.values()
@@ -375,11 +377,11 @@ pub fn process_properties(res: Vec<Map<String, Value>>) -> (Vec<Robj>, Vec<Strin
 
     for obs in res.iter().skip(1) {
 
-        rprintln!("inner loop accessed");
+//        rprintln!("inner loop accessed");
 
         let keys_i = match_type(obs);
 
-        rprintln!("keys matched");
+        //rprintln!("keys matched");
         
 
         let which_unknown = col_types
@@ -392,11 +394,11 @@ pub fn process_properties(res: Vec<Map<String, Value>>) -> (Vec<Robj>, Vec<Strin
         rprintln!("identified which keys are unknown");
         // if all aren't true break
         if which_unknown.is_empty() {
-            rprintln!("loop broken");
+           // rprintln!("loop broken");
             break;
         }
 
-        rprintln!("filling unknown types");
+       // rprintln!("filling unknown types");
         // if not fill the types
         for i in which_unknown.into_iter() {
             col_types[i] = keys_i[i];
@@ -405,7 +407,7 @@ pub fn process_properties(res: Vec<Map<String, Value>>) -> (Vec<Robj>, Vec<Strin
 
     let mut res_vec: Vec<Robj> = Vec::with_capacity(nn);
 
-    rprintln!("next loop reached. creating R type columns");
+    //rprintln!("next loop reached. creating R type columns");
 
     for (i, key) in keys.clone().into_iter().enumerate() {
         
@@ -443,7 +445,7 @@ pub fn process_properties(res: Vec<Map<String, Value>>) -> (Vec<Robj>, Vec<Strin
         res_vec.push(col)
     }
 
-    rprintln!("R columns created and pushed to `res_vec`");
+   // rprintln!("R columns created and pushed to `res_vec`");
 
     let keys = keys
         .into_iter()
@@ -470,7 +472,7 @@ pub fn process_props(res: Vec<Map<String, Value>>) -> (Vec<Robj>, Vec<String>) {
 
     for obs in res.iter().skip(1) {
 
-        rprintln!("inner loop accessed");
+        //rprintln!("inner loop accessed");
 
         let keys_i = match_type(obs);
 

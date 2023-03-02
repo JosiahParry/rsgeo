@@ -19,8 +19,8 @@ fn bounding_box_(x: Robj) -> List {
     let min = rect.min();
 
     List::from_names_and_values(
-        ["x_min", "x_max", "y_min", "y_max"],
-        [min.x, max.x, min.y, max.y],
+        ["xmin", "ymin", "xmax", "ymax"],
+        [min.x, min.y, max.x, max.y],
     )
     .unwrap()
 }

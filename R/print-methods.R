@@ -86,17 +86,17 @@ vec_ptype_abbr.multipolygon <- function(x, ...) "mpoly"
 #' @export
 vec_ptype_abbr.rs_POINT <- function(x, ...) "POINT"
 #' @export
-vec_ptype_abbr.rs_MULTIPOINT <- function(x, ...) "MPNT"
+vec_ptype_abbr.rs_MULTIPOINT <- function(x, ...) "MULTIPOINT"
 #' @export
-vec_ptype_abbr.rs_LINESTRING <- function(x, ...) "LNSTR"
+vec_ptype_abbr.rs_LINESTRING <- function(x, ...) "LINESTRING"
 #' @export
-vec_ptype_abbr.rs_MULTILINESTRING <- function(x, ...) "MLNST"
+vec_ptype_abbr.rs_MULTILINESTRING <- function(x, ...) "MULTILINESTRING"
 #' @export
-vec_ptype_abbr.rs_POLYGON <- function(x, ...) "POLY"
+vec_ptype_abbr.rs_POLYGON <- function(x, ...) "POLYGON"
 #' @export
-vec_ptype_abbr.rs_MULTIPOLYGON <- function(x, ...) "MPOLY"
+vec_ptype_abbr.rs_MULTIPOLYGON <- function(x, ...) "MULTIPOLYGON"
 #' @export
-vec_ptype_abbr.rs_GEOMETRYCOLLECTION <- function(x, ...) "GEOMS"
+vec_ptype_abbr.rs_GEOMETRYCOLLECTION <- function(x, ...) "GEOMETRYCOLLECTION"
 
 
 
