@@ -1,46 +1,21 @@
 // module imports
-mod utils;
-use utils::get_utils_metadata;
-
-mod geoms;
-use geoms::{get_geoms_metadata, to_pntr};
-
-mod area;
-use area::get_area_metadata;
-
-mod length;
-use length::get_length_metadata;
-
-mod query;
-use query::get_query_metadata;
-
-mod distance;
-use distance::get_distance_metadata;
-
-mod boundary;
-use boundary::get_boundary_metadata;
-
-mod union;
-use union::get_union_metadata;
-
-mod conversion;
-use conversion::get_conversion_metadata;
-
-mod simplification;
-use simplification::get_simplification_metadata;
-
 mod io;
-pub mod types;
-use io::get_io_metadata;
-
-mod spatial_index;
-use spatial_index::get_spatial_index_metadata;
-
-mod topology;
-use topology::get_topology_metadata;
-
+mod area;
+mod query;
+mod utils;
+mod geoms;
+mod union;
+mod length;
 mod casting;
-use casting::get_casting_metadata;
+mod distance;
+mod boundary;
+mod topology;
+mod conversion;
+mod spatial_index;
+mod simplification;
+
+
+pub mod types;
 
 use crate::types::Geom;
 use extendr_api::prelude::*;
@@ -48,48 +23,10 @@ use extendr_api::wrapper::{ExternalPtr, RMatrix};
 use geo::{coord, Centroid, ChaikinSmoothing, HaversineDestination, HaversineIntermediate};
 use geo_types::line_string;
 use ndarray::{Array2, ShapeBuilder};
+use geoms::to_pntr;
 
 use geo::geometry::{Coord, Geometry, Point};
 
-// This is so much slower than the 1 - 1 and so much slower than geos
-// Tried without cloning. same speed. It must be the claiming ownership?
-// or the deparsing. idk intersect_poly_poly is SOOO much faster than c
-// but the loop is slower idk
-// man idfk
-// #[extendr]
-// fn intersect_poly_polys(lhs: Robj, rhs: List) -> Logicals {
-//     let n = rhs.len();
-//     let mut res = Logicals::new(n);
-//     let xpoly: ExternalPtr<Polygon> = lhs.try_into().unwrap();
-
-//     for i in 0..n {
-//         let ypoly: ExternalPtr<Polygon> = rhs[i].to_owned().try_into().unwrap();
-//         res.set_elt(i, Rbool::from(xpoly.intersects(&*ypoly)));
-//     }
-//     res
-
-// }
-
-// Intersect wrapper
-
-// mod intersects;
-// use crate::intersects::poly_geoms;
-
-// mod utils;
-// use crate::utils::as_vec_geoms;
-// ///@export
-// #[extendr (use_try_from = true)]
-// fn poly_intersect(x: ExternalPtr<Polygon>, y: List) -> Integers {
-//     let geoms = as_vec_geoms(y);
-
-//     let res = poly_geoms(*x, geoms);
-
-//     let res: Integers = res.into_iter()
-//         .map(|index| Rint::from(index as i32))
-//         .collect();
-
-//     res
-// }
 
 // Helpers -----------------------------------------------------------------
 
