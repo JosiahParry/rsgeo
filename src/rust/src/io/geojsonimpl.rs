@@ -40,7 +40,7 @@ pub fn read_gj_props(file: &str) -> Robj {
         .into_par_iter()
         .map(|feat| feat.unwrap().properties.unwrap())
         .collect::<Vec<Map<String, Value>>>();
-    
+
     rprintln!("results collected into vec of hashmaps");
 
     let n = res.len();
@@ -149,12 +149,9 @@ pub fn read_geojson_props(file: &str) -> Robj {
         .unwrap()
 }
 
-
 #[extendr]
 pub fn read_props(file: &str) -> Robj {
-
-    let file = std::fs::File::open(file)
-        .expect("this to work");
+    let file = std::fs::File::open(file).expect("this to work");
 
     let reader = BufReader::new(file);
 
@@ -162,12 +159,12 @@ pub fn read_props(file: &str) -> Robj {
 
     let res = data
         .features()
-       // .par_bridge()
-      //  .into_par_iter()
+        // .par_bridge()
+        //  .into_par_iter()
         .map(|feat| feat.unwrap().properties.unwrap())
         .collect::<Vec<Map<String, Value>>>();
 
-   // rprintln!("no problem here no");
+    // rprintln!("no problem here no");
     let n = res.len();
     let (res_vec, keys) = process_properties(res);
 
@@ -211,8 +208,6 @@ pub fn read_props_string(geojson_str: String) -> Robj {
         .unwrap()
 }
 
-
-
 fn match_type(x: &Map<String, Value>) -> Vec<&str> {
     x.values()
         .map(|val| match val {
@@ -223,8 +218,6 @@ fn match_type(x: &Map<String, Value>) -> Vec<&str> {
         })
         .collect::<Vec<&str>>()
 }
-
-
 
 use std::io::BufReader;
 //use std::io::BufReader;
@@ -342,8 +335,6 @@ fn read_geojsonl(file: &str) -> Robj {
         .set_attrib("class", crate::utils::geom_class("geometrycollection"))
         .unwrap();
 
-
-    
     res_vec.push(geoms);
 
     keys.push(String::from("geometry"));
@@ -359,12 +350,10 @@ fn read_geojsonl(file: &str) -> Robj {
         .unwrap()
 }
 
-
-
 pub fn process_properties(res: Vec<Map<String, Value>>) -> (Vec<Robj>, Vec<String>) {
     // pull first element to find the keys
     let x1 = res[0].clone();
-   // rprintln!("pulled first element");
+    // rprintln!("pulled first element");
     // collect keys into vec of string
     let keys = x1.keys().collect::<Vec<&String>>();
     //rprintln!("have first element keys");
@@ -373,16 +362,14 @@ pub fn process_properties(res: Vec<Map<String, Value>>) -> (Vec<Robj>, Vec<Strin
 
     //let mut col_types: Vec<&str> = Vec::with_capacity(nn);
     let mut col_types = match_type(&res[0]);
-   //rprintln!("matches col types for first element");
+    //rprintln!("matches col types for first element");
 
     for obs in res.iter().skip(1) {
-
-//        rprintln!("inner loop accessed");
+        //        rprintln!("inner loop accessed");
 
         let keys_i = match_type(obs);
 
         //rprintln!("keys matched");
-        
 
         let which_unknown = col_types
             .iter()
@@ -394,11 +381,11 @@ pub fn process_properties(res: Vec<Map<String, Value>>) -> (Vec<Robj>, Vec<Strin
         rprintln!("identified which keys are unknown");
         // if all aren't true break
         if which_unknown.is_empty() {
-           // rprintln!("loop broken");
+            // rprintln!("loop broken");
             break;
         }
 
-       // rprintln!("filling unknown types");
+        // rprintln!("filling unknown types");
         // if not fill the types
         for i in which_unknown.into_iter() {
             col_types[i] = keys_i[i];
@@ -410,33 +397,22 @@ pub fn process_properties(res: Vec<Map<String, Value>>) -> (Vec<Robj>, Vec<Strin
     //rprintln!("next loop reached. creating R type columns");
 
     for (i, key) in keys.clone().into_iter().enumerate() {
-        
         let ctype = col_types[i];
         //rprintln!("column {} being processed has type {}", i, ctype);
         let col = match ctype {
             "double" => Doubles::from_iter(
                 res.iter()
-                    .map(|x| 
-                        Rfloat::try_from(x[key].as_f64()).unwrap_or(Rfloat::na())),
+                    .map(|x| Rfloat::try_from(x[key].as_f64()).unwrap_or(Rfloat::na())),
             )
             .into_robj(),
-            "character" => Strings::from_iter(
-                res
-                    .iter()
-                    .map(|x| { // dies here
-                        Rstr::try_from(
-                            x[key]
-                                .as_str()
-                                .unwrap_or(&Rstr::na()))
-                                .unwrap_or(Rstr::na()
-                        )
+            "character" => Strings::from_iter(res.iter().map(|x| {
+                // dies here
+                Rstr::try_from(x[key].as_str().unwrap_or(&Rstr::na())).unwrap_or(Rstr::na())
             }))
             .into_robj(),
             "logical" => Logicals::from_iter(
                 res.iter()
-                    .map(|x| 
-                        Rbool::try_from(x[key].as_bool().unwrap()).unwrap_or(Rbool::na())
-                    ),
+                    .map(|x| Rbool::try_from(x[key].as_bool().unwrap()).unwrap_or(Rbool::na())),
             )
             .into_robj(),
             _ => List::from_iter(res.iter().map(|x| to_robj(&x[key]).unwrap())).into_robj(),
@@ -445,7 +421,7 @@ pub fn process_properties(res: Vec<Map<String, Value>>) -> (Vec<Robj>, Vec<Strin
         res_vec.push(col)
     }
 
-   // rprintln!("R columns created and pushed to `res_vec`");
+    // rprintln!("R columns created and pushed to `res_vec`");
 
     let keys = keys
         .into_iter()
@@ -454,12 +430,10 @@ pub fn process_properties(res: Vec<Map<String, Value>>) -> (Vec<Robj>, Vec<Strin
     (res_vec, keys)
 }
 
-
-
 pub fn process_props(res: Vec<Map<String, Value>>) -> (Vec<Robj>, Vec<String>) {
     // pull first element to find the keys
     let x1 = res[0].clone();
-   // rprintln!("pulled first element");
+    // rprintln!("pulled first element");
     // collect keys into vec of string
     let keys = x1.keys().collect::<Vec<&String>>();
     //rprintln!("have first element keys");
@@ -468,16 +442,14 @@ pub fn process_props(res: Vec<Map<String, Value>>) -> (Vec<Robj>, Vec<String>) {
 
     //let mut col_types: Vec<&str> = Vec::with_capacity(nn);
     let mut col_types = match_type(&res[0]);
-   //rprintln!("matches col types for first element");
+    //rprintln!("matches col types for first element");
 
     for obs in res.iter().skip(1) {
-
         //rprintln!("inner loop accessed");
 
         let keys_i = match_type(obs);
 
         rprintln!("keys matched");
-        
 
         let which_unknown = col_types
             .iter()
@@ -505,28 +477,22 @@ pub fn process_props(res: Vec<Map<String, Value>>) -> (Vec<Robj>, Vec<String>) {
     rprintln!("next loop reached. creating R type columns");
 
     for (i, key) in keys.clone().into_iter().enumerate() {
-        
         let ctype = col_types[i];
         //rprintln!("column {} being processed has type {}", i, ctype);
         let col = match ctype {
             "double" => Doubles::from_iter(
                 res.iter()
-                    .map(|x| 
-                        Rfloat::try_from(x[key].as_f64()).unwrap_or(Rfloat::na())),
+                    .map(|x| Rfloat::try_from(x[key].as_f64()).unwrap_or(Rfloat::na())),
             )
             .into_robj(),
-            "character" => Strings::from_iter(
-                res
-                    .iter()
-                    .map(|x| { // dies here
-                        x[key].to_string()
+            "character" => Strings::from_iter(res.iter().map(|x| {
+                // dies here
+                x[key].to_string()
             }))
             .into_robj(),
             "logical" => Logicals::from_iter(
                 res.iter()
-                    .map(|x| 
-                        Rbool::try_from(x[key].as_bool().unwrap()).unwrap_or(Rbool::na())
-                    ),
+                    .map(|x| Rbool::try_from(x[key].as_bool().unwrap()).unwrap_or(Rbool::na())),
             )
             .into_robj(),
             _ => List::from_iter(res.iter().map(|x| to_robj(&x[key]).unwrap())).into_robj(),

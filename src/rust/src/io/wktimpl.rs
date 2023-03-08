@@ -8,10 +8,9 @@ use extendr_api::{extendr, Robj, Strings};
 use crate::to_pntr;
 use crate::types::Geom;
 
-
 #[extendr]
 /// WKT translation
-/// 
+///
 /// @export
 /// @rdname wkt
 pub fn wkt_to_geom(x: &str) -> Robj {

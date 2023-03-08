@@ -1,8 +1,8 @@
 use extendr_api::prelude::*;
 
-pub mod wktimpl;
 pub mod geojsonimpl;
 pub mod wkbimpl;
+pub mod wktimpl;
 
 extendr_module! {
     mod io;

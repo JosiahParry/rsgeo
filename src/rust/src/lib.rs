@@ -1,19 +1,18 @@
 // module imports
-mod io;
 mod area;
-mod query;
-mod utils;
-mod geoms;
-mod union;
-mod length;
-mod casting;
-mod distance;
 mod boundary;
-mod topology;
+mod casting;
 mod conversion;
-mod spatial_index;
+mod distance;
+mod geoms;
+mod io;
+mod length;
+mod query;
 mod simplification;
-
+mod spatial_index;
+mod topology;
+mod union;
+mod utils;
 
 pub mod types;
 
@@ -22,11 +21,10 @@ use extendr_api::prelude::*;
 use extendr_api::wrapper::{ExternalPtr, RMatrix};
 use geo::{coord, Centroid, ChaikinSmoothing, HaversineDestination, HaversineIntermediate};
 use geo_types::line_string;
-use ndarray::{Array2, ShapeBuilder};
 use geoms::to_pntr;
+use ndarray::{Array2, ShapeBuilder};
 
 use geo::geometry::{Coord, Geometry, Point};
-
 
 // Helpers -----------------------------------------------------------------
 
@@ -69,7 +67,7 @@ fn centroid(x: Robj) -> Robj {
 
     let res: Geom = res.into();
 
-   to_pntr(res)
+    to_pntr(res)
 }
 
 /// @rdname centroid
@@ -139,7 +137,6 @@ fn chaikin_smoothing(x: Robj, niter: f64) -> Robj {
     to_pntr(res)
 }
 
-
 // ---------------------------------------------------------------------------------
 
 // Macro to generate exports.
@@ -153,7 +150,7 @@ extendr_module! {
     fn haversine_destination;
     fn haversine_intermediate;
     fn chaikin_smoothing;
-    use utils; 
+    use utils;
     use area;
     use geoms;
     use length;

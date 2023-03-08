@@ -18,7 +18,7 @@ is_geometry.rs_MULTILINESTRING <- function(x)  inherits(x, "rs_MULTILINESTRING")
 # rs_LINESTRING
 # rs_MULTILINESTRING
 
-guerry <- sfdep::guerry
+# guerry <- sfdep::guerry
 # m <- matrix(runif(200, -180, 180), ncol = 2)
 # x <- geom_points_matrix(m)
 # bounding_box(x)

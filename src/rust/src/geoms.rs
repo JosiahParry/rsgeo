@@ -33,7 +33,9 @@ fn print_geoms(x: List) {
 fn geom_point(x: f64, y: f64) -> Robj {
     let pnt = Point::new(x, y);
     let pnt: Geom = pnt.try_into().unwrap();
-    to_pntr(pnt)
+    list![to_pntr(pnt)]
+        .set_attrib("class", geom_class("point"))
+        .unwrap()
 }
 
 #[extendr]
@@ -57,10 +59,14 @@ fn geom_points(x: List) -> Robj {
 /// @export
 /// @rdname geometry
 fn geom_points_xy(x: Doubles, y: Doubles) -> Robj {
-    x
-        .into_iter()
+    x.into_iter()
         .enumerate()
-        .map(|(i, xi )| geom_point(xi.0, y[i].0))
+        .map(|(i, xi)| {
+            List::try_from(geom_point(xi.0, y[i].0))
+                .unwrap()
+                .elt(0)
+                .unwrap()
+        })
         .collect::<List>()
         .set_attrib("class", geom_class("point"))
         .unwrap()
@@ -76,7 +82,12 @@ pub fn geom_points_matrix(x: RMatrix<f64>) -> Robj {
     let mut res: Vec<Robj> = Vec::with_capacity(n);
 
     for row in arr.axis_iter(Axis(0)) {
-        res.push(geom_point(row[0], row[1]));
+        res.push(
+            List::try_from(geom_point(row[0], row[1]))
+                .unwrap()
+                .elt(0)
+                .unwrap(),
+        );
     }
 
     List::from_values(res)
@@ -98,9 +109,12 @@ fn geom_multipoint(x: RMatrix<f64>) -> Robj {
             .collect::<Vec<Point>>(),
     );
 
-    to_pntr(Geom {
+    let res = to_pntr(Geom {
         geom: Geometry::from(mpnt),
-    })
+    });
+    list![res]
+        .set_attrib("class", geom_class("multipoint"))
+        .unwrap()
 }
 
 #[extendr]
@@ -108,10 +122,15 @@ fn geom_multipoint(x: RMatrix<f64>) -> Robj {
 /// @rdname geometry
 fn geom_multipoints(x: List) -> Robj {
     x.into_iter()
-        .map(|(_, x)| geom_multipoint(RMatrix::try_from(x).unwrap()))
+        .map(|(_, x)| {
+            List::try_from(geom_multipoint(RMatrix::try_from(x).unwrap()))
+                .unwrap()
+                .elt(0)
+                .unwrap()
+        })
         .collect::<List>()
         .as_robj()
-        .set_attrib("class", ["rs_MULTIPOINT", "vctrs_vctr", "list"])
+        .set_attrib("class", geom_class("multipoint"))
         .unwrap()
 }
 
@@ -139,7 +158,9 @@ pub fn geom_polygon(x: List) -> Robj {
     let polygon = Polygon::new(exterior, linestrings);
     let polygon: Geom = polygon.into();
 
-    to_pntr(polygon)
+    list![to_pntr(polygon)]
+        .set_class(geom_class("polygon"))
+        .unwrap()
 }
 
 // List of polygons
@@ -153,11 +174,11 @@ fn geom_polygons(x: List) -> Robj {
 
     for (_, robj) in x.into_iter() {
         let robj: List = robj.try_into().unwrap();
-        polygons.push(geom_polygon(robj));
+        polygons.push(List::try_from(geom_polygon(robj)).unwrap().elt(0).unwrap());
     }
 
     List::from_values(polygons)
-        .set_attrib("class", ["rs_POLYGON", "vctrs_vctr", "list"])
+        .set_attrib("class", geom_class("polygon"))
         .unwrap()
 }
 
@@ -174,7 +195,9 @@ fn geom_multipolygon(x: List) -> Robj {
 
     let res: Geom = res.into();
 
-    to_pntr(res)
+    list![to_pntr(res)]
+        .set_class(geom_class("multipolygon"))
+        .unwrap()
 }
 
 #[extendr]
@@ -182,7 +205,12 @@ fn geom_multipolygon(x: List) -> Robj {
 /// @rdname geometry
 fn geom_multipolygons(x: List) -> Robj {
     x.into_iter()
-        .map(|(_, x)| geom_multipolygon(List::try_from(x).unwrap()))
+        .map(|(_, x)| {
+            List::try_from(geom_multipolygon(List::try_from(x).unwrap()))
+                .unwrap()
+                .elt(0)
+                .unwrap()
+        })
         .collect::<List>()
         .set_attrib("class", ["rs_MULTIPOLYGON", "vctrs_vctr", "list"])
         .unwrap()
@@ -196,7 +224,9 @@ fn geom_multipolygons(x: List) -> Robj {
 fn geom_linestring(x: RMatrix<f64>) -> Robj {
     let coords = matrix_to_coords(x);
     let lns = LineString::new(coords);
-    to_pntr(Geom::try_from(lns).unwrap())
+    list![to_pntr(Geom::try_from(lns).unwrap())]
+        .set_class(geom_class("linestring"))
+        .unwrap()
 }
 
 #[extendr]
@@ -204,9 +234,14 @@ fn geom_linestring(x: RMatrix<f64>) -> Robj {
 /// @rdname geometry
 fn geom_linestrings(x: List) -> Robj {
     x.into_iter()
-        .map(|(_, x)| geom_linestring(RMatrix::try_from(x).unwrap()))
+        .map(|(_, x)| {
+            List::try_from(geom_linestring(RMatrix::try_from(x).unwrap()))
+                .unwrap()
+                .elt(0)
+                .unwrap()
+        })
         .collect::<List>()
-        .set_attrib("class", ["rs_LINESTRING", "vctrs_vctr", "list"])
+        .set_attrib("class", geom_class("linestring"))
         .unwrap()
 }
 
@@ -242,7 +277,10 @@ fn geom_multilinestring(x: List) -> Robj {
         .collect::<Vec<LineString>>();
 
     let res = MultiLineString::new(vec_lns).into();
-    to_pntr(res)
+
+    list![to_pntr(res)]
+        .set_class(geom_class("multilinestring"))
+        .unwrap()
 }
 
 #[extendr]
@@ -250,9 +288,14 @@ fn geom_multilinestring(x: List) -> Robj {
 /// @rdname geometry
 fn geom_multilinestrings(x: List) -> Robj {
     x.into_iter()
-        .map(|(_, x)| geom_multilinestring(List::try_from(x).unwrap()))
+        .map(|(_, x)| {
+            List::try_from(geom_multilinestring(List::try_from(x).unwrap()))
+                .unwrap()
+                .elt(0)
+                .unwrap()
+        })
         .collect::<List>()
-        .set_attrib("class", ["rs_MULTILINESTRING", "vctrs_vctr", "list"])
+        .set_attrib("class", geom_class("multilinestring"))
         .unwrap()
 }
 
@@ -286,7 +329,7 @@ extendr_module! {
     mod geoms;
     fn geom_point; // a single point
     fn geom_points; // a list of points
-    fn geom_points_xy; // two vectors 
+    fn geom_points_xy; // two vectors
     fn geom_points_matrix; // a matrix of coordinates
     fn geom_multipoint; // a single multipoint from matrix of coords
     fn geom_multipoints; // a list of coordinates (sfc of multipoints)

@@ -1,9 +1,9 @@
 use extendr_api::prelude::*;
 use geo_types::*;
 //use crate::utils::geom_class;
-use crate::types::Geom;
-use crate::to_pntr;
 use crate::geoms::from_list;
+use crate::to_pntr;
+use crate::types::Geom;
 
 // COMBINE ------------------------------------------------------------------------
 
@@ -14,9 +14,9 @@ use crate::geoms::from_list;
 #[extendr]
 fn combine_points(x: List) -> Robj {
     let x = from_list(x)
-    .into_iter()
-    .map(|x| Point::try_from(x.geom).unwrap())
-    .collect::<Vec<Point>>();
+        .into_iter()
+        .map(|x| Point::try_from(x.geom).unwrap())
+        .collect::<Vec<Point>>();
 
     to_pntr(Geom::from(MultiPoint::from(x)))
 }
@@ -24,13 +24,12 @@ fn combine_points(x: List) -> Robj {
 #[extendr]
 fn combine_multipoints(x: List) -> Robj {
     let x = from_list(x)
-    .into_iter()
-    .flat_map(|x| MultiPoint::try_from(x.geom).unwrap().0)
-    .collect::<Vec<Point>>();
+        .into_iter()
+        .flat_map(|x| MultiPoint::try_from(x.geom).unwrap().0)
+        .collect::<Vec<Point>>();
 
     to_pntr(Geom::from(MultiPoint::from(x)))
 }
-
 
 #[extendr]
 fn combine_linestrings(x: List) -> Robj {
@@ -39,9 +38,8 @@ fn combine_linestrings(x: List) -> Robj {
         .map(|x| LineString::try_from(x.geom).unwrap())
         .collect::<Vec<LineString>>();
 
-        to_pntr(Geom::from(MultiLineString::new(x)))
+    to_pntr(Geom::from(MultiLineString::new(x)))
 }
-
 
 #[extendr]
 fn combine_multilinestrings(x: List) -> Robj {
@@ -50,7 +48,7 @@ fn combine_multilinestrings(x: List) -> Robj {
         .flat_map(|x| MultiLineString::try_from(x.geom).unwrap().0)
         .collect::<Vec<LineString>>();
 
-        to_pntr(Geom::from(MultiLineString::new(x)))
+    to_pntr(Geom::from(MultiLineString::new(x)))
 }
 
 #[extendr]
@@ -58,7 +56,7 @@ fn combine_polygons(x: List) -> Robj {
     let x = from_list(x)
         .into_iter()
         .map(|x| Polygon::try_from(x.geom).unwrap())
-        .collect::<Vec<Polygon>>(); 
+        .collect::<Vec<Polygon>>();
 
     to_pntr(Geom::from(MultiPolygon::new(x)))
 }

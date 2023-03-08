@@ -40,6 +40,8 @@ fn from_coord(x: Coord) -> [f64; 2] {
 fn from_point(x: Point) -> Robj {
     let x = from_coord(x.0);
     Robj::try_from(x).unwrap()
+        .set_class(["XY", "POINT", "sfg"])
+        .unwrap()
 }
 
 fn from_multipoint(x: MultiPoint) -> Robj {
@@ -50,6 +52,8 @@ fn from_multipoint(x: MultiPoint) -> Robj {
 
     let res = RMatrix::new_matrix(x.len(), 2, |r, c| x[r][c]);
     Robj::from(res)
+        .set_class(["XY", "MULTIPOINT", "sfg"])
+        .unwrap()
 }
 
 fn from_linestring(x: LineString) -> Robj {
@@ -57,6 +61,8 @@ fn from_linestring(x: LineString) -> Robj {
 
     let res = RMatrix::new_matrix(x.len(), 2, |r, c| x[r][c]);
     Robj::from(res)
+        .set_class(["XY", "LINESTRING", "sfg"])
+        .unwrap()
 }
 
 fn from_multilinestring(x: MultiLineString) -> Robj {
@@ -64,6 +70,8 @@ fn from_multilinestring(x: MultiLineString) -> Robj {
         .map(from_linestring)
         .collect::<List>()
         .into_robj()
+        .set_class(["XY", "MULTILINESTRING", "sfg"])
+        .unwrap()
 }
 
 fn from_polygon(x: Polygon) -> Robj {
@@ -80,12 +88,16 @@ fn from_polygon(x: Polygon) -> Robj {
     let res = res.into_iter().map(from_linestring).collect::<Vec<Robj>>();
 
     Robj::from(List::from_values(res))
+        .set_class(["XY", "POLYGON", "sfg"])
+        .unwrap()
 }
 
 fn from_multipolygon(x: MultiPolygon) -> Robj {
     let res = x.into_iter().map(from_polygon).collect::<List>();
 
     Robj::from(res)
+        .set_class(["XY", "MULTIPOLYGON", "sfg"])
+        .unwrap()
 }
 
 extendr_module! {

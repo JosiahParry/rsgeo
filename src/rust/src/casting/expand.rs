@@ -1,12 +1,11 @@
+use crate::to_pntr;
+use crate::types::Geom;
+use crate::utils::geom_class;
 use extendr_api::prelude::*;
 use geo_types::*;
-use crate::utils::geom_class;
-use crate::types::Geom;
-use crate::to_pntr;
-
 
 // EXPAND -------------------------------------------------------------------------
-// multis to the single varietys 
+// multis to the single varietys
 #[extendr]
 fn expand_multipolygon(x: Robj) -> Robj {
     let x = Geom::from(x).geom;
@@ -56,10 +55,10 @@ fn expand_multilinestring(x: Robj) -> Robj {
 fn expand_polygon(x: Robj) -> Robj {
     let x = Geom::from(x).geom;
     let poly = Polygon::try_from(x).unwrap();
-    
+
     let ext = poly.exterior().to_owned();
     let interior = poly.interiors().to_owned();
-    
+
     let mut res: Vec<Robj> = Vec::with_capacity(interior.len() + 1);
 
     res.push(to_pntr(Geom::from(ext)));
@@ -77,7 +76,8 @@ fn expand_polygon(x: Robj) -> Robj {
 fn expand_linestring(x: Robj) -> Robj {
     let x = Geom::from(x).geom;
     let line = LineString::try_from(x).unwrap();
-    let res = line.0
+    let res = line
+        .0
         .into_iter()
         .map(|x| to_pntr(Geom::from(Point::try_from(x).unwrap())))
         .collect::<List>()
@@ -86,7 +86,6 @@ fn expand_linestring(x: Robj) -> Robj {
     res.set_attrib("class", geom_class("point")).unwrap()
 }
 
-
 // Expansion Hierarchy
 // MultiPolygon -> Polygon
 // (Polygon -> LineString) OR (MultiLineString -> LineString)
@@ -94,8 +93,7 @@ fn expand_linestring(x: Robj) -> Robj {
 
 #[extendr]
 fn expand_linestrings(x: List) -> List {
-    x
-        .into_iter()
+    x.into_iter()
         .map(|(_, robj)| {
             if robj.is_null() {
                 Robj::from(extendr_api::NULL)
@@ -106,11 +104,9 @@ fn expand_linestrings(x: List) -> List {
         .collect::<List>()
 }
 
-
 #[extendr]
 fn expand_multipolygons(x: List) -> List {
-    x
-        .into_iter()
+    x.into_iter()
         .map(|(_, robj)| {
             if robj.is_null() {
                 Robj::from(extendr_api::NULL)
@@ -121,11 +117,9 @@ fn expand_multipolygons(x: List) -> List {
         .collect::<List>()
 }
 
-
 #[extendr]
 fn expand_multilinestrings(x: List) -> List {
-    x
-        .into_iter()
+    x.into_iter()
         .map(|(_, robj)| {
             if robj.is_null() {
                 Robj::from(extendr_api::NULL)
@@ -136,11 +130,9 @@ fn expand_multilinestrings(x: List) -> List {
         .collect::<List>()
 }
 
-
 #[extendr]
 fn expand_multipoints(x: List) -> List {
-    x
-        .into_iter()
+    x.into_iter()
         .map(|(_, robj)| {
             if robj.is_null() {
                 Robj::from(extendr_api::NULL)
@@ -151,11 +143,9 @@ fn expand_multipoints(x: List) -> List {
         .collect::<List>()
 }
 
-
 #[extendr]
 fn expand_polygons(x: List) -> List {
-    x
-        .into_iter()
+    x.into_iter()
         .map(|(_, robj)| {
             if robj.is_null() {
                 Robj::from(extendr_api::NULL)

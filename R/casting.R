@@ -59,7 +59,7 @@ cast_geoms.multilinestring <- function(x, to) .cast_geom(x, to)
 cast_geoms.polygon <- function(x, to) .cast_geom(x, to)
 #' @export
 cast_geoms.multipolygon <- function(x, to) .cast_geom(x, to)
-
+#' @export
 cast_geoms.rs_POINT <- function(x, to) .cast_geoms(x, to)
 #' @export
 cast_geoms.rs_MULTIPOINT <- function(x, to) .cast_geoms(x, to)

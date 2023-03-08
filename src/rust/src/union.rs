@@ -1,7 +1,7 @@
 use extendr_api::prelude::*;
 use geo::{
-    BooleanOps, Geometry, LineString, MultiLineString, MultiPoint, MultiPolygon, Point,
-    Polygon, RemoveRepeatedPoints,
+    BooleanOps, Geometry, LineString, MultiLineString, MultiPoint, MultiPolygon, Point, Polygon,
+    RemoveRepeatedPoints,
 };
 
 use crate::geoms::*;
@@ -21,7 +21,7 @@ fn union_geoms(x: List) -> Robj {
 
     //match geom_type
     let geo_type = geom_type.nth(0).unwrap();
-    
+
     let res = match geo_type {
         "rs_POINT" => {
             let x = x
@@ -68,14 +68,11 @@ fn union_geoms(x: List) -> Robj {
                 .collect::<Vec<MultiLineString>>();
             to_pntr(Geom::from(Geometry::from(union_multilinestring(x))))
         }
-        _ => Robj::from(extendr_api::NULL)
+        _ => Robj::from(extendr_api::NULL),
     };
 
-
-    
     //let lst = List::from_values(&[res]);
     crate::utils::restore_geoms(list!(res).into())
-
 }
 
 //#[extendr]

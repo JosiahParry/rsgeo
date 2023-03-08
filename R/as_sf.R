@@ -70,28 +70,28 @@ st_as_sfc.rs_POINT <- function(x) {
 }
 
 st_as_sfc.rs_MULTIPOINT <- function(x) {
-  sf::st_sfc(lapply(x, as_sfg))
+  sf::st_sfc(geoms_to_r(x))
 }
 
 st_as_sfc.rs_POLYGON <- function(x) {
-  sf::st_sfc(lapply(x, as_sfg))
+  sf::st_sfc(geoms_to_r(x))
 }
 
 
 st_as_sfc.rs_MULTIPOLYGON <- function(x) {
-  sf::st_sfc(lapply(x, as_sfg))
+  sf::st_sfc(geoms_to_r(x))
 }
 
 
 st_as_sfc.rs_LINESTRING <- function(x) {
-  sf::st_sfc(lapply(x, as_sfg))
+  sf::st_sfc(geoms_to_r(x))
 }
 
 st_as_sfc.rs_MULTILINESTRING <- function(x) {
-  sf::st_sfc(lapply(x, as_sfg))
+  sf::st_sfc(geoms_to_r(x))
 }
 
 
 st_as_sfc.rs_GEOMETRYCOLLECTION <- function(x) {
-  sf::st_sfc(lapply(x, as_sfg))
+  sf::st_sfc(geoms_to_r(x))
 }

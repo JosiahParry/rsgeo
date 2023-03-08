@@ -10,7 +10,6 @@ use geo_types::{Geometry, Point, Polygon};
 
 #[extendr]
 fn bounding_box_(x: Robj) -> List {
-
     let x: Geom = x.try_into().unwrap();
 
     let rect = x.geom.bounding_rect().unwrap();
@@ -25,29 +24,29 @@ fn bounding_box_(x: Robj) -> List {
     .unwrap()
 }
 
-
 #[extendr]
-/// Compute Geometric Boundaries 
-/// 
+/// Compute Geometric Boundaries
+///
 /// @export
 /// @rdname boundaries
-/// @param x a rust geometry either a scalar or a vector for functions ending in `s`. See "Details" for more. 
+/// @param x a rust geometry either a scalar or a vector for functions ending in `s`. See "Details" for more.
 ///
 /// @details
-/// 
+///
 /// - `bounding_box()` returns a named list of x and y maximums and minimums
 /// - `bounding_rectangle()` returns a polygon of the bounding rectangle
 /// - `convex_hull()` returns a polygon of the convex hull
 /// - `concave_hull()` returns a polygon of the specified concavity
-/// 
-/// Each function, with the exception of `bounding_box()` has a plural version ending 
-/// with an `s` which is vectorized over `x`. 
+///
+/// Each function, with the exception of `bounding_box()` has a plural version ending
+/// with an `s` which is vectorized over `x`.
 fn bounding_rectangle(x: Robj) -> Robj {
     let x: Geom = x.try_into().unwrap();
 
     let rect = x.geom.bounding_rect().unwrap();
-    to_pntr(Geom::from(Polygon::from(rect)))
-
+    list![to_pntr(Geom::from(Polygon::from(rect)))]
+        .set_class(geom_class("polygon"))
+        .unwrap()
 }
 
 #[extendr]
@@ -56,14 +55,13 @@ fn bounding_rectangle(x: Robj) -> Robj {
 fn bounding_rectangles(x: List) -> Robj {
     let res = x
         .into_iter()
-        .map(|(_, x)| bounding_rectangle(x))
+        .map(|(_, x)| 
+            List::try_from(bounding_rectangle(x)).unwrap().elt(0).unwrap()
+        )
         .collect::<List>();
 
-    res
-        .set_attrib("class", geom_class("polygon"))
-        .unwrap() 
+    res.set_attrib("class", geom_class("polygon")).unwrap()
 }
-
 
 #[extendr]
 /// @export
@@ -89,13 +87,11 @@ fn concave_hull(x: Robj, concavity: f64) -> Robj {
 /// @rdname boundaries
 fn concave_hulls(x: List, concavity: f64) -> Robj {
     let res = x
-    .into_iter()
-    .map(|(_, x)| concave_hull(x, concavity))
-    .collect::<List>();
+        .into_iter()
+        .map(|(_, x)| concave_hull(x, concavity))
+        .collect::<List>();
 
-    res
-        .set_attrib("class", geom_class("polygon"))
-        .unwrap() 
+    res.set_attrib("class", geom_class("polygon")).unwrap()
 }
 
 #[extendr]
@@ -116,15 +112,9 @@ fn convex_hull(x: Robj) -> Robj {
 /// @export
 /// @rdname boundaries
 fn convex_hulls(x: List) -> Robj {
-    let res = x
-        .into_iter()
-        .map(|(_, x)| convex_hull(x))
-        .collect::<List>();
+    let res = x.into_iter().map(|(_, x)| convex_hull(x)).collect::<List>();
 
-    res
-        .set_attrib("class", geom_class("polygon"))
-        .unwrap() 
-
+    res.set_attrib("class", geom_class("polygon")).unwrap()
 }
 
 /// Find extremes

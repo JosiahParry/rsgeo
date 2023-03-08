@@ -1,10 +1,10 @@
 use extendr_api::prelude::*;
 
-use geo::{BoundingRect};
-use rstar::{RTree, RTreeObject, AABB};
-use rstar::primitives::GeomWithData;
 use crate::geoms::from_list;
 use crate::types::Geom;
+use geo::BoundingRect;
+use rstar::primitives::GeomWithData;
+use rstar::{RTree, RTreeObject, AABB};
 
 // implement RTreeObject for Geom struct (wrapper for geo-types::Geometry)
 impl RTreeObject for Geom {
@@ -14,7 +14,6 @@ impl RTreeObject for Geom {
         let ll = bbox.min(); //lower left x coord
         let ur = bbox.max(); // upper right y
         AABB::from_corners(ll.into(), ur.into())
-        
     }
 }
 
@@ -30,17 +29,16 @@ pub fn create_rtree(geoms: Vec<Geom>) -> RTree<GeomWithData<Geom, usize>> {
     r_tree
 }
 
-
 #[extendr]
 /// Create an rstar RTree from a vector of geometry
-/// @param x a vector of rust geometry 
-/// @export 
+/// @param x a vector of rust geometry
+/// @export
 fn rstar_rtree(x: List) -> Robj {
     let geoms = from_list(x);
 
     let rtree = create_rtree(geoms);
     let rtree_size = rtree.size();
-    
+
     ExternalPtr::new(rtree)
         .as_robj()
         .set_attrib("class", "rstar_rtree")
@@ -49,12 +47,10 @@ fn rstar_rtree(x: List) -> Robj {
         .unwrap()
 }
 
-
 #[extendr]
 fn intersection_candidates(x: List, y: List) -> List {
-    
     let x = from_list(x);
-    let n = x.len(); 
+    let n = x.len();
     let y = from_list(y);
 
     let x_rtree = create_rtree(x);
@@ -66,9 +62,9 @@ fn intersection_candidates(x: List, y: List) -> List {
         .map(|(x, y)| (x.data, y.data))
         .collect::<Vec<(usize, usize)>>();
 
-    // need to create a sparse representation now 
+    // need to create a sparse representation now
     let mut res: Vec<Vec<i32>> = Vec::with_capacity(n);
-    
+
     // allocate internal vecs
     for _ in 0..n {
         res.push(Vec::with_capacity(n))
@@ -77,18 +73,14 @@ fn intersection_candidates(x: List, y: List) -> List {
     for (xin, yin) in res_cands.into_iter() {
         //if yin == 0 { continue; }
         res[xin].push(yin as i32)
-
     }
 
     List::from_values(res)
-
 }
-
-
 
 // helper to craft the AABB this is an alternative to a
 // from trait becuase i dont know the types here
-fn to_aabb(x: &Geom) -> AABB<[f64;2]> {
+fn to_aabb(x: &Geom) -> AABB<[f64; 2]> {
     let rct = x.geom.bounding_rect().unwrap();
     let ll = rct.min();
     let ur = rct.max();
@@ -109,9 +101,7 @@ fn locate_in_envelope(rtree: Robj, geom: Robj) -> Integers {
 
     let res = rtree.locate_in_envelope(&env);
 
-    res
-        .map(|x| Rint::from(x.data as i32))
-        .collect::<Integers>()
+    res.map(|x| Rint::from(x.data as i32)).collect::<Integers>()
 }
 
 // fn locate_nearest_nbs(rtree: Robj, geom: Robj) -> Integers {
@@ -123,7 +113,7 @@ fn locate_in_envelope(rtree: Robj, geom: Robj) -> Integers {
 
 // }
 
-extendr_module!{
+extendr_module! {
     mod spatial_index;
     fn rstar_rtree;
     fn print_aabb;
@@ -131,7 +121,6 @@ extendr_module!{
     fn intersection_candidates;
     //fn queen_contiguity;
 }
-
 
 // This is how i would do queen contiguity but intersects is just so friggin slow
 // #[extendr]
@@ -152,9 +141,9 @@ extendr_module!{
 //         .map(|(x, y)| (x.data, y.data))
 //         .collect::<Vec<(usize, usize)>>();
 
-//     // need to create a sparse representation now 
+//     // need to create a sparse representation now
 //     let mut res: Vec<Vec<i32>> = Vec::with_capacity(n);
-    
+
 //     // allocate internal vecs
 //     for _ in 0..n {
 //         res.push(Vec::with_capacity(n))
@@ -166,6 +155,5 @@ extendr_module!{
 //     }
 
 //     List::from_values(res)
-
 
 // }
