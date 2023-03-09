@@ -247,7 +247,7 @@ fn geom_linestrings(x: List) -> Robj {
 
 // utility function to take a list and convert to a Polygon
 // will be used to collect into `Vec<Polygon>` and thus into `MultiPolygon`
-fn polygon_inner(x: List) -> Polygon {
+pub fn polygon_inner(x: List) -> Polygon {
     let n = x.len();
     let mut linestrings: Vec<LineString> = Vec::with_capacity(n);
 

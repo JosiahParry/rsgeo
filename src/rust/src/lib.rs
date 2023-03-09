@@ -14,7 +14,9 @@ mod topology;
 mod union;
 mod utils;
 
+
 pub mod types;
+pub mod sfconversion;
 
 use crate::types::Geom;
 use extendr_api::prelude::*;
@@ -164,4 +166,5 @@ extendr_module! {
     use spatial_index;
     use topology;
     use casting;
+    use sfconversion;
 }
