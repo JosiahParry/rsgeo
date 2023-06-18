@@ -16,3 +16,4 @@ Imports:
     vctrs
 Suggests: 
     sf
+Config/rextendr/version: 0.2.0.9000

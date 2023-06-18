@@ -4,7 +4,7 @@ use geo_types::*;
 
 use crate::types::Geom;
 
-#[extendr]
+// #[extendr]
 fn geom_to_r(x: Robj) -> Robj {
     let x = Geom::from(x);
     Robj::from(x)
@@ -102,6 +102,5 @@ fn from_multipolygon(x: MultiPolygon) -> Robj {
 
 extendr_module! {
     mod conversion;
-    fn geom_to_r;
     fn geoms_to_r;
 }

@@ -66,7 +66,7 @@ as_sfg.multipolygon <- function(x) {
 
 # to sfc objects
 st_as_sfc.rs_POINT <- function(x) {
-  sf::st_sfc(lapply(x, as_sfg))
+  sf::st_sfc(geoms_to_r(x))
 }
 
 st_as_sfc.rs_MULTIPOINT <- function(x) {
