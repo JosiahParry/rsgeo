@@ -47,7 +47,9 @@ fn geom_points(x: List) -> Robj {
 
     for i in 0..n {
         let xi: Doubles = x[i].to_owned().try_into().unwrap();
-        res.push(geom_point(xi[0].0, xi[1].0));
+        let pnt = List::try_from(geom_point(xi[0].0, xi[1].0)).unwrap().elt(0).unwrap();
+
+        res.push(pnt);
     }
 
     List::from_values(res)
