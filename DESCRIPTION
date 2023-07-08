@@ -4,7 +4,7 @@ Version: 0.0.0.9000
 Authors@R: 
     person("Josiah", "Parry", , "josiah.parry@gmail.com", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0001-9910-865X"))
-Description: What the package does (one paragraph).
+Description: An R interface to the geo-rust libraries geo and geo-types. 
 License: MIT + file LICENSE
 Encoding: UTF-8
 Language: en
@@ -16,4 +16,5 @@ Imports:
     vctrs
 Suggests: 
     sf
-Config/rextendr/version: 0.2.0.9000
+Config/rextendr/version: 0.3.1.9000
+SystemRequirements: Cargo (rustc package manager)
