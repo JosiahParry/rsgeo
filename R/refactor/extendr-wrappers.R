@@ -16,9 +16,7 @@ from_sfc <- function(x) .Call(wrap__from_sfc, x)
 #' Find centroid
 #' @param x an object of class `point`
 #'@export
-centroids <- function(x) .Call(wrap__centroids, x)
-
-haversine_destination <- function(x, bearing, distance) .Call(wrap__haversine_destination, x, bearing, distance)
+centroid <- function(x) .Call(wrap__centroid, x)
 
 
 # nolint end

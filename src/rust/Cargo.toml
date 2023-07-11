@@ -18,3 +18,4 @@ rstar = "0.9.3"
 serde_json = "1.0.92"
 wkb = "0.7.1"
 wkt = "0.10.3"
+sfconversions = { version = "0.2.0", git = "https://github.com/JosiahParry/sfconversions"}

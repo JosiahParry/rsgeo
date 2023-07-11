@@ -405,6 +405,7 @@ dependencies = [
  "rayon",
  "rstar",
  "serde_json",
+ "sfconversions",
  "wkb",
  "wkt",
 ]
@@ -476,6 +477,15 @@ dependencies = [
  "itoa",
  "ryu",
  "serde",
+]
+
+[[package]]
+name = "sfconversions"
+version = "0.2.0"
+source = "git+https://github.com/JosiahParry/sfconversions#d4cccde2cbaac8ccb426c85aac4fc59a5b54385b"
+dependencies = [
+ "extendr-api",
+ "geo-types",
 ]
 
 [[package]]
