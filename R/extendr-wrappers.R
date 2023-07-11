@@ -20,5 +20,10 @@ centroids <- function(x) .Call(wrap__centroids, x)
 
 haversine_destination <- function(x, bearing, distance) .Call(wrap__haversine_destination, x, bearing, distance)
 
+#' @param x an `rs_POINT` vector 
+#' @param y an `rs_POINT` vector
+#' @param distance a numeric vector of either length 1 or the same length as x and y.
+haversine_intermediate <- function(x, y, distance) .Call(wrap__haversine_intermediate, x, y, distance)
+
 
 # nolint end

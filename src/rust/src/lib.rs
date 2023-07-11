@@ -162,7 +162,9 @@ fn haversine_intermediate(x: List, y: List, distance: Doubles) -> Robj {
 
     let n_d = distance.len();
 
-    if (n_d != n_x) || (n_d != n_y) || (n_d == 1) {
+    //rprintln!("nd {} nx {} ny {}", n_d, n_x, n_y);
+    //rprintln!("cond1 {} cond 2 {}", ((n_d != n_x) && (n_d != n_y)), (n_d != 1));
+    if ((n_d != n_x) && (n_d != n_y)) && (n_d != 1) {
         panic!("`distance` must be the same length as `x`, `y`, or length 1");
     }
 
@@ -258,6 +260,7 @@ extendr_module! {
     fn from_sfc;
     fn centroids;
     fn haversine_destination;
+    fn haversine_intermediate;
     //fn linestring_to_points;
     // fn centroids;
     // fn haversine_destination;
