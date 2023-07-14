@@ -266,8 +266,6 @@ extendr_module! {
     fn haversine_intermediate;
     //fn linestring_to_points;
     // fn centroids;
-    fn haversine_destination;
-    fn haversine_intermediate;
     // fn chaikin_smoothing;
     // use utils;
     use area;
@@ -277,7 +275,7 @@ extendr_module! {
     // use boundary;
     // use union;
     // use conversion;
-    // use simplification;
+    use simplification;
     // use io;
     // use spatial_index;
     // use topology;
