@@ -3,6 +3,7 @@ mod area;
 mod length;
 mod simplification;
 mod query;
+mod similarity;
 // mod boundary;
 // mod casting;
 // mod conversion;
@@ -276,6 +277,7 @@ extendr_module! {
     // use union;
     // use conversion;
     use simplification;
+    use similarity;
     // use io;
     // use spatial_index;
     // use topology;
