@@ -1,14 +1,17 @@
 // module imports
-//mod area;
+mod area;
+mod length;
+mod simplification;
+mod query;
 // mod boundary;
 // mod casting;
 // mod conversion;
 // mod distance;
 // mod geoms;
 // mod io;
-// mod length;
-// mod query;
-// mod simplification;
+
+
+
 // mod spatial_index;
 // mod topology;
 // mod union;
@@ -263,14 +266,13 @@ extendr_module! {
     fn haversine_intermediate;
     //fn linestring_to_points;
     // fn centroids;
-    // fn haversine_destination;
-    // fn haversine_intermediate;
+    fn haversine_destination;
+    fn haversine_intermediate;
     // fn chaikin_smoothing;
     // use utils;
-    // use area;
-    // use geoms;
-    // use length;
-    // use query;
+    use area;
+    use length;
+    use query;
     // use distance;
     // use boundary;
     // use union;

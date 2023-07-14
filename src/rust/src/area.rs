@@ -1,51 +1,82 @@
-use crate::geoms::*;
 use extendr_api::prelude::*;
 
+
+use sfconversions::Geom;
 use geo::chamberlain_duquette_area::ChamberlainDuquetteArea;
 use geo::Area;
 
 #[extendr]
 ///@export
-fn signed_area(x: List) -> Vec<f64> {
-    let geoms = from_list(x);
-
-    geoms
-        .into_iter()
-        .map(|geom| geom.geom.signed_area())
-        .collect::<Vec<f64>>()
+fn signed_area(x: List) -> Doubles {
+    x
+        .iter()
+        .map(|(_, xi)| {
+            if xi.is_null() {
+                Rfloat::na()
+            } else {
+                let area = Geom::try_from(xi) 
+                    .unwrap()
+                    .geom
+                    .signed_area();
+                Rfloat::from(area)
+            }
+        }).collect::<Doubles>()
 }
 
 #[extendr]
-///@export
-fn unsigned_area(x: List) -> Vec<f64> {
-    let geoms = from_list(x);
+/// @export
+fn unsigned_area(x: List) -> Doubles {
+    x
+    .iter()
+    .map(|(_, xi)| {
+        if xi.is_null() {
+            Rfloat::na()
+        } else {
+            let area = Geom::try_from(xi) 
+                .unwrap()
+                .geom
+                .unsigned_area();
+            Rfloat::from(area)
+        }
+    }).collect::<Doubles>()
+}
 
-    geoms
-        .into_iter()
-        .map(|geom| geom.geom.unsigned_area())
-        .collect::<Vec<f64>>()
+
+
+#[extendr]
+/// @export
+fn signed_area_geodesic(x: List) -> Doubles {
+    x
+        .iter()
+        .map(|(_, xi)| {
+            if xi.is_null() {
+                Rfloat::na()
+            } else {
+                let area = Geom::try_from(xi) 
+                    .unwrap()
+                    .geom
+                    .chamberlain_duquette_signed_area();
+                Rfloat::from(area)
+            }
+        }).collect::<Doubles>()
 }
 
 #[extendr]
-///@export
-fn geodesic_signed_area(x: List) -> Vec<f64> {
-    let geoms = from_list(x);
-
-    geoms
-        .into_iter()
-        .map(|geom| geom.geom.chamberlain_duquette_signed_area())
-        .collect::<Vec<f64>>()
-}
-
-#[extendr]
-///@export
-fn geodesic_unsigned_area(x: List) -> Vec<f64> {
-    let geoms = from_list(x);
-
-    geoms
-        .into_iter()
-        .map(|geom| geom.geom.chamberlain_duquette_unsigned_area())
-        .collect::<Vec<f64>>()
+/// @export
+fn unsigned_area_geodesic(x: List) -> Doubles {
+    x
+        .iter()
+        .map(|(_, xi)| {
+            if xi.is_null() {
+                Rfloat::na()
+            } else {
+                let area = Geom::try_from(xi) 
+                    .unwrap()
+                    .geom
+                    .chamberlain_duquette_unsigned_area();
+                Rfloat::from(area)
+            }
+        }).collect::<Doubles>()
 }
 
 // Macro to generate exports
@@ -53,6 +84,6 @@ extendr_module! {
     mod area;
     fn signed_area;
     fn unsigned_area;
-    fn geodesic_signed_area;
-    fn geodesic_unsigned_area;
+    fn signed_area_geodesic;
+    fn unsigned_area_geodesic;
 }
