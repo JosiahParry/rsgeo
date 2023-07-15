@@ -4,32 +4,15 @@ mod length;
 mod simplification;
 mod query;
 mod similarity;
-// mod boundary;
+mod boundary;
 // mod casting;
 // mod conversion;
 // mod distance;
-// mod geoms;
 // mod io;
-
-
-
 // mod spatial_index;
 // mod topology;
 // mod union;
-// mod utils;
 
-
-// pub mod types;
-
-
-// use crate::types::Geom;
-
-// use extendr_api::wrapper::{ExternalPtr, RMatrix};
-// use geo::{coord, Centroid, ChaikinSmoothing, HaversineDestination, HaversineIntermediate};
-// use geo_types::line_string;
-// use geoms::to_pntr;
-
-// use geo::geometry::{Coord, Geometry, Point};
 
 use extendr_api::prelude::*;
 use sfconversions::{
@@ -111,9 +94,6 @@ fn haversine_destination(x: List, bearing: Doubles, distance: Doubles) -> Robj {
     } else {
         distance
     };
-
-    //let bearing = bearing.iter().cycle();
-    //let distance = distance.iter().cycle();
 
     let mut res: Vec<Robj> = Vec::with_capacity(n);
     
@@ -213,21 +193,6 @@ fn haversine_intermediate(x: List, y: List, distance: Doubles) -> Robj {
         .unwrap()
 }
 
-// /// Haversine Intermediate
-// ///@export
-// #[extendr]
-// fn haversine_intermediate(x: Robj, y: Robj, distance: f64) -> Robj {
-//     let x: Geom = x.try_into().unwrap();
-//     let x: Point = x.try_into().unwrap();
-
-//     let y: Geom = y.try_into().unwrap();
-//     let y: Point = y.try_into().unwrap();
-
-//     let point = x.haversine_intermediate(&y, distance);
-//     let res = Geom::from(point);
-
-//     to_pntr(res)
-// }
 
 // /// Chaikin Smoothing
 // ///@export
@@ -265,21 +230,10 @@ extendr_module! {
     fn centroids;
     fn haversine_destination;
     fn haversine_intermediate;
-    //fn linestring_to_points;
-    // fn centroids;
-    // fn chaikin_smoothing;
-    // use utils;
     use area;
     use length;
     use query;
-    // use distance;
-    // use boundary;
-    // use union;
-    // use conversion;
+    use boundary;
     use simplification;
     use similarity;
-    // use io;
-    // use spatial_index;
-    // use topology;
-    // use casting;
 }
