@@ -43,3 +43,5 @@ extendr_module! {
     fn null_pntr;
     fn restore_geoms;
 }
+
+use extendr_api::scalar::Scalar; 

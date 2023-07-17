@@ -9,17 +9,18 @@ mod boundary;
 // mod conversion;
 // mod distance;
 // mod io;
-// mod spatial_index;
-// mod topology;
+mod spatial_index;
+mod topology;
 // mod union;
 
 
 use extendr_api::prelude::*;
-use sfconversions::{
+pub use sfconversions::{
     Geom, 
     vctrs::*,
     fromsf::sfc_to_rsgeo
 };
+
 
 // MISC algos -------
 
@@ -236,4 +237,5 @@ extendr_module! {
     use boundary;
     use simplification;
     use similarity;
+    use topology;
 }

@@ -215,7 +215,7 @@ fn is_convex(x: List) -> Logicals {
 }
 
 #[extendr]
-fn interpolate_point(x: List, fraction: Doubles) -> Robj {
+fn line_interpolate_point(x: List, fraction: Doubles) -> Robj {
     if !x.inherits("rs_LINESTRING") {
         panic!("`x` must be a `rs_LINESTRING`")
     }
@@ -293,6 +293,6 @@ extendr_module! {
     fn closest_point;
     fn closest_point_haversine;
     fn is_convex;
-    fn interpolate_point;
+    fn line_interpolate_point;
     fn locate_point_on_line;
 }
