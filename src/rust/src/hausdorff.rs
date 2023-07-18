@@ -8,6 +8,12 @@ use geo::EuclideanDistance;
 use geo::GeoFloat;
 use geo::Coord;
 
+// This is a test implementation of haussdorf distance that requires 
+// https://github.com/georust/geo/pull/1029/ to be merged
+// it is not complete yet. 
+// will create PR to geo when figured out. 
+// also a great way to learn how to make a rust macro
+
 pub trait HausdorffDistance<T, Rhs = Self> {
     fn hausdorff_distance(&self, rhs: &Rhs) -> T;
 }
