@@ -1,7 +1,10 @@
 use extendr_api::prelude::*;
 use geo::{Intersects, Contains, Within};
 
-use crate::spatial_index::{create_rtree, create_cached_rtree};
+use crate::spatial_index::{
+    // create_rtree,
+     create_cached_rtree
+};
 use rstar::RTreeObject;
 use sfconversions::Geom;
 
@@ -138,13 +141,13 @@ extendr_module! {
     // fn contains_sparse;
     // fn contains_pairwise;
     // fn intersects;
-    fn intersects_sparse_cached2;
-    fn intersects_sparse_cached;
+    // fn intersects_sparse_cached2;
+    // fn intersects_sparse_cached;
     fn intersects_sparse;
     fn contains_sparse;
-    fn contains_sparse_cached;
+    // fn contains_sparse_cached;
     fn within_sparse;
-    fn within_sparse_cached;
+    // fn within_sparse_cached;
     // fn intersects_sparse2;
     // fn intersects_pairwise;
     // fn within;

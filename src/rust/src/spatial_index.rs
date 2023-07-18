@@ -8,30 +8,30 @@ use rstar::{RTree};
 
 // Creates a spatial index from a list
 //(RTree<GeomWithData<Geom, usize>>, Rc<Vec<GeomWithData<Geom, usize>>>)
-pub fn create_rtree(geoms: List) -> RTree<GeomWithData<Geom, usize>> {
-    // Class checking
-    let cls = geoms.class().unwrap().next().unwrap();
-    if !cls.starts_with("rs_") {
-        panic!("`x` must be a Rust geometry type")
-    }
+// pub fn create_rtree(geoms: List) -> RTree<GeomWithData<Geom, usize>> {
+//     // Class checking
+//     let cls = geoms.class().unwrap().next().unwrap();
+//     if !cls.starts_with("rs_") {
+//         panic!("`x` must be a Rust geometry type")
+//     }
 
-    let all_geoms = geoms
-        .iter()
-        .enumerate()
-        .filter_map(|(i, (_, xi))| {
-            if xi.is_null() {
-                None
-            } else {
-                let geo = Geom::try_from(xi).unwrap();
-                Some(GeomWithData::new(geo, i))
-            }
-        })
-        .collect::<Vec<GeomWithData<Geom, usize>>>();
+//     let all_geoms = geoms
+//         .iter()
+//         .enumerate()
+//         .filter_map(|(i, (_, xi))| {
+//             if xi.is_null() {
+//                 None
+//             } else {
+//                 let geo = Geom::try_from(xi).unwrap();
+//                 Some(GeomWithData::new(geo, i))
+//             }
+//         })
+//         .collect::<Vec<GeomWithData<Geom, usize>>>();
 
-    //let all_geoms = Rc::new(all_geoms);
-    // (RTree::bulk_load(all_geoms.to_vec()), all_geoms)
-    RTree::bulk_load(all_geoms.to_vec())
-}
+//     //let all_geoms = Rc::new(all_geoms);
+//     // (RTree::bulk_load(all_geoms.to_vec()), all_geoms)
+//     RTree::bulk_load(all_geoms.to_vec())
+// }
 
 // use cached envelopes
 pub fn create_cached_rtree(geoms: List) -> RTree<GeomWithData<CachedEnvelope<Geom>, usize>> {

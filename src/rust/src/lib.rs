@@ -9,6 +9,7 @@ mod boundary;
 // mod conversion;
 // mod distance;
 // mod io;
+mod hausdorff;
 mod spatial_index;
 mod topology;
 // mod union;

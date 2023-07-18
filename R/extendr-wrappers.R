@@ -25,5 +25,69 @@ haversine_destination <- function(x, bearing, distance) .Call(wrap__haversine_de
 #' @param distance a numeric vector of either length 1 or the same length as x and y.
 haversine_intermediate <- function(x, y, distance) .Call(wrap__haversine_intermediate, x, y, distance)
 
+#'@export
+signed_area <- function(x) .Call(wrap__signed_area, x)
+
+#' @export
+unsigned_area <- function(x) .Call(wrap__unsigned_area, x)
+
+#' @export
+signed_area_geodesic <- function(x) .Call(wrap__signed_area_geodesic, x)
+
+#' @export
+unsigned_area_geodesic <- function(x) .Call(wrap__unsigned_area_geodesic, x)
+
+length_euclidean <- function(x) .Call(wrap__length_euclidean, x)
+
+length_geodesic <- function(x) .Call(wrap__length_geodesic, x)
+
+length_vincenty <- function(x) .Call(wrap__length_vincenty, x)
+
+bearing_geodesic <- function(x, y) .Call(wrap__bearing_geodesic, x, y)
+
+bearing_haversine <- function(x, y) .Call(wrap__bearing_haversine, x, y)
+
+closest_point <- function(x, y) .Call(wrap__closest_point, x, y)
+
+closest_point_haversine <- function(x, y) .Call(wrap__closest_point_haversine, x, y)
+
+is_convex <- function(x) .Call(wrap__is_convex, x)
+
+line_interpolate_point <- function(x, fraction) .Call(wrap__line_interpolate_point, x, fraction)
+
+locate_point_on_line <- function(x, y) .Call(wrap__locate_point_on_line, x, y)
+
+bounding_boxes <- function(x) .Call(wrap__bounding_boxes, x)
+
+bounding_rect <- function(x) .Call(wrap__bounding_rect, x)
+
+convex_hull <- function(x) .Call(wrap__convex_hull, x)
+
+concave_hull <- function(x, concavity) .Call(wrap__concave_hull, x, concavity)
+
+extreme_coords <- function(x) .Call(wrap__extreme_coords, x)
+
+simplify_geoms <- function(x, epsilon) .Call(wrap__simplify_geoms, x, epsilon)
+
+simplify_vw_geoms <- function(x, epsilon) .Call(wrap__simplify_vw_geoms, x, epsilon)
+
+simplify_vw_preserve_geoms <- function(x, epsilon) .Call(wrap__simplify_vw_preserve_geoms, x, epsilon)
+
+frechet_distance <- function(x, y) .Call(wrap__frechet_distance, x, y)
+
+intersects_sparse_cached2 <- function(x, y) .Call(wrap__intersects_sparse_cached2, x, y)
+
+intersects_sparse_cached <- function(x, y) .Call(wrap__intersects_sparse_cached, x, y)
+
+intersects_sparse <- function(x, y) .Call(wrap__intersects_sparse, x, y)
+
+contains_sparse <- function(x, y) .Call(wrap__contains_sparse, x, y)
+
+contains_sparse_cached <- function(x, y) .Call(wrap__contains_sparse_cached, x, y)
+
+within_sparse <- function(x, y) .Call(wrap__within_sparse, x, y)
+
+within_sparse_cached <- function(x, y) .Call(wrap__within_sparse_cached, x, y)
+
 
 # nolint end
