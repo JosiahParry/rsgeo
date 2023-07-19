@@ -1,5 +1,5 @@
 use extendr_api::prelude::*;
-use geo::{Intersects, Contains, Within};
+use geo::{PreparedGeometry, Relate};
 
 use crate::spatial_index::{
     // create_rtree,
@@ -72,11 +72,12 @@ fn intersects_sparse(x: List, y: List) -> List {
         let env = yi.envelope();
         let cands = xtree.locate_in_envelope_intersecting(&env);
 
+        let prepared_y = PreparedGeometry::from(&yi.geom);
         // iterate through all candidates
         cands
             .for_each(|cnd| {
-                if yi.geom.intersects(&cnd.geom().geom) {
-                    index[cnd.data].push((i as i32) + 1)
+                if prepared_y.relate(&cnd.data.1).is_intersects() {
+                    index[cnd.data.0].push((i as i32) + 1)
                 }
             });
 
@@ -94,14 +95,15 @@ fn contains_sparse(x: List, y: List) -> List {
 
     for (i, (_, y)) in y.iter().enumerate() {
         let yi = Geom::try_from(y).unwrap();
+        let prepared_y = PreparedGeometry::from(&yi.geom);
         let env = yi.envelope();
         let cands = xtree.locate_in_envelope_intersecting(&env);
 
         // iterate through all candidates
         cands
             .for_each(|cnd| {
-                if yi.geom.contains(&cnd.geom().geom) {
-                    index[cnd.data].push((i as i32) + 1)
+                if prepared_y.relate(&cnd.data.1).is_contains() {
+                    index[cnd.data.0].push((i as i32) + 1)
                 }
             });
     }
@@ -119,14 +121,15 @@ fn within_sparse(x: List, y: List) -> List {
 
     for (i, (_, y)) in y.iter().enumerate() {
         let yi = Geom::try_from(y).unwrap();
+        let prepared_y = PreparedGeometry::from(&yi.geom);
         let env = yi.envelope();
         let cands = xtree.locate_in_envelope_intersecting(&env);
 
         // iterate through all candidates
         cands
             .for_each(|cnd| {
-                if yi.geom.is_within(&cnd.geom().geom) {
-                    index[cnd.data].push((i as i32) + 1)
+                if prepared_y.relate(&cnd.data.1).is_within() {
+                    index[cnd.data.0].push((i as i32) + 1)
                 }
             });
 

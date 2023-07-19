@@ -1,8 +1,9 @@
 use extendr_api::prelude::*;
+use geo::PreparedGeometry;
 
 use sfconversions::{Geom, IntoGeom};
 use rstar::primitives::{GeomWithData, CachedEnvelope};
-use rstar::{RTree};
+use rstar::RTree;
 
 // use std::rc::Rc;
 
@@ -34,7 +35,7 @@ use rstar::{RTree};
 // }
 
 // use cached envelopes
-pub fn create_cached_rtree(geoms: List) -> RTree<GeomWithData<CachedEnvelope<Geom>, usize>> {
+pub fn create_cached_rtree(geoms: List) -> RTree<GeomWithData<CachedEnvelope<Geom>, (usize, PreparedGeometry<'static>)>> {
     // Class checking
     let cls = geoms.class().unwrap().next().unwrap();
     if !cls.starts_with("rs_") {
@@ -49,13 +50,15 @@ pub fn create_cached_rtree(geoms: List) -> RTree<GeomWithData<CachedEnvelope<Geo
                 None
             } else {
                 let geo = Geom::try_from(xi).unwrap();
+                let prepared_geom: PreparedGeometry<'static> = PreparedGeometry::from(geo.geom.clone());
                 let env = geo.cached_envelope();
-                Some(GeomWithData::new(env, i))
+                let geom_with_data = GeomWithData::new(env, (i, prepared_geom));
+                Some(geom_with_data)
             }
         })
-        .collect::<Vec<GeomWithData<CachedEnvelope<Geom>, usize>>>();
+        .collect::<Vec<_>>();
 
-    RTree::bulk_load(all_geoms.to_vec())
+    RTree::bulk_load(all_geoms)
 
 }
 
