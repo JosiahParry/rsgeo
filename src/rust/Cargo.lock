@@ -159,6 +159,21 @@ dependencies = [
 ]
 
 [[package]]
+name = "geo"
+version = "0.26.0"
+source = "git+https://github.com/georust/geo?branch=mkirk/prepared-geom#5f599d17e9f075e2b9d0c1018e6da415250cd0c9"
+dependencies = [
+ "earcutr",
+ "float_next_after",
+ "geo-types",
+ "geographiclib-rs",
+ "log",
+ "num-traits",
+ "robust",
+ "rstar",
+]
+
+[[package]]
 name = "geo-types"
 version = "0.7.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -409,10 +424,11 @@ name = "rsgeo"
 version = "0.1.0"
 dependencies = [
  "extendr-api",
- "geo",
+ "geo 0.26.0 (git+https://github.com/georust/geo?branch=mkirk/prepared-geom)",
  "geo-types",
  "geojson",
  "ndarray",
+ "num-traits",
  "rayon",
  "rstar",
  "serde_json",
@@ -496,7 +512,7 @@ version = "0.2.0"
 source = "git+https://github.com/JosiahParry/sfconversions#b5a051209f6cc3f633e1425472c04822cc5358ca"
 dependencies = [
  "extendr-api",
- "geo",
+ "geo 0.26.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "geo-types",
  "rstar",
 ]

@@ -9,7 +9,7 @@ name = 'rsgeo'
 
 [dependencies]
 extendr-api = { version = '0.4.0'}
-geo = { git = "https://github.com/mcassels/geo", branch = "euclidean-distance" }
+geo = { git = "https://github.com/georust/geo", branch = "mkirk/prepared-geom" }
 geo-types = "0.7.8"
 geojson = "0.24.0"
 ndarray = "0.15.6"
