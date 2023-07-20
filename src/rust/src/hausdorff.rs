@@ -9,6 +9,7 @@ use geo::GeoFloat;
 use geo::Coord;
 use num_traits::Bounded; // used to have T as generic type in folding
 use num_traits::FloatConst;
+use geo_types::GeometryCollection;
 
 // This is a test implementation of haussdorf distance that requires 
 // https://github.com/georust/geo/pull/1029/ to be merged
@@ -106,6 +107,17 @@ macro_rules! impl_haussdorf_distance_coord_to_multi {
 impl_haussdorf_distance_coord_to_multi!(MultiPoint, MultiLineString, MultiPolygon, Triangle, Rect);
 
 
+impl<T> HausdorffDistance<T, GeometryCollection<T>> for Coord<T>
+where
+    T: GeoFloat + FloatConst,
+{
+    fn hausdorff_distance(&self, rhs: &GeometryCollection<T>) -> T {
+        rhs
+        .into_iter()
+        .map(|geom| self.hausdorff_distance(geom))
+        .fold(<T as Bounded>::min_value(), |accum, val| accum.max(val))
+    }
+}
 
 impl<T> HausdorffDistance<T, Geometry<T>> for Coord<T>
 where
@@ -122,11 +134,12 @@ where
             Geometry::MultiLineString(rhs) => self.hausdorff_distance(rhs),
             Geometry::Polygon(rhs) => self.hausdorff_distance(rhs),
             Geometry::MultiPolygon(rhs) => self.hausdorff_distance(rhs),
-            // Geometry::GeometryCollection(rhs) => self.hausdorff_distance(rhs),
-            _ => todo!()
+            Geometry::GeometryCollection(rhs) => self.hausdorff_distance(rhs)
         }
     }
 }
+
+
 
 // geometry and geometry collection 
 // impl<T> HausdorffDistance<T, GeometryCollection<T>> for Coord<T>
@@ -165,7 +178,7 @@ impl_haussdorf_distance_point!(
     Coord, Line, Rect, Triangle,
     Point, LineString, Polygon, 
     MultiPoint, MultiLineString, MultiPolygon,
-    Geometry
+    Geometry, GeometryCollection
 );
 
 
@@ -212,7 +225,15 @@ macro_rules! impl_hausdorff_distance_for_mpnt {
 
 
 // TODO for coord
-impl_hausdorff_distance_for_mpnt!([Line, Rect, Triangle, Point, MultiPoint, LineString, MultiLineString, Polygon, MultiPolygon]);
+impl_hausdorff_distance_for_mpnt!(
+    [
+        Line, Rect, Triangle, 
+        Point, MultiPoint, 
+        LineString, MultiLineString, 
+        Polygon, MultiPolygon, 
+        Geometry, GeometryCollection
+        ]
+    );
 
 // ┌────────────────────────────────┐
 // │ Implementations for LineString │
@@ -256,7 +277,14 @@ macro_rules! impl_hausdorff_distance_for_linestring {
 }
 
 // TODO coord, GeometryCollection, Geometry
-impl_hausdorff_distance_for_linestring!([Line, Rect, Triangle, Point, MultiPoint, LineString, MultiLineString, Polygon, MultiPolygon]);
+impl_hausdorff_distance_for_linestring!([
+    Line, Rect, Triangle, 
+    Point, MultiPoint,
+    LineString, MultiLineString, 
+    Polygon, MultiPolygon,
+    Geometry, GeometryCollection
+    ]
+);
 
 
 // ┌─────────────────────────────────────┐
@@ -283,7 +311,15 @@ macro_rules! impl_hausdorff_distance_for_multilinestring {
 }
 
 // TODO coord, GeometryCollection, Geometry
-impl_hausdorff_distance_for_multilinestring!([Line, Rect, Triangle, Point, MultiPoint, LineString, MultiLineString, Polygon, MultiPolygon]);
+impl_hausdorff_distance_for_multilinestring!(
+    [
+        Line, Rect, Triangle, 
+        Point, MultiPoint, 
+        LineString, MultiLineString, 
+        Polygon, MultiPolygon,
+        Geometry, GeometryCollection
+    ]
+);
 
 
 // ┌─────────────────────────────┐
@@ -310,7 +346,15 @@ macro_rules! impl_hausdorff_distance_for_polygon {
 }
 
 // TODO coord, GeometryCollection, Geometry
-impl_hausdorff_distance_for_polygon!([Line, Rect, Triangle, Point, MultiPoint, LineString, MultiLineString, Polygon, MultiPolygon]);
+impl_hausdorff_distance_for_polygon!(
+    [
+        Line, Rect, Triangle, 
+        Point, MultiPoint, 
+        LineString, MultiLineString, 
+        Polygon, MultiPolygon,
+        Geometry, GeometryCollection
+    ]
+);
 
 // ┌──────────────────────────────────┐
 // │ Implementations for MultiPolygon │
@@ -336,8 +380,7 @@ macro_rules! impl_hausdorff_distance_for_multipolygon {
 }
 
 // TODO coord, GeometryCollection, Geometry
-impl_hausdorff_distance_for_multipolygon!([Line, Rect, Triangle, Point, MultiPoint, LineString, MultiLineString, Polygon, MultiPolygon]);
-
+impl_hausdorff_distance_for_multipolygon!([Line, Rect, Triangle, Point, MultiPoint, LineString, MultiLineString, Polygon, MultiPolygon, Geometry, GeometryCollection]);
 
 
 // ┌──────────────────────────┐
@@ -367,7 +410,8 @@ impl_hausdorff_distance_for_line!([
     Line, Triangle, Rect, 
     Point, MultiPoint,
     LineString, MultiLineString,
-    Polygon, MultiPolygon
+    Polygon, MultiPolygon,
+    Geometry, GeometryCollection
 ]);
 
 
@@ -399,7 +443,8 @@ impl_hausdorff_distance_for_rect!([
     Line, Triangle, Rect, 
     Point, MultiPoint,
     LineString, MultiLineString,
-    Polygon, MultiPolygon
+    Polygon, MultiPolygon,
+    Geometry, GeometryCollection
 ]);
 
 
@@ -430,7 +475,8 @@ impl_hausdorff_distance_for_tri!([
     Line, Triangle, Rect, 
     Point, MultiPoint,
     LineString, MultiLineString,
-    Polygon, MultiPolygon
+    Polygon, MultiPolygon,
+    Geometry, GeometryCollection
 ]);
 
 
