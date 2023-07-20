@@ -9,7 +9,6 @@ use geo::GeoFloat;
 use geo::Coord;
 use num_traits::Bounded; // used to have T as generic type in folding
 use num_traits::FloatConst;
-use wkt::types::GeometryCollection;
 
 // This is a test implementation of haussdorf distance that requires 
 // https://github.com/georust/geo/pull/1029/ to be merged
@@ -123,24 +122,25 @@ where
             Geometry::MultiLineString(rhs) => self.hausdorff_distance(rhs),
             Geometry::Polygon(rhs) => self.hausdorff_distance(rhs),
             Geometry::MultiPolygon(rhs) => self.hausdorff_distance(rhs),
-            Geometry::GeometryCollection(rhs) => self.hausdorff_distance(rhs),
+            // Geometry::GeometryCollection(rhs) => self.hausdorff_distance(rhs),
+            _ => todo!()
         }
     }
 }
 
 // geometry and geometry collection 
-impl<T> HausdorffDistance<T, GeometryCollection<T>> for Coord<T>
-where
-    T: GeoFloat + FloatConst,
-{
-    fn hausdorff_distance(&self, rhs: &GeometryCollection<T>) -> T {
-        rhs
-            .0
-            .iter()
-            .map(|c2| self.hausdorff_distance(&c2))
-            .fold(<T as Bounded>::min_value(), |accum, val| accum.max(val))
-    }
-}
+// impl<T> HausdorffDistance<T, GeometryCollection<T>> for Coord<T>
+// where
+//     T: GeoFloat + FloatConst,
+// {
+//     fn hausdorff_distance(&self, rhs: &GeometryCollection<T>) -> T {
+//         rhs
+//             .0
+//             .iter()
+//             .map(|c2| self.hausdorff_distance(&c2))
+//             .fold(<T as Bounded>::min_value(), |accum, val| accum.max(val))
+//     }
+// }
 
 
 // ┌───────────────────────────┐
@@ -212,7 +212,7 @@ macro_rules! impl_hausdorff_distance_for_mpnt {
 
 
 // TODO for coord
-impl_hausdorff_distance_for_mpnt!([Line, Rect, Triangle, Point, MultiPoint, LineString, MultiLineString, Polygon, MultiPolygon, Geometry, GeometryCollection]);
+impl_hausdorff_distance_for_mpnt!([Line, Rect, Triangle, Point, MultiPoint, LineString, MultiLineString, Polygon, MultiPolygon]);
 
 // ┌────────────────────────────────┐
 // │ Implementations for LineString │
