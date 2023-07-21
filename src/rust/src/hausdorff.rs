@@ -479,12 +479,121 @@ impl_hausdorff_distance_for_tri!([
     Geometry, GeometryCollection
 ]);
 
+// ┌────────────────────────────────────────┐
+// │ Implementations for GeometryCollection │
+// └────────────────────────────────────────┘
+
+impl<T> HausdorffDistance<T, Geometry<T>> for GeometryCollection<T>
+where
+    T: GeoFloat + FloatConst
+{
+    fn hausdorff_distance(&self, rhs: &Geometry<T>) -> T {
+        self
+            .into_iter()
+            .map(|g| g.hausdorff_distance(rhs))
+            .fold(<T as Bounded>::min_value(), |accum, val| accum.max(val))
+
+    }
+}
+
+impl<T> HausdorffDistance<T, GeometryCollection<T>> for GeometryCollection<T>
+where
+    T: GeoFloat + FloatConst
+{
+    fn hausdorff_distance(&self, rhs: &GeometryCollection<T>) -> T {
+        self
+            .iter()
+            .map(|g| g.hausdorff_distance(rhs))
+            .fold(<T as Bounded>::min_value(), |accum, val| accum.max(val))
+
+    }
+}
+
+macro_rules! impl_hausdorff_distance_for_collection {
+    ([$($from:ident),*]) => {
+        $(
+            impl<T> HausdorffDistance<T, $from<T>> for GeometryCollection<T>
+            where
+                T: GeoFloat + FloatConst
+            {
+                fn hausdorff_distance(&self, geom: &$from<T>) -> T {
+                    geom.hausdorff_distance(self)
+                }
+            }
+        )*
+    };
+}
+
+impl_hausdorff_distance_for_collection!(
+    [
+        Coord, Line, Rect, Triangle, 
+        Point, LineString, Polygon,
+        MultiPoint, MultiLineString, MultiPolygon
+    ]
+);
+
+
+// ┌──────────────────────────────┐
+// │ Implementations for Geometry │
+// └──────────────────────────────┘
+
+impl<T> HausdorffDistance<T, Geometry<T>> for Geometry<T>
+where
+    T: GeoFloat + FloatConst
+{
+    fn hausdorff_distance(&self, rhs: &Geometry<T>) -> T {
+        match self {
+            Geometry::Line(g) => g.hausdorff_distance(rhs),
+            Geometry::Rect(g) => g.hausdorff_distance(rhs),
+            Geometry::Triangle(g) => g.hausdorff_distance(rhs),
+            Geometry::Point(g) => g.hausdorff_distance(rhs),
+            Geometry::LineString(g) => g.hausdorff_distance(rhs),
+            Geometry::Polygon(g) => g.hausdorff_distance(rhs),
+            Geometry::MultiPolygon(g) => g.hausdorff_distance(rhs),
+            Geometry::MultiPoint(g) => g.hausdorff_distance(rhs),
+            Geometry::MultiLineString(g) => g.hausdorff_distance(rhs),
+            Geometry::GeometryCollection(g) => g.hausdorff_distance(rhs)
+        }
+    }
+}
+
+
+impl<T> HausdorffDistance<T, GeometryCollection<T>> for Geometry<T>
+where
+    T: GeoFloat + FloatConst
+{
+    fn hausdorff_distance(&self, rhs: &GeometryCollection<T>) -> T {
+        rhs.hausdorff_distance(self)
+    }
+}
+
+macro_rules! impl_hausdorff_distance_for_geometry {
+    ([$($from:ident),*]) => {
+        $(
+            impl<T> HausdorffDistance<T, $from<T>> for Geometry<T>
+            where
+                T: GeoFloat + FloatConst
+            {
+                fn hausdorff_distance(&self, geom: &$from<T>) -> T {
+                    geom.hausdorff_distance(self)
+                }
+            }
+        )*
+    };
+}
+
+impl_hausdorff_distance_for_geometry!(
+    [
+        Coord, Line, Rect, Triangle, 
+        Point, LineString, Polygon,
+        MultiPoint, MultiLineString, MultiPolygon
+    ]
+);
 
 
 // types that iterate through multiple coords
 // line, triangle, rect, linestring, polygon, multipoint
 // then multilinestring, muiltipolygon are just the max of each of those
-
 // # we find the minimum distance for each point in x to the point set in y
 // # then we take all of the minima and find the maximum
 // impl<T> HausdorffDistance<T, MultiPoint<T>> for MultiPoint<T> 
@@ -498,7 +607,6 @@ impl_hausdorff_distance_for_tri!([
 //             .fold(<T as Bounded>::min_value(), |accum, val| accum.max(val))
 //     }
 // }
-
 
 // impl<T> HausdorffDistance<T, Polygon<T>> for MultiPoint<T> 
 // where
