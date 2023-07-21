@@ -75,19 +75,13 @@ simplify_vw_preserve_geoms <- function(x, epsilon) .Call(wrap__simplify_vw_prese
 
 frechet_distance <- function(x, y) .Call(wrap__frechet_distance, x, y)
 
-intersects_sparse_cached2 <- function(x, y) .Call(wrap__intersects_sparse_cached2, x, y)
-
-intersects_sparse_cached <- function(x, y) .Call(wrap__intersects_sparse_cached, x, y)
-
 intersects_sparse <- function(x, y) .Call(wrap__intersects_sparse, x, y)
 
 contains_sparse <- function(x, y) .Call(wrap__contains_sparse, x, y)
 
-contains_sparse_cached <- function(x, y) .Call(wrap__contains_sparse_cached, x, y)
-
 within_sparse <- function(x, y) .Call(wrap__within_sparse, x, y)
 
-within_sparse_cached <- function(x, y) .Call(wrap__within_sparse_cached, x, y)
+hausdorff_dist <- function(x, y) .Call(wrap__hausdorff_dist, x, y)
 
 
 # nolint end
