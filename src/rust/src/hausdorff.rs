@@ -326,6 +326,9 @@ impl_hausdorff_distance_for_multilinestring!(
 // │ Implementations for Polygon │
 // └─────────────────────────────┘
 
+// TODO i am only calculating the directional hausdorf distance
+// This needs to be bi-directional and then the max of the two. 
+
 macro_rules! impl_hausdorff_distance_for_polygon {
     ([$($from:ident),*]) => {
         $(
@@ -334,11 +337,17 @@ macro_rules! impl_hausdorff_distance_for_polygon {
                 T: GeoFloat + FloatConst
             {
                 fn hausdorff_distance(&self, geom: &$from<T>) -> T {
-                    self
+                    let hd1 = self
                         .coords_iter()
                         .map(|c| Point::from(c).euclidean_distance(geom))
-                        .fold(<T as Bounded>::min_value(), |accum, val| accum.max(val))
+                        .fold(<T as Bounded>::min_value(), |accum, val| accum.max(val));
 
+                    let hd2 = geom
+                        .coords_iter()
+                        .map(|c| Point::from(c).euclidean_distance(self))
+                        .fold(<T as Bounded>::min_value(), |accum, val| accum.max(val));
+
+                    hd1.max(hd2)
                 }
             }
         )*
@@ -621,6 +630,15 @@ impl_hausdorff_distance_for_geometry!(
 // }
 
 
+use sfconversions::Geom;
+
+#[extendr]
+fn hausdorff_dist(x: &Geom, y: &Geom) -> Rfloat {
+    let res = x.geom.hausdorff_distance(&y.geom);
+    Rfloat::from(res)
+}
+
 extendr_module! {
     mod hausdorff;
+    fn hausdorff_dist;
 }

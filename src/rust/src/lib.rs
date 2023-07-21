@@ -239,4 +239,5 @@ extendr_module! {
     use simplification;
     use similarity;
     use topology;
+    use hausdorff;
 }
