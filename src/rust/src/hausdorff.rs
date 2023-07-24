@@ -248,7 +248,7 @@ macro_rules! impl_hausdorff_distance_for_linestring {
                 T: GeoFloat + FloatConst
             {
                 fn hausdorff_distance(&self, geom: &$from<T>) -> T {
-                    rprintln!("for linestring impl");
+                    rprintln!("for LineString impl");
                     self
                         .coords_iter()
                         .map(|c| Point::from(c).euclidean_distance(geom))
@@ -260,15 +260,63 @@ macro_rules! impl_hausdorff_distance_for_linestring {
     };
 }
 
+
+impl<T> HausdorffDistance<T, Geometry<T>> for LineString<T>
+where
+T: GeoFloat + FloatConst
+{
+    fn hausdorff_distance(&self, geom: &Geometry<T>) -> T {
+        rprintln!("from Geometry for LineString<T>");
+
+        match geom {
+            Geometry::Line(g) => self.hausdorff_distance(g),
+            Geometry::Triangle(g) => self.hausdorff_distance(g),
+            Geometry::Rect(g) => self.hausdorff_distance(g),
+            Geometry::Point(g) => self.hausdorff_distance(g),
+            Geometry::MultiPoint(g) => self.hausdorff_distance(g),
+            Geometry::LineString(g) => self.hausdorff_distance(g),
+            Geometry::MultiLineString(g) => self.hausdorff_distance(g),
+            Geometry::Polygon(g) => self.hausdorff_distance(g),
+            Geometry::MultiPolygon(g) => self.hausdorff_distance(g),
+            Geometry::GeometryCollection(g) => self.hausdorff_distance(g)
+        }
+    }
+}
+
+
+
 // TODO coord, GeometryCollection, Geometry
 impl_hausdorff_distance_for_linestring!([
     Line, Rect, Triangle, 
     Point, 
     LineString, 
-    Polygon, 
-    Geometry, GeometryCollection
+    // Polygon, 
+    // Geometry,
+    GeometryCollection
     ]
 );
+
+
+
+impl<T> HausdorffDistance<T, Polygon<T>> for LineString<T>
+where
+T: GeoFloat + FloatConst
+{
+    fn hausdorff_distance(&self, geom: &Polygon<T>) -> T {
+        rprintln!("from Polygon for LineString<T>");
+        let hd1 = self
+            .coords_iter()
+            .map(|c| Point::from(c).hausdorff_distance(geom))
+            .fold(<T as Bounded>::min_value(), |accum, val| accum.max(val));
+
+        let hd2 = geom
+            .coords_iter()
+            .map(|c| Point::from(c).hausdorff_distance(self))
+            .fold(<T as Bounded>::min_value(), |accum, val| accum.max(val));
+        
+        hd1.max(hd2)
+    }
+}
 
 
 // separate implementation for multis 
@@ -307,7 +355,7 @@ where
 T: GeoFloat + FloatConst
 {
     fn hausdorff_distance(&self, geom: &MultiLineString<T>) -> T {
-        rprintln!("$from<T> for LineString<T> macro");
+        rprintln!("from MultiLineString for LineString<T>");
         let hd1 = self
             .coords_iter()
             .map(|c| Point::from(c).hausdorff_distance(geom))
@@ -327,7 +375,7 @@ where
 T: GeoFloat + FloatConst
 {
     fn hausdorff_distance(&self, geom: &MultiPoint<T>) -> T {
-        rprintln!("$from<T> for LineString<T> macro");
+        rprintln!("from MultiPoint for LineString<T>");
         let hd1 = self
             .coords_iter()
             .map(|c| Point::from(c).hausdorff_distance(geom))
@@ -347,15 +395,15 @@ where
 T: GeoFloat + FloatConst
 {
     fn hausdorff_distance(&self, geom: &MultiPolygon<T>) -> T {
-        rprintln!("$from<T> for LineString<T> macro");
+        rprintln!(" for LineString<T> macro");
         let hd1 = self
             .coords_iter()
-            .map(|c| Point::from(c).hausdorff_distance(geom))
+            .map(|c| Point::from(c).euclidean_distance(geom))
             .fold(<T as Bounded>::min_value(), |accum, val| accum.max(val));
 
         let hd2 = geom
             .coords_iter()
-            .map(|c| Point::from(c).hausdorff_distance(self))
+            .map(|c| Point::from(c).euclidean_distance(self))
             .fold(<T as Bounded>::min_value(), |accum, val| accum.max(val));
         
         hd1.max(hd2)
@@ -481,6 +529,7 @@ macro_rules! impl_hausdorff_distance_for_line {
                 T: GeoFloat + FloatConst
             {
                 fn hausdorff_distance(&self, geom: &$from<T>) -> T {
+                    rprintln!("for Line impl");
                     self
                         .coords_iter()
                         .map(|p| Point::from(p).euclidean_distance(geom))
@@ -661,6 +710,7 @@ macro_rules! impl_hausdorff_distance_for_geometry {
                 T: GeoFloat + FloatConst
             {
                 fn hausdorff_distance(&self, geom: &$from<T>) -> T {
+                    rprintln!("{:?}", stringify!($from));
                     geom.hausdorff_distance(self)
                 }
             }

@@ -125,7 +125,6 @@ expect_equal(
 # LineString to MultiPolygon
 expect_equal(
   hausdorff_dist(lns2rs, mplyrs),
-  hausdorff_dist(mplyrs, lns2rs),
   hd(lns2, mply)
 )
 
