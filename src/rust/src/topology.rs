@@ -36,30 +36,6 @@ use sfconversions::Geom;
 // }
 
 
-// #[extendr]
-// fn intersects_sparse(x: List, y: List) -> List {
-//     let n = x.len();
-//     let xtree  = create_rtree(x);
-
-//     let mut index = vec![Vec::with_capacity(n); n];
-
-//     for (i, (_, y)) in y.iter().enumerate() {
-//         let yi = Geom::try_from(y).unwrap();
-//         let env = yi.envelope();
-//         let cands = xtree.locate_in_envelope_intersecting(&env);
-
-//         // iterate through all candidates
-//         cands
-//             .for_each(|cnd| {
-//                 if yi.geom.intersects(&cnd.geom().geom) {
-//                     index[cnd.data].push((i as i32) + 1)
-//                 }
-//             });
-
-//     }
-//     List::from_values(index)
-// }
-
 #[extendr]
 fn intersects_sparse(x: List, y: List) -> List {
     let n = x.len();
@@ -135,22 +111,24 @@ fn within_sparse(x: List, y: List) -> List {
 }
 
 
+
+// relates use something called DE-9IM 
+// its an intersection matrix between two geometries. 
+// Each geometry is evaluated in 3 "parts"
+// I: interrior
+// B: boundary
+// E: exterior 
+//
+// There are 4 types of intersections:
+// F: false, or none
+// 0: a single point
+// 1: a shared line
+// 3: an area intersection
+
+
 extendr_module! {
     mod topology;
-    // fn contains; // vectorized along y
-    // fn contains_sparse;
-    // fn contains_pairwise;
-    // fn intersects;
-    // fn intersects_sparse_cached2;
-    // fn intersects_sparse_cached;
     fn intersects_sparse;
     fn contains_sparse;
-    // fn contains_sparse_cached;
     fn within_sparse;
-    // fn within_sparse_cached;
-    // fn intersects_sparse2;
-    // fn intersects_pairwise;
-    // fn within;
-    // fn within_sparse;
-    // fn within_pairwise;
 }

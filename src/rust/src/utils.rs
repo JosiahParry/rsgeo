@@ -19,7 +19,7 @@ pub fn determine_geoms_class(x: &Robj) -> [String; 3] {
     let class = if all_identical {
         x[0].class().unwrap().nth(0).unwrap()
     } else {
-        "geometrycollection"
+        "geometry"
     };
 
     geom_class(class)

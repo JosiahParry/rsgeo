@@ -9,11 +9,10 @@ mod boundary;
 // mod conversion;
 // mod distance;
 // mod io;
-mod hausdorff;
 mod spatial_index;
 mod topology;
 // mod union;
-
+mod construction;
 
 use extendr_api::prelude::*;
 pub use sfconversions::{
@@ -160,9 +159,6 @@ fn haversine_intermediate(x: List, y: List, distance: Doubles) -> Robj {
         distance
     };
 
-    //let bearing = bearing.iter().cycle();
-    //let distance = distance.iter().cycle();
-
     let mut res: Vec<Robj> = Vec::with_capacity(n);
     
     for i in 0..(n-1) {
@@ -239,5 +235,5 @@ extendr_module! {
     use simplification;
     use similarity;
     use topology;
-    use hausdorff;
+    use construction;
 }

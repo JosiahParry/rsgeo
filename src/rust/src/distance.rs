@@ -31,10 +31,7 @@ fn euclidean_distance_matrix(x: List, y: List) {
             })
             .collect::<Vec<_>>()
     } else if 
-
-
-
-
+    
     let nrow = x.len();
     let ncol = y.len();
 
