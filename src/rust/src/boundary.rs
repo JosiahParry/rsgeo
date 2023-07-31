@@ -1,23 +1,16 @@
 use sfconversions::{
-    Geom, 
-    vctrs::{geom_class, verify_rsgeo}, 
-    IntoGeom
+    vctrs::{geom_class, verify_rsgeo},
+    Geom, IntoGeom,
 };
 
 use extendr_api::prelude::*;
 
-use geo::{BoundingRect, 
-    ConcaveHull, 
-    ConvexHull, 
-    Extremes,
-    MinimumRotatedRect
-};
-use geo_types::{Polygon, Geometry, Point};
+use geo::{BoundingRect, ConcaveHull, ConvexHull, Extremes, MinimumRotatedRect};
+use geo_types::{Geometry, Point, Polygon};
 
 #[extendr]
 fn bounding_boxes(x: List) -> List {
-    x
-        .iter()
+    x.iter()
         .map(|(_, xi)| {
             if x.is_null() {
                 let bb = [Rfloat::na(); 4];
@@ -26,10 +19,7 @@ fn bounding_boxes(x: List) -> List {
                     .set_names(["xmin", "ymin", "xmax", "ymax"])
                     .unwrap()
             } else {
-                let bb = Geom::try_from(xi)
-                    .unwrap()
-                    .geom
-                    .bounding_rect();
+                let bb = Geom::try_from(xi).unwrap().geom.bounding_rect();
 
                 match bb {
                     Some(b) => {
@@ -39,7 +29,7 @@ fn bounding_boxes(x: List) -> List {
                             .into_robj()
                             .set_names(["xmin", "ymin", "xmax", "ymax"])
                             .unwrap()
-                    },
+                    }
                     None => {
                         let bb = [Rfloat::na(); 4];
                         Doubles::from_values(bb)
@@ -49,56 +39,43 @@ fn bounding_boxes(x: List) -> List {
                     }
                 }
             }
-        }).collect::<List>()
+        })
+        .collect::<List>()
 }
-
 
 #[extendr]
 fn bounding_rect(x: List) -> Robj {
-    x
-        .iter()
+    x.iter()
         .map(|(_, xi)| {
             if x.is_null() {
                 ().into_robj()
             } else {
-                let bb = Geom::try_from(xi)
-                    .unwrap()
-                    .geom
-                    .bounding_rect();
+                let bb = Geom::try_from(xi).unwrap().geom.bounding_rect();
 
                 match bb {
-                    Some(b) => {
-
-                        Geom::from(Polygon::from(b))
-                            .into_robj()
-
-                    },
-                    None => {
-                        NULL.into_robj()
-                    }
+                    Some(b) => Geom::from(Polygon::from(b)).into_robj(),
+                    None => NULL.into_robj(),
                 }
             }
-        }).collect::<List>()
+        })
+        .collect::<List>()
         .set_class(geom_class("polygon"))
         .unwrap()
 }
 
-
 #[extendr]
 fn convex_hull(x: List) -> Robj {
-    x
-        .iter()
+    x.iter()
         .map(|(_, xi)| {
-            if xi.is_null(){ 
+            if xi.is_null() {
                 ().into_robj()
             } else {
-                let xi = Geom::try_from(xi)
-                    .unwrap()
-                    .geom.convex_hull();
-        
-                    Geom::from(xi).into_robj()
+                let xi = Geom::try_from(xi).unwrap().geom.convex_hull();
+
+                Geom::from(xi).into_robj()
             }
-        }).collect::<List>()
+        })
+        .collect::<List>()
         .set_class(geom_class("polygon"))
         .unwrap()
 }
@@ -110,7 +87,7 @@ fn concave_hull(x: List, concavity: Doubles) -> Robj {
     let cls = x.class().unwrap().next().unwrap();
 
     if x.inherits("rs_POINT") {
-        return x.into()
+        return x.into();
     } else if !cls.starts_with("rs_") {
         panic!("`x` must be a Rust geometry type")
     }
@@ -123,8 +100,7 @@ fn concave_hull(x: List, concavity: Doubles) -> Robj {
         concavity
     };
 
-    x
-        .iter()
+    x.iter()
         .zip(concavity.iter())
         .map(|((_, xi), ci)| {
             if xi.is_null() || ci.is_na() || ci.is_nan() || ci.is_infinite() {
@@ -138,22 +114,20 @@ fn concave_hull(x: List, concavity: Doubles) -> Robj {
                     Geometry::MultiPolygon(g) => g.concave_hull(ci.inner()).into_geom().into(),
                     Geometry::MultiPoint(g) => g.concave_hull(ci.inner()).into_geom().into(),
                     Geometry::Polygon(g) => g.concave_hull(ci.inner()).into_geom().into(),
-                    _ => ().into_robj()
+                    _ => ().into_robj(),
                 }
             }
-        }).collect::<List>()
+        })
+        .collect::<List>()
         .set_class(geom_class("polygon"))
         .unwrap()
-
 }
-
 
 #[extendr]
 fn extreme_coords(x: List) -> List {
     verify_rsgeo(&x);
 
-    x
-        .iter()
+    x.iter()
         .map(|(_, xi)| {
             if xi.is_null() {
                 ().into_robj()
@@ -161,51 +135,42 @@ fn extreme_coords(x: List) -> List {
                 let extremes = Geom::try_from(xi).unwrap().geom.extremes();
                 match extremes {
                     Some(ext) => {
-                        
                         let crds = [
                             Point::from(ext.x_min.coord).into_geom(),
                             Point::from(ext.y_min.coord).into_geom(),
                             Point::from(ext.x_max.coord).into_geom(),
-                            Point::from(ext.y_max.coord).into_geom()
-                            ];
+                            Point::from(ext.y_max.coord).into_geom(),
+                        ];
 
                         List::from_values(crds)
                             .set_class(geom_class("point"))
                             .unwrap()
                             .set_names(["xmin", "ymin", "xmax", "ymax"])
                             .unwrap()
-                    },
-                    _ => ().into_robj()
+                    }
+                    _ => ().into_robj(),
                 }
             }
-        }).collect()
+        })
+        .collect()
 }
-
 
 #[extendr]
 fn minimum_bounding_rect(x: List) -> Robj {
-    x
-        .iter()
+    x.iter()
         .map(|(_, xi)| {
             if x.is_null() {
                 ().into_robj()
             } else {
-                let bb = Geom::try_from(xi)
-                    .unwrap()
-                    .geom
-                    .minimum_rotated_rect();
+                let bb = Geom::try_from(xi).unwrap().geom.minimum_rotated_rect();
 
                 match bb {
-                    Some(b) => {
-                        Geom::from(Polygon::from(b))
-                            .into_robj()
-                    },
-                    None => {
-                        NULL.into_robj()
-                    }
+                    Some(b) => Geom::from(Polygon::from(b)).into_robj(),
+                    None => NULL.into_robj(),
                 }
             }
-        }).collect::<List>()
+        })
+        .collect::<List>()
         .set_class(geom_class("polygon"))
         .unwrap()
 }
@@ -248,10 +213,6 @@ fn minimum_bounding_rect(x: List) -> Robj {
 // /// Each function, with the exception of `bounding_box()` has a plural version ending
 // /// with an `s` which is vectorized over `x`.
 
-
-
-
-
 extendr_module! {
     mod boundary;
     fn bounding_boxes;
@@ -264,7 +225,7 @@ extendr_module! {
     // fn bounding_rectangles;
     // fn concave_hull;
     // fn concave_hulls;
-    
+
     // fn convex_hulls;
     // fn extreme_coords;
 }

@@ -1,11 +1,10 @@
-
-use sfconversions::Geom;
 use extendr_api::prelude::*;
 use geo::{Simplify, SimplifyVw, SimplifyVwPreserve};
 use geo_types::Geometry;
+use sfconversions::Geom;
 
 #[extendr]
-fn simplify_geoms(x: List,  epsilon: Doubles) -> Robj {
+fn simplify_geoms(x: List, epsilon: Doubles) -> Robj {
     let n_e = epsilon.len();
     let n_x = x.len();
 
@@ -21,8 +20,7 @@ fn simplify_geoms(x: List,  epsilon: Doubles) -> Robj {
     // determine the input class the output must be the same type
     let cls = x.class().unwrap();
 
-    x
-        .iter()
+    x.iter()
         .zip(epsilon.iter())
         .map(|((_, xi), ei)| {
             if xi.is_null() || ei.is_na() || ei.is_infinite() || ei.is_nan() {
@@ -36,16 +34,17 @@ fn simplify_geoms(x: List,  epsilon: Doubles) -> Robj {
                     Geometry::MultiLineString(geom) => Geom::from(geom.simplify(&ei)).into(),
                     Geometry::Polygon(geom) => Geom::from(geom.simplify(&ei)).into(),
                     Geometry::MultiPolygon(geom) => Geom::from(geom.simplify(&ei)).into(),
-                    _ => NULL.into_robj()
+                    _ => NULL.into_robj(),
                 }
             }
-        }).collect::<List>()
+        })
+        .collect::<List>()
         .set_class(cls)
         .unwrap()
 }
 
 #[extendr]
-fn simplify_vw_geoms(x: List,  epsilon: Doubles) -> Robj {
+fn simplify_vw_geoms(x: List, epsilon: Doubles) -> Robj {
     let n_e = epsilon.len();
     let n_x = x.len();
 
@@ -61,8 +60,7 @@ fn simplify_vw_geoms(x: List,  epsilon: Doubles) -> Robj {
     // determine the input class the output must be the same type
     let cls = x.class().unwrap();
 
-    x
-        .iter()
+    x.iter()
         .zip(epsilon.iter())
         .map(|((_, xi), ei)| {
             if xi.is_null() || ei.is_na() || ei.is_infinite() || ei.is_nan() {
@@ -76,16 +74,17 @@ fn simplify_vw_geoms(x: List,  epsilon: Doubles) -> Robj {
                     Geometry::MultiLineString(geom) => Geom::from(geom.simplify_vw(&ei)).into(),
                     Geometry::Polygon(geom) => Geom::from(geom.simplify_vw(&ei)).into(),
                     Geometry::MultiPolygon(geom) => Geom::from(geom.simplify_vw(&ei)).into(),
-                    _ => NULL.into_robj()
+                    _ => NULL.into_robj(),
                 }
             }
-        }).collect::<List>()
+        })
+        .collect::<List>()
         .set_class(cls)
         .unwrap()
 }
 
 #[extendr]
-fn simplify_vw_preserve_geoms(x: List,  epsilon: Doubles) -> Robj {
+fn simplify_vw_preserve_geoms(x: List, epsilon: Doubles) -> Robj {
     let n_e = epsilon.len();
     let n_x = x.len();
 
@@ -101,8 +100,7 @@ fn simplify_vw_preserve_geoms(x: List,  epsilon: Doubles) -> Robj {
     // determine the input class the output must be the same type
     let cls = x.class().unwrap();
 
-    x
-        .iter()
+    x.iter()
         .zip(epsilon.iter())
         .map(|((_, xi), ei)| {
             if xi.is_null() || ei.is_na() || ei.is_infinite() || ei.is_nan() {
@@ -113,13 +111,18 @@ fn simplify_vw_preserve_geoms(x: List,  epsilon: Doubles) -> Robj {
 
                 match geom {
                     Geometry::LineString(geom) => Geom::from(geom.simplify_vw_preserve(&ei)).into(),
-                    Geometry::MultiLineString(geom) => Geom::from(geom.simplify_vw_preserve(&ei)).into(),
+                    Geometry::MultiLineString(geom) => {
+                        Geom::from(geom.simplify_vw_preserve(&ei)).into()
+                    }
                     Geometry::Polygon(geom) => Geom::from(geom.simplify_vw_preserve(&ei)).into(),
-                    Geometry::MultiPolygon(geom) => Geom::from(geom.simplify_vw_preserve(&ei)).into(),
-                    _ => NULL.into_robj()
+                    Geometry::MultiPolygon(geom) => {
+                        Geom::from(geom.simplify_vw_preserve(&ei)).into()
+                    }
+                    _ => NULL.into_robj(),
                 }
             }
-        }).collect::<List>()
+        })
+        .collect::<List>()
         .set_class(cls)
         .unwrap()
 }
@@ -130,7 +133,3 @@ extendr_module! {
     fn simplify_vw_geoms;
     fn simplify_vw_preserve_geoms;
 }
-
-
-
-

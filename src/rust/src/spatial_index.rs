@@ -1,8 +1,8 @@
 use extendr_api::prelude::*;
 
+use rstar::primitives::{CachedEnvelope, GeomWithData};
+use rstar::RTree;
 use sfconversions::{Geom, IntoGeom};
-use rstar::primitives::{GeomWithData, CachedEnvelope};
-use rstar::{RTree};
 
 // use std::rc::Rc;
 
@@ -56,9 +56,7 @@ pub fn create_cached_rtree(geoms: List) -> RTree<GeomWithData<CachedEnvelope<Geo
         .collect::<Vec<GeomWithData<CachedEnvelope<Geom>, usize>>>();
 
     RTree::bulk_load(all_geoms.to_vec())
-
 }
-
 
 // // related:
 // // https://github.com/georust/rstar/issues/108
