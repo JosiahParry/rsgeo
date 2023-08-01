@@ -4,7 +4,6 @@ use rstar::primitives::{CachedEnvelope, GeomWithData};
 use rstar::RTree;
 use sfconversions::{Geom, IntoGeom};
 
-
 // use cached envelopes
 pub fn create_cached_rtree(geoms: List) -> RTree<GeomWithData<CachedEnvelope<Geom>, usize>> {
     // Class checking
@@ -30,12 +29,9 @@ pub fn create_cached_rtree(geoms: List) -> RTree<GeomWithData<CachedEnvelope<Geo
     RTree::bulk_load(all_geoms.to_vec())
 }
 
-
-
 extendr_module! {
     mod spatial_index;
 }
-
 
 // use std::rc::Rc;
 

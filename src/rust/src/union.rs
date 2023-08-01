@@ -4,13 +4,13 @@ use geo::{
     RemoveRepeatedPoints,
 };
 
-use sfconversions::Geom;
+use std::rc::Rc;
+
 use crate::spatial_index::create_cached_rtree;
-//use crate::geoms::to_pntr;
+use sfconversions::{Geom, IntoGeom};
 
-use rstar::primitives::{GeomWithData, CachedEnvelope};
-use rstar::{ParentNode, RTreeNode, RTree};
-
+use rstar::primitives::{CachedEnvelope, GeomWithData};
+use rstar::{ParentNode, RTreeNode};
 
 // /// @export
 /// @rdname combine_geoms
@@ -74,7 +74,6 @@ use rstar::{ParentNode, RTreeNode, RTree};
 //     //let lst = List::from_values(&[res]);
 //     crate::utils::restore_geoms(list!(res).into())
 // }
-
 
 //#[extendr]
 // fn union_polygon(x: ) -> MultiPolygon {
@@ -159,78 +158,62 @@ extendr_module! {
     // fn union_geoms;
 }
 
+fn union_multipolygon(x: List) -> MultiPolygon {
+    // first extract the underlying multipolygons into a single
+    // vector only then do we insert it into the tree.
+    let x = x
+        .into_iter()
+        // filter out missing values
+        .filter(|(_, xi)| xi.is_null())
+        // extract multipolygons in sub polygons
+        .flat_map(|(_, x)| {
+            MultiPolygon::from(x.into_geom())
+                .0
+                .into_iter()
+                .map(|xi| Geom::from(xi))
+                .collect::<Vec<Geom>>()
+        })
+        // collect into a vector of geoms
+        .collect::<Vec<Geom>>();
 
+    // convert to a list cannot collect due to list collection bugh
+    let x = List::from_values(x);
 
+    union_polygon(x)
+}
 
-// fn inner(papa: ParentNode<GeomWithData<CachedEnvelope<Geom>, usize>>) -> MultiPolygon {
-//     papa
-//         .children()
-//         .iter()
-//         .fold(MultiPolygon::new(vec![]), |accum, child| 
-//         match child {
-//             RTreeNode::Leaf(value) => {
-//                 let mply = MultiPolygon::try_from(value.geom().geom).unwrap();
-//                 accum.union(&mply)
-//             }
-//             RTreeNode::Parent(parent) => {
-//                 let value = inner(parent);
-//                 accum.union(&value)
-//             }
-//         })
-// }
+fn union_polygon(x: List) -> MultiPolygon {
+    let shared_geo = Rc::new(x);
+    let xx = shared_geo.clone().as_list().unwrap();
 
-fn inner(papa: &ParentNode<GeomWithData<Polygon, usize>>) -> MultiPolygon {
-    papa
+    let tree = create_cached_rtree(xx);
+
+    tree.root()
         .children()
-        .iter()
-        .fold(MultiPolygon::new(vec![]), |accum, child| 
-        match child {
-            RTreeNode::Leaf(value) => {
-                let v = MultiPolygon::try_from(value.geom().to_owned()).unwrap();
-                accum.union(&v)
+        .into_iter()
+        .fold(MultiPolygon::new(vec![]), |accum, child| match child {
+            RTreeNode::Leaf(val) => {
+                let robj = MultiPolygon::from(shared_geo.elt(val.data).unwrap().into_geom());
+                accum.union(&robj)
+            }
+            RTreeNode::Parent(parent) => inner(parent, shared_geo.clone()),
+        })
+}
+
+fn inner(
+    papa: &ParentNode<GeomWithData<CachedEnvelope<Geom>, usize>>,
+    shared_geo: Rc<List>,
+) -> MultiPolygon {
+    papa.children()
+        .into_iter()
+        .fold(MultiPolygon::new(vec![]), |accum, child| match child {
+            RTreeNode::Leaf(val) => {
+                let robj = MultiPolygon::from(shared_geo.elt(val.data).unwrap().into_geom());
+                accum.union(&robj)
             }
             RTreeNode::Parent(parent) => {
-                let value = inner(parent);
+                let value = inner(parent, shared_geo.clone());
                 accum.union(&value)
             }
         })
 }
-
-use std::rc::Rc;
-
-fn union_polygon(x: List) {
-    
-    let polys = x
-        .into_iter()
-        .enumerate()
-        .filter_map(|(i, (_, xi))| {
-            if xi.is_null() {
-                None
-            } else {
-                let p = Polygon::from(Geom::from(xi));
-                Some(GeomWithData::new(p, i))
-            }
-        })
-        .collect::<Vec<GeomWithData<Polygon, usize>>>();
-
-    let poly_rc = Rc::new(polys);
-
-    let mut rtree = RTree::bulk_load(poly_rc.to_vec());
-
-}
-
-
-//     let x: Vec<Polygon> = x.into_iter()
-//         .map(|x| Polygon::try_from(x.geom).unwrap())
-//         .collect();
-
-//         // create the tree
-//     let mut r_tree = RTree::new();
-
-//     // insert into rtree with index as data
-//     for (index, geom) in x.into_iter().enumerate() {
-//         let geom = GeomWithData::new(geom, index);
-//         r_tree.insert(geom);
-//     }
-
-//     let papa = r_tree.root();
