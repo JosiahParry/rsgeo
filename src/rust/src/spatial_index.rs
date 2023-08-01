@@ -4,6 +4,39 @@ use rstar::primitives::{CachedEnvelope, GeomWithData};
 use rstar::RTree;
 use sfconversions::{Geom, IntoGeom};
 
+
+// use cached envelopes
+pub fn create_cached_rtree(geoms: List) -> RTree<GeomWithData<CachedEnvelope<Geom>, usize>> {
+    // Class checking
+    let cls = geoms.class().unwrap().next().unwrap();
+    if !cls.starts_with("rs_") {
+        panic!("`x` must be a Rust geometry type")
+    }
+
+    let all_geoms = geoms
+        .iter()
+        .enumerate()
+        .filter_map(|(i, (_, xi))| {
+            if xi.is_null() {
+                None
+            } else {
+                let geo = Geom::try_from(xi).unwrap();
+                let env = geo.cached_envelope();
+                Some(GeomWithData::new(env, i))
+            }
+        })
+        .collect::<Vec<GeomWithData<CachedEnvelope<Geom>, usize>>>();
+
+    RTree::bulk_load(all_geoms.to_vec())
+}
+
+
+
+extendr_module! {
+    mod spatial_index;
+}
+
+
 // use std::rc::Rc;
 
 // Creates a spatial index from a list
@@ -32,31 +65,6 @@ use sfconversions::{Geom, IntoGeom};
 //     // (RTree::bulk_load(all_geoms.to_vec()), all_geoms)
 //     RTree::bulk_load(all_geoms.to_vec())
 // }
-
-// use cached envelopes
-pub fn create_cached_rtree(geoms: List) -> RTree<GeomWithData<CachedEnvelope<Geom>, usize>> {
-    // Class checking
-    let cls = geoms.class().unwrap().next().unwrap();
-    if !cls.starts_with("rs_") {
-        panic!("`x` must be a Rust geometry type")
-    }
-
-    let all_geoms = geoms
-        .iter()
-        .enumerate()
-        .filter_map(|(i, (_, xi))| {
-            if xi.is_null() {
-                None
-            } else {
-                let geo = Geom::try_from(xi).unwrap();
-                let env = geo.cached_envelope();
-                Some(GeomWithData::new(env, i))
-            }
-        })
-        .collect::<Vec<GeomWithData<CachedEnvelope<Geom>, usize>>>();
-
-    RTree::bulk_load(all_geoms.to_vec())
-}
 
 // // related:
 // // https://github.com/georust/rstar/issues/108
@@ -153,15 +161,6 @@ pub fn create_cached_rtree(geoms: List) -> RTree<GeomWithData<CachedEnvelope<Geo
 //     tree.near
 
 // }
-
-extendr_module! {
-    mod spatial_index;
-    // fn rstar_rtree;
-    // fn print_aabb;
-    // fn locate_in_envelope;
-    // fn intersection_candidates;
-    //fn queen_contiguity;
-}
 
 // This is how i would do queen contiguity but intersects is just so friggin slow
 // #[extendr]

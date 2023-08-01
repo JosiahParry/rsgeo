@@ -95,7 +95,7 @@ fn concave_hull(x: List, concavity: Doubles) -> Robj {
     let concavity = if n_c == 1 {
         Doubles::from_values(vec![concavity[0]; n])
     } else if n_c != n {
-        panic!("`concavity` must be length 1 or the same lnght as `x`")
+        panic!("`concavity` must be length 1 or the same length as `x`")
     } else {
         concavity
     };
