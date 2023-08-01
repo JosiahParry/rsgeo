@@ -6,13 +6,12 @@ mod length;
 mod query;
 mod similarity;
 mod simplification;
-// mod conversion;
 // mod distance;
 // mod io;
+mod construction;
 mod spatial_index;
 mod topology;
-// mod union;
-mod construction;
+mod union;
 
 use extendr_api::prelude::*;
 pub use sfconversions::{fromsf::sfc_to_rsgeo, vctrs::*, Geom};
