@@ -9,50 +9,36 @@ use sfconversions::{
 // multis to the single varietys
 #[extendr]
 fn expand_multipolygon(x: Robj) -> Robj {
-
     let res = MultiPolygon::from(Geom::from(x))
         .0
         .into_iter()
         .map(|p| Geom::from(p))
         .collect::<Vec<Geom>>();
 
-    as_rsgeo_vctr(
-        List::from_values(res), 
-        geom_class("polygon")
-    )
+    as_rsgeo_vctr(List::from_values(res), geom_class("polygon"))
 }
 
 #[extendr]
 fn expand_multipoint(x: Robj) -> Robj {
-
     let res = MultiPoint::from(Geom::from(x))
         .0
         .into_iter()
         .map(|p| Geom::from(p))
         .collect::<Vec<Geom>>();
 
-    as_rsgeo_vctr(
-        List::from_values(res), 
-        geom_class("point")
-    )
+    as_rsgeo_vctr(List::from_values(res), geom_class("point"))
 }
-
 
 #[extendr]
 fn expand_multilinestring(x: Robj) -> Robj {
-
     let res = MultiPoint::from(Geom::from(x))
         .0
         .into_iter()
         .map(|p| Geom::from(p))
         .collect::<Vec<Geom>>();
 
-    as_rsgeo_vctr(
-        List::from_values(res), 
-        geom_class("linestring")
-    )
+    as_rsgeo_vctr(List::from_values(res), geom_class("linestring"))
 }
-
 
 // // primitives to components
 // // polygon to linestring
@@ -71,10 +57,7 @@ fn expand_polygon(x: Robj) -> Robj {
         .map(|i| Geom::from(i))
         .collect::<Vec<Geom>>();
 
-    as_rsgeo_vctr(
-        List::from_values(res), 
-        geom_class("linestring")
-    )
+    as_rsgeo_vctr(List::from_values(res), geom_class("linestring"))
 }
 
 #[extendr]
@@ -86,24 +69,21 @@ fn expand_linestring(x: Robj) -> Robj {
         .into_iter()
         .map(|i| Geom::from(i))
         .collect::<Vec<Geom>>();
-    
-    as_rsgeo_vctr(
-        List::from_values(res), 
-        geom_class("point")
-    )
+
+    as_rsgeo_vctr(List::from_values(res), geom_class("point"))
 }
 
 #[extendr]
 fn expand_geom(x: Robj) -> Robj {
     let cls = x.class().unwrap().next().unwrap();
-    match cls { 
+    match cls {
         "rs_POINT" => x,
         "rs_MULTIPOINT" => expand_multipoint(x),
         "rs_LINESTRING" => expand_linestring(x),
         "rs_MULTILINESTRING" => expand_multilinestring(x),
         "rs_POLYGON" => expand_polygon(x),
         "rs_MULTIPOLYGON" => expand_multipolygon(x),
-        &_ => x
+        &_ => x,
     }
 }
 
@@ -122,7 +102,6 @@ fn expand_geoms(x: List) -> List {
 
     List::from_values(res)
 }
-
 
 // Expansion Hierarchy
 // MultiPolygon -> Polygon
