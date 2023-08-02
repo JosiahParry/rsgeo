@@ -1,5 +1,6 @@
 use extendr_api::prelude::*;
 
+// use geo_types::Point;
 use rstar::primitives::{CachedEnvelope, GeomWithData};
 use rstar::RTree;
 use sfconversions::{Geom, IntoGeom};
@@ -32,6 +33,8 @@ pub fn create_cached_rtree(geoms: List) -> RTree<GeomWithData<CachedEnvelope<Geo
 extendr_module! {
     mod spatial_index;
 }
+
+
 
 // use std::rc::Rc;
 

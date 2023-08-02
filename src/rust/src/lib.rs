@@ -16,6 +16,7 @@ mod union;
 use extendr_api::prelude::*;
 pub use sfconversions::{fromsf::sfc_to_rsgeo, vctrs::*, Geom};
 
+
 // MISC algos -------
 
 use geo::Centroid;
@@ -234,4 +235,5 @@ extendr_module! {
     use similarity;
     use topology;
     use construction;
+    use union;
 }
