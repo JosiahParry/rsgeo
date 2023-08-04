@@ -13,6 +13,8 @@ NULL
 
 from_sfc <- function(x) .Call(wrap__from_sfc, x)
 
+to_sfc <- function(x) .Call(wrap__to_sfc, x)
+
 #' Find centroid
 #' @param x an object of class `point`
 #'@export
@@ -20,7 +22,7 @@ centroids <- function(x) .Call(wrap__centroids, x)
 
 haversine_destination <- function(x, bearing, distance) .Call(wrap__haversine_destination, x, bearing, distance)
 
-#' @param x an `rs_POINT` vector 
+#' @param x an `rs_POINT` vector
 #' @param y an `rs_POINT` vector
 #' @param distance a numeric vector of either length 1 or the same length as x and y.
 haversine_intermediate <- function(x, y, distance) .Call(wrap__haversine_intermediate, x, y, distance)
@@ -81,7 +83,69 @@ contains_sparse <- function(x, y) .Call(wrap__contains_sparse, x, y)
 
 within_sparse <- function(x, y) .Call(wrap__within_sparse, x, y)
 
-hausdorff_dist <- function(x, y) .Call(wrap__hausdorff_dist, x, y)
+geom_point <- function(x, y) .Call(wrap__geom_point, x, y)
+
+geom_multipoint <- function(x, y, id) .Call(wrap__geom_multipoint, x, y, id)
+
+geom_linestring <- function(x, y, id) .Call(wrap__geom_linestring, x, y, id)
+
+geom_polygon <- function(x, y, id, ring) .Call(wrap__geom_polygon, x, y, id, ring)
+
+#' @export
+#' @rdname combine_geoms
+union_geoms <- function(x) .Call(wrap__union_geoms, x)
+
+null_pntr <- function() .Call(wrap__null_pntr)
+
+print_geom <- function(x) .Call(wrap__print_geom, x)
+
+cast_points <- function(x, to) .Call(wrap__cast_points, x, to)
+
+cast_multipoints <- function(x, to) .Call(wrap__cast_multipoints, x, to)
+
+cast_linestrings <- function(x, to) .Call(wrap__cast_linestrings, x, to)
+
+cast_multilinestrings <- function(x, to) .Call(wrap__cast_multilinestrings, x, to)
+
+cast_polygons <- function(x, to) .Call(wrap__cast_polygons, x, to)
+
+cast_multipolygons <- function(x, to) .Call(wrap__cast_multipolygons, x, to)
+
+expand_linestring <- function(x) .Call(wrap__expand_linestring, x)
+
+expand_multipolygon <- function(x) .Call(wrap__expand_multipolygon, x)
+
+expand_multilinestring <- function(x) .Call(wrap__expand_multilinestring, x)
+
+expand_multipoint <- function(x) .Call(wrap__expand_multipoint, x)
+
+expand_polygon <- function(x) .Call(wrap__expand_polygon, x)
+
+expand_geoms <- function(x) .Call(wrap__expand_geoms, x)
+
+combine_points <- function(x) .Call(wrap__combine_points, x)
+
+combine_multipoints <- function(x) .Call(wrap__combine_multipoints, x)
+
+combine_linestrings <- function(x) .Call(wrap__combine_linestrings, x)
+
+combine_multilinestrings <- function(x) .Call(wrap__combine_multilinestrings, x)
+
+combine_polygons <- function(x) .Call(wrap__combine_polygons, x)
+
+combine_multipolygons <- function(x) .Call(wrap__combine_multipolygons, x)
+
+point_to_coords <- function(x) .Call(wrap__point_to_coords, x)
+
+multipoint_to_coords <- function(x) .Call(wrap__multipoint_to_coords, x)
+
+linestring_to_coords <- function(x) .Call(wrap__linestring_to_coords, x)
+
+multilinestring_to_coords <- function(x) .Call(wrap__multilinestring_to_coords, x)
+
+polygon_to_coords <- function(x) .Call(wrap__polygon_to_coords, x)
+
+multipolygon_to_coords <- function(x) .Call(wrap__multipolygon_to_coords, x)
 
 
 # nolint end

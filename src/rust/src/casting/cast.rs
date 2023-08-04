@@ -1,7 +1,7 @@
 use extendr_api::prelude::*;
 use geo::CoordsIter;
 use geo_types::{LineString, MultiLineString, MultiPoint, MultiPolygon, Point, Polygon};
-use sfconversions::Geom;
+use sfconversions::{Geom, vctrs::as_rsgeo_vctr, IntoGeom};
 
 //# cast 1 : 1
 //# expand 1 : many
@@ -81,19 +81,13 @@ fn cast_polygon_multipoint(x: Geom) -> Geom {
 }
 
 fn cast_polygon_multipolygon(x: Geom) -> Geom {
-    Geom::from(MultiPolygon::from(x))
+    Geom::from(MultiPolygon::try_from(x.geom).unwrap())
 }
 
 fn cast_polygon_linestring(x: Geom) -> Geom {
     let x = Polygon::from(x);
-
-    // TODO possibly only return the exterrior ring
-    let pnts = x
-        .coords_iter()
-        .map(|x| Point::from(x))
-        .collect::<Vec<Point>>();
-
-    Geom::from(LineString::from(pnts))
+    let x = x.into_inner();
+    Geom::from(x.0)
 }
 
 fn cast_polygon_multilinestring(x: Geom) -> Geom {
@@ -105,13 +99,14 @@ fn cast_polygon_multilinestring(x: Geom) -> Geom {
     Geom::from(MultiLineString::new(ext))
 }
 
+
 // MultiPolygon Conversions
 // ————————————————————————
 
 // //                       to_multipoint  to_multipolygon  to_multilinestring
 // // from_multipolygon              TRUE             TRUE                TRUE
 fn cast_multipolygon_multipoint(x: Geom) -> Geom {
-    let mply = MultiPolygon::from(x);
+    let mply = MultiPolygon::try_from(x.geom).unwrap();
 
     let pnts = mply
         .coords_iter()
@@ -123,11 +118,11 @@ fn cast_multipolygon_multipoint(x: Geom) -> Geom {
 }
 
 fn cast_multipolygon_multilinestring(x: Geom) -> Geom {
-    let mply = MultiPolygon::from(x);
+    let mply = MultiPolygon::try_from(x.geom).unwrap();
     let linestrings = mply
         .0
         .into_iter()
-        .map(|x| LineString::from_iter(x.coords_iter()))
+        .flat_map(|x| MultiLineString::try_from(cast_polygon_multilinestring(x.into_geom()).geom).unwrap().0)
         .collect::<Vec<LineString>>();
 
     Geom::from(MultiLineString::new(linestrings))
@@ -181,7 +176,7 @@ fn cast_multilinestring_multipolygon(x: Geom) -> Geom {
 // ———————————————————————
 
 #[extendr]
-fn cast_points(x: List, to: &str) -> List {
+fn cast_points(x: List, to: &str) -> Robj {
     if !x.inherits("rs_POINT") {
         panic!("`x` must be an `rs_POINT`")
     }
@@ -189,7 +184,7 @@ fn cast_points(x: List, to: &str) -> List {
     let f = match to {
         "point" => |x| x,
         "multipoint" => cast_point_multipoint,
-        &_ => unimplemented!(), // unreachable (in theory)
+        &_ => unimplemented!("for provided `to` geometry type"), // unreachable (in theory)
     };
 
     let res_vec = x
@@ -203,11 +198,11 @@ fn cast_points(x: List, to: &str) -> List {
         })
         .collect::<Vec<Robj>>();
 
-    List::from_values(res_vec)
+    as_rsgeo_vctr(List::from_values(res_vec), to)
 }
 
 #[extendr]
-fn cast_multipoints(x: List, to: &str) -> List {
+fn cast_multipoints(x: List, to: &str) -> Robj {
     if !x.inherits("rs_MULTIPOINT") {
         panic!("`x` must be an `rs_MULTIPOINT`")
     }
@@ -218,7 +213,7 @@ fn cast_multipoints(x: List, to: &str) -> List {
         "multipolygon" => cast_multipoint_multipolygon,
         "linestring" => cast_multipoint_linestring,
         "multilinestring" => cast_multipoint_multilinestring,
-        &_ => unimplemented!(),
+        &_ => unimplemented!("for provided `to` geometry type"),
     };
 
     let res_vec = x
@@ -232,11 +227,11 @@ fn cast_multipoints(x: List, to: &str) -> List {
         })
         .collect::<Vec<Robj>>();
 
-    List::from_values(res_vec)
+    as_rsgeo_vctr(List::from_values(res_vec), to)
 }
 
 #[extendr]
-fn cast_linestrings(x: List, to: &str) -> List {
+fn cast_linestrings(x: List, to: &str) -> Robj {
     if !x.inherits("rs_LINESTRING") {
         panic!("`x` must be an `rs_LINESTRING`")
     }
@@ -246,7 +241,7 @@ fn cast_linestrings(x: List, to: &str) -> List {
         "multipoint" => cast_linestring_multipoint,
         "multilinestring" => cast_linestring_multilinestring,
         "polygon" => cast_linestring_polygon,
-        &_ => unimplemented!(),
+        &_ => unimplemented!("for provided `to` geometry type"),
     };
 
     let res_vec = x
@@ -260,11 +255,11 @@ fn cast_linestrings(x: List, to: &str) -> List {
         })
         .collect::<Vec<Robj>>();
 
-    List::from_values(res_vec)
+    as_rsgeo_vctr(List::from_values(res_vec), to)
 }
 
 #[extendr]
-fn cast_multilinestrings(x: List, to: &str) -> List {
+fn cast_multilinestrings(x: List, to: &str) -> Robj {
     if !x.inherits("rs_MULTILINESTRING") {
         panic!("`x` must be an `rs_MULTILINESTRING`")
     }
@@ -273,7 +268,7 @@ fn cast_multilinestrings(x: List, to: &str) -> List {
         "multilinestring" => |x| x,
         "multipoint" => cast_multilinestring_multipoint,
         "multipolygon" => cast_multilinestring_multipolygon,
-        &_ => unimplemented!(),
+        &_ => unimplemented!("for provided `to` geometry type"),
     };
 
     let res_vec = x
@@ -287,11 +282,11 @@ fn cast_multilinestrings(x: List, to: &str) -> List {
         })
         .collect::<Vec<Robj>>();
 
-    List::from_values(res_vec)
+    as_rsgeo_vctr(List::from_values(res_vec), to)
 }
 
 #[extendr]
-fn cast_polygons(x: List, to: &str) -> List {
+fn cast_polygons(x: List, to: &str) -> Robj {
     if !x.inherits("rs_POLYGON") {
         panic!("`x` must be an `rs_POLYGON`")
     }
@@ -302,7 +297,7 @@ fn cast_polygons(x: List, to: &str) -> List {
         "multipoint" => cast_polygon_multipoint,
         "linestring" => cast_polygon_linestring,
         "multilinestring" => cast_polygon_multilinestring,
-        &_ => unimplemented!(),
+        &_ => unimplemented!("for provided `to` geometry type"),
     };
 
     let res_vec = x
@@ -316,11 +311,12 @@ fn cast_polygons(x: List, to: &str) -> List {
         })
         .collect::<Vec<Robj>>();
 
-    List::from_values(res_vec)
+    as_rsgeo_vctr(List::from_values(res_vec), to)
 }
 
 #[extendr]
-fn cast_multipolygons(x: List, to: &str) -> List {
+fn cast_multipolygons(x: List, to: &str) -> Robj {
+    
     if !x.inherits("rs_MULTIPOLYGON") {
         panic!("`x` must be an `rs_MULTIPOLYGON`")
     }
@@ -329,7 +325,7 @@ fn cast_multipolygons(x: List, to: &str) -> List {
         "multipolygon" => |x| x,
         "multipoint" => cast_multipolygon_multipoint,
         "multilinestring" => cast_multipolygon_multilinestring,
-        &_ => unimplemented!(),
+        &_ => unimplemented!("for provided `to` geometry type"),
     };
 
     let res_vec = x
@@ -343,8 +339,12 @@ fn cast_multipolygons(x: List, to: &str) -> List {
         })
         .collect::<Vec<Robj>>();
 
-    List::from_values(res_vec)
+    as_rsgeo_vctr(List::from_values(res_vec), to)
+
 }
+
+
+
 
 extendr_module! {
     mod cast;

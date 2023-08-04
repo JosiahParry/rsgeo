@@ -12,11 +12,12 @@ mod construction;
 mod spatial_index;
 mod topology;
 mod union;
+mod coords;
 
 use extendr_api::prelude::*;
 pub use sfconversions::{fromsf::sfc_to_rsgeo, vctrs::*, Geom};
 
-
+mod utils;
 // MISC algos -------
 
 use geo::Centroid;
@@ -41,7 +42,7 @@ fn centroids(x: List) -> Robj {
         })
         .collect::<List>();
 
-    as_rsgeo_vctr(centroids, geom_class("point"))
+    as_rsgeo_vctr(centroids, "point")
 }
 
 #[extendr]
@@ -236,4 +237,9 @@ extendr_module! {
     use topology;
     use construction;
     use union;
+    use utils;
+    use casting;
+    use coords;
 }
+
+

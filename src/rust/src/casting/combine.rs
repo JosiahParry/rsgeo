@@ -1,7 +1,7 @@
 use extendr_api::list;
 use extendr_api::prelude::*;
 use geo_types::*;
-use sfconversions::vctrs::geom_class;
+// use sfconversions::vctrs::geom_class;
 //use crate::utils::geom_class;
 use sfconversions::{
     vctrs::{as_rsgeo_vctr, verify_rsgeo},
@@ -23,7 +23,7 @@ fn combine_points(x: List) -> Robj {
         .collect::<Vec<Point>>();
 
     let res = Geom::from(MultiPoint::from(x));
-    as_rsgeo_vctr(list!(res), geom_class("point"))
+    as_rsgeo_vctr(list!(res), "point")
 }
 
 #[extendr]
@@ -35,7 +35,7 @@ fn combine_multipoints(x: List) -> Robj {
         .collect::<Vec<Point>>();
 
     let res = Geom::from(MultiPoint::from(x));
-    as_rsgeo_vctr(list!(res), geom_class("multipoint"))
+    as_rsgeo_vctr(list!(res), "multipoint")
 }
 
 #[extendr]
@@ -47,7 +47,7 @@ fn combine_linestrings(x: List) -> Robj {
         .collect::<Vec<LineString>>();
 
     let res = Geom::from(MultiLineString::new(x));
-    as_rsgeo_vctr(list!(res), geom_class("linestring"))
+    as_rsgeo_vctr(list!(res), "linestring")
 }
 
 #[extendr]
@@ -59,7 +59,7 @@ fn combine_multilinestrings(x: List) -> Robj {
         .collect::<Vec<LineString>>();
 
     let res = Geom::from(MultiLineString::new(x));
-    as_rsgeo_vctr(list!(res), geom_class("multilinestring"))
+    as_rsgeo_vctr(list!(res), "multilinestring")
 }
 
 #[extendr]
@@ -71,7 +71,7 @@ fn combine_polygons(x: List) -> Robj {
         .collect::<Vec<Polygon>>();
 
     let res = Geom::from(MultiPolygon::new(x));
-    as_rsgeo_vctr(list!(res), geom_class("polygon"))
+    as_rsgeo_vctr(list!(res), "polygon")
 }
 
 #[extendr]
@@ -83,7 +83,7 @@ fn combine_multipolygons(x: List) -> Robj {
         .collect::<Vec<Polygon>>();
 
     let res = Geom::from(MultiPolygon::new(x));
-    as_rsgeo_vctr(list!(res), geom_class("multipolygon"))
+    as_rsgeo_vctr(list!(res), "multipolygon")
 }
 
 extendr_module! {

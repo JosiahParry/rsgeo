@@ -7,7 +7,7 @@ use geo::{
 
 };
 use geo_types::Point;
-use sfconversions::vctrs::{as_rsgeo_vctr, geom_class};
+use sfconversions::vctrs::{as_rsgeo_vctr};
 
 use std::rc::Rc;
 
@@ -39,7 +39,7 @@ fn union_geoms(x: List) -> Robj {
         "rs_MULTIPOLYGON" => union_multipolygons(x),
         "rs_LINESTRING" => union_linestrings(x),
         "rs_MULTILINESTRING" => union_multilinestrings(x),
-        _ => as_rsgeo_vctr(list!(extendr_api::NULL), geom_class("geometry")),
+        _ => as_rsgeo_vctr(list!(extendr_api::NULL), "geometry")
     };
     res
 }
@@ -60,7 +60,7 @@ fn union_points(x: List) -> Robj {
         .remove_repeated_points()
         .into_geom();
 
-    as_rsgeo_vctr(list!(res), geom_class("multipoint"))
+    as_rsgeo_vctr(list!(res), "multipoint")
 }
 
 
@@ -79,7 +79,7 @@ fn union_multipoints(x: List) -> Robj {
         .remove_repeated_points()
         .into_geom();
 
-    as_rsgeo_vctr(list!(res), geom_class("multipoint"))
+    as_rsgeo_vctr(list!(res), "multipoint")
 
 }
 
@@ -95,7 +95,7 @@ fn union_linestrings(x: List) -> Robj {
         .remove_repeated_points()
         .into_geom();
 
-    as_rsgeo_vctr(list!(res), geom_class("multilinestring"))
+    as_rsgeo_vctr(list!(res), "multilinestring")
 }
 
 fn union_multilinestrings(x: List) -> Robj {
@@ -110,7 +110,7 @@ fn union_multilinestrings(x: List) -> Robj {
         .remove_repeated_points()
         .into_geom();
 
-    as_rsgeo_vctr(list!(res), geom_class("multilinestring"))
+    as_rsgeo_vctr(list!(res), "multilinestring")
 }
 
 
@@ -161,7 +161,7 @@ fn union_polygons(x: List) -> Robj {
             }
         }).into_geom();
 
-    as_rsgeo_vctr(list!(res), geom_class("multipolygon"))
+    as_rsgeo_vctr(list!(res), "multipolygon")
 }
 
 

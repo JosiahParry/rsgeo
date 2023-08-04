@@ -1,18 +1,20 @@
 use extendr_api::prelude::*;
+use sfconversions::Geom;
 // Create a blank pointer to be used in ptype casting
+
 #[extendr]
 fn null_pntr() -> Robj {
     ExternalPtr::new(0).into_robj()
 }
 
 #[extendr]
-pub fn restore_geoms(x: Robj) -> Robj {
-    let class_to_set = determine_geoms_class(&x);
-    x.set_attrib("class", class_to_set).unwrap()
+fn print_geom(x: Robj) -> String {
+    Geom::from(x).print().into()
 }
 
 extendr_module! {
     mod utils;
     fn null_pntr;
-    fn restore_geoms;
+    fn print_geom;
+    // fn restore_geoms;
 }
