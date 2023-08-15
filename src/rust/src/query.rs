@@ -1,4 +1,6 @@
 use extendr_api::prelude::*;
+use sfconversions::IntoGeom;
+use sfconversions::vctrs::as_rsgeo_vctr;
 use sfconversions::{vctrs::geom_class, Geom};
 
 use geo::{
@@ -220,6 +222,64 @@ fn locate_point_on_line(x: List, y: List) -> Doubles {
         .collect::<Doubles>()
 }
 
+
+
+use geo::algorithm::LinesIter;
+use geo::algorithm::EuclideanLength;
+use geo_types::Coord;
+
+#[extendr]
+fn split_line(x: Robj, fraction: f64) -> Robj {
+    let x = LineString::from(Geom::from(x));
+    let mut lns = x.lines_iter();
+    let mut ln_vec: Vec<Coord> = Vec::new();
+
+    // push the first coord in
+    // each subsequent coord will be the end point
+    ln_vec.push(lns.nth(0).clone().unwrap().start);
+
+    let total_length = x.euclidean_length();
+    let fractional_length = total_length * fraction;
+    let mut cum_length = 0_f64;
+    
+    // Pre-allocate LineString vector with `n` elements
+    // iterate up to the first fractional amount collecting 
+    // Coords along the way. Once that fractional piece is 
+    // identified, create the linestring from Vec<Coord> and push.
+    // Reinstantiate a new Vec<Coord> where the first Coord is the 
+    // previous endpoint. Then change the target fractional length
+    // to the next calculated one. Repeat until the last fractional element 
+    // is fetched (which should be the last line segment in the for loop).
+    for segment in lns {
+        let length = segment.euclidean_length();
+        if cum_length + length >= fractional_length {
+            let segment_fraction = (fractional_length - cum_length) / length;
+            let endpoint = segment.line_interpolate_point(segment_fraction).unwrap().0;
+            ln_vec.push(endpoint);
+            break;
+        }
+
+        cum_length += length;
+        ln_vec.push(segment.start);
+    }
+
+    let res = LineString::new(ln_vec);
+    as_rsgeo_vctr(list!(res.into_geom()), "linestring")
+
+}
+
+// let total_length = self.euclidean_length();
+//     let fractional_length = total_length * fraction;
+//     let mut cum_length = T::zero();
+//     for segment in self.lines() {
+//         let length = segment.euclidean_length();
+//         if cum_length + length >= fractional_length {
+//             let segment_fraction = (fractional_length - cum_length) / length;
+//             return segment.line_interpolate_point(segment_fraction);
+//         }
+//         cum_length += length;
+//     }
+
 extendr_module! {
     mod query;
     fn bearing_geodesic;
@@ -229,4 +289,5 @@ extendr_module! {
     fn is_convex;
     fn line_interpolate_point;
     fn locate_point_on_line;
+    fn split_line;
 }
