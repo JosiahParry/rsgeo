@@ -1,365 +1,96 @@
-use sfconversions::Geom;
 use extendr_api::prelude::*;
-// use extendr_api::Robj;
+
+use sfconversions::{
+    Geom,
+    vctrs::is_rsgeo
+};
+
 
 use geo::{
-    EuclideanDistance
+    EuclideanDistance, HausdorffDistance,
+    // HausdorffDistance
     // , GeodesicDistance, HaversineDistance, VincentyDistance
 };
-use geo_types::Point;
-
-// use geo_types::{Geometry, LineString, MultiLineString, MultiPoint, MultiPolygon, Point, Polygon};
-
-
-
-
 
 
 #[extendr]
-fn euclidean_distance_matrix(x: List, y: List) {
+fn euclidean_distance_pairwise(x: List, y: List) -> Doubles {
+    let x_is_geo = match is_rsgeo(&x).inner() {
+        0_i32 => false,
+        1_i32 => true,
+        i32::MAX => false,
+        _ => false
+    };
 
-    // using the class of the vector cast to that type and collect into a vector
-    // this will use only two matches instead of matching in each iteration.
-    let x_cls = x.class().unwrap().next().unwrap();
-    let y_cls = y.class().unwrap().next().unwrap();
+    let y_is_geo = match is_rsgeo(&y).inner() {
+        0_i32 => false,
+        1_i32 => true,
+        i32::MAX => false,
+        _ => false
+    };
 
-    let x = if x_cls.contains("POINT") {
-        x
-            .iter()
-            .map(|(_, xi)| {
-                Point::from(Geom::try_from(xi).unwrap())
-            })
-            .collect::<Vec<_>>()
-    } else if 
-    
-    let nrow = x.len();
-    let ncol = y.len();
-
-    let res = vec![vec![Rfloat::from(0.0); ncol]; nrow];
-
-    for ((i, (_, xi)), (j, (_, yi))) in x.iter().enumerate().zip(y.iter().enumerate()) {
-        let xi = Geom::try_from(xi).unwrap().geom;
-
-        // let xi = Point::from(Geom::try_from(xi).unwrap());
-
-        
+    if !x_is_geo || !y_is_geo {
+        panic!("`x` and `y` must be rsgeo geometries")
     }
 
+    x
+        .iter()
+        .zip(y.iter())
+        .map(|((_, xi), (_, yi))| {
+
+            if xi.is_null() || yi.is_null() {
+                Rfloat::na()
+            } else {
+                let xg = <&Geom>::from_robj(&xi).unwrap();
+                let yg = <&Geom>::from_robj(&yi).unwrap();
+    
+                let d = xg.geom.euclidean_distance(&yg.geom);
+                Rfloat::from(d)
+            }
+        })
+        .collect::<Doubles>()
 }
 
+#[extendr]
+fn hausdorff_distance_pairwise(x: List, y: List) -> Doubles {
 
-// #[extendr]
-// /// Distance calculations
-// ///
-// /// @param x a single `point` or list of points `rs_POINT`
-// /// @param y a single `point` or list of points `rs_POINT`
-// ///@export
-// /// @rdname distance
-// fn euclidean_distance_matrix(x: List, y: List) -> RMatrix<f64> {
-//     let nr = x.len();
-//     let nc = y.len();
+    let x_is_geo = match is_rsgeo(&x).inner() {
+        0_i32 => false,
+        1_i32 => true,
+        i32::MAX => false,
+        _ => false
+    };
 
-//     let xg = from_list(x);
-//     let yg = from_list(y);
+    let y_is_geo = match is_rsgeo(&y).inner() {
+        1_i32 => true,
+        _ => false
+    };
 
-//     let res_vec = xg
-//         .into_iter()
-//         .map(|x| {
-//             yg.iter()
-//                 .map(|y| euclidean_distance_impl(x.geom.clone(), &y.geom))
-//                 .collect::<Vec<f64>>()
-//         })
-//         .collect::<Vec<Vec<f64>>>();
+    if !x_is_geo || !y_is_geo {
+        panic!("`x` and `y` must be rsgeo geometries")
+    }
 
-//     RMatrix::new_matrix(nr, nc, |r, c| res_vec[r][c])
-// }
+    x
+        .iter()
+        .zip(y.iter())
+        .map(|((_, xi), (_, yi))| {
 
-// fn euclidean_distance_impl(x: Geometry, y: &Geometry) -> f64 {
-//     match x {
-//         Geometry::Point(x) => e_dist_pnt(x, y),
-//         Geometry::MultiPoint(x) => e_dist_mpnt(x, y),
-//         Geometry::LineString(x) => e_dist_linestring(x, y),
-//         Geometry::MultiLineString(x) => e_dist_mlinestring(x, y),
-//         Geometry::Polygon(x) => e_dist_poly(x, y),
-//         Geometry::MultiPolygon(x) => e_dist_mpoly(x, y),
-//         _ => 0.,
-//     }
-// }
-
-// #[extendr]
-// ///@export
-// /// @rdname distance
-// fn euclidean_distance_pairwise(x: List, y: List) -> Vec<f64> {
-//     x.into_iter()
-//         .enumerate()
-//         .map(|(i, x)| euclidean_distance(x.1, y[i].to_owned()))
-//         .collect::<Vec<f64>>()
-// }
-
-// // TODO have functions return Rfloat object,
-// // underlying functions can return NA instead of 0 for types without the impl
-// #[extendr]
-// fn euclidean_distances(x: Robj, y: List) -> Vec<f64> {
-//     y.into_iter()
-//         .map(|(_, y)| euclidean_distance(x.clone(), y))
-//         .collect::<Vec<f64>>()
-// }
-
-// #[extendr]
-// ///@export
-// /// @rdname distance
-// fn euclidean_distance(x: Robj, y: Robj) -> f64 {
-//     let x: Geom = x.into();
-//     let y: Geom = y.into();
-
-//     let y = &y.geom;
-//     let x = x.geom;
-
-//     match x {
-//         Geometry::Point(x) => e_dist_pnt(x, y),
-//         Geometry::MultiPoint(x) => e_dist_mpnt(x, y),
-//         Geometry::LineString(x) => e_dist_linestring(x, y),
-//         Geometry::MultiLineString(x) => e_dist_mlinestring(x, y),
-//         Geometry::Polygon(x) => e_dist_poly(x, y),
-//         Geometry::MultiPolygon(x) => e_dist_mpoly(x, y),
-//         _ => 0.,
-//     }
-// }
-
-// fn e_dist_pnt(x: Point, y: &Geometry) -> f64 {
-//     match y {
-//         Geometry::LineString(y) => x.euclidean_distance(y),
-//         Geometry::MultiLineString(y) => x.euclidean_distance(y),
-//         Geometry::Point(y) => x.euclidean_distance(y),
-//         Geometry::MultiPoint(y) => x.euclidean_distance(y),
-//         Geometry::Polygon(y) => x.euclidean_distance(y),
-//         Geometry::MultiPolygon(y) => x.euclidean_distance(y),
-//         Geometry::Line(y) => x.euclidean_distance(y),
-//         _ => 0.0,
-//     }
-// }
-
-// fn e_dist_mpnt(x: MultiPoint, y: &Geometry) -> f64 {
-//     match y {
-//         Geometry::Point(y) => x.euclidean_distance(y),
-//         _ => 0.0,
-//     }
-// }
-
-// fn e_dist_linestring(x: LineString, y: &Geometry) -> f64 {
-//     match y {
-//         Geometry::LineString(y) => x.euclidean_distance(y),
-//         Geometry::Point(y) => x.euclidean_distance(y),
-//         Geometry::Polygon(y) => x.euclidean_distance(y),
-//         Geometry::Line(y) => x.euclidean_distance(y),
-//         _ => 0.0,
-//     }
-// }
-
-// fn e_dist_mlinestring(x: MultiLineString, y: &Geometry) -> f64 {
-//     match y {
-//         Geometry::Point(y) => x.euclidean_distance(y),
-//         _ => 0.0,
-//     }
-// }
-
-// fn e_dist_poly(x: Polygon, y: &Geometry) -> f64 {
-//     match y {
-//         Geometry::LineString(y) => x.euclidean_distance(y),
-//         //Geometry::MultiLineString(y) => x.euclidean_distance(y),
-//         Geometry::Point(y) => x.euclidean_distance(y),
-//         //Geometry::MultiPoint(y) => x.euclidean_distance(y),
-//         Geometry::Polygon(y) => x.euclidean_distance(y),
-//         //Geometry::MultiPolygon(y) => x.euclidean_distance(y),
-//         Geometry::Line(y) => x.euclidean_distance(y),
-//         _ => 0.0,
-//     }
-// }
-
-// fn e_dist_mpoly(x: MultiPolygon, y: &Geometry) -> f64 {
-//     match y {
-//         Geometry::Point(y) => x.euclidean_distance(y),
-//         _ => 0.0,
-//     }
-// }
-
-// //// Haversine distance
-// #[extendr]
-// ///@export
-// /// @rdname distance
-// fn haversine_distances(x: Robj, y: List) -> Vec<f64> {
-//     let x: Geom = x.try_into().unwrap();
-//     let x: Point = x.try_into().unwrap();
-//     let y = from_list(y);
-
-//     y.into_iter()
-//         .map(|y| Point::try_from(y.geom).unwrap())
-//         .map(|pnt| x.haversine_distance(&pnt))
-//         .collect::<Vec<f64>>()
-// }
-
-// #[extendr]
-// ///@export
-// /// @rdname distance
-// fn haversine_distance(x: Robj, y: Robj) -> f64 {
-//     let x: Geom = x.into();
-//     let y: Geom = y.into();
-
-//     let x: Point = x.geom.try_into().unwrap();
-//     let y: Point = y.geom.try_into().unwrap();
-
-//     x.haversine_distance(&y)
-// }
-
-// #[extendr]
-// ///@export
-// /// @rdname distance
-// fn haversine_distance_matrix(x: List, y: List) -> RMatrix<f64> {
-//     let nr = x.len();
-//     let nc = y.len();
-
-//     let xg = from_list(x);
-//     let yg = from_list(y);
-
-//     let res_vec = xg
-//         .into_iter()
-//         .map(|x| Point::try_from(x).unwrap())
-//         .map(|x| {
-//             yg.iter()
-//                 .cloned()
-//                 .map(|y| Point::try_from(y).unwrap())
-//                 .map(|y| x.haversine_distance(&y))
-//                 .collect::<Vec<f64>>()
-//         })
-//         .collect::<Vec<Vec<f64>>>();
-
-//     RMatrix::new_matrix(nr, nc, |r, c| res_vec[r][c])
-// }
-
-// //// Geodesic distance
-// #[extendr]
-// ///@export
-// /// @rdname distance
-// fn geodesic_distances(x: Robj, y: List) -> Vec<f64> {
-//     let x: Geom = x.try_into().unwrap();
-//     let x: Point = x.try_into().unwrap();
-//     let y = from_list(y);
-
-//     y.into_iter()
-//         .map(|y| Point::try_from(y.geom).unwrap())
-//         .map(|pnt| x.geodesic_distance(&pnt))
-//         .collect::<Vec<f64>>()
-// }
-
-// #[extendr]
-// ///@export
-// /// @rdname distance
-// fn geodesic_distance(x: Robj, y: Robj) -> f64 {
-//     let x: Geom = x.into();
-//     let y: Geom = y.into();
-
-//     let x: Point = x.geom.try_into().unwrap();
-//     let y: Point = y.geom.try_into().unwrap();
-
-//     x.geodesic_distance(&y)
-// }
-
-// #[extendr]
-// ///@export
-// /// @rdname distance
-// fn geodesic_distance_matrix(x: List, y: List) -> RMatrix<f64> {
-//     let nr = x.len();
-//     let nc = y.len();
-
-//     let xg = from_list(x);
-//     let yg = from_list(y);
-
-//     let res_vec = xg
-//         .into_iter()
-//         .map(|x| Point::try_from(x).unwrap())
-//         .map(|x| {
-//             yg.iter()
-//                 .cloned()
-//                 .map(|y| Point::try_from(y).unwrap())
-//                 .map(|y| x.geodesic_distance(&y))
-//                 .collect::<Vec<f64>>()
-//         })
-//         .collect::<Vec<Vec<f64>>>();
-
-//     RMatrix::new_matrix(nr, nc, |r, c| res_vec[r][c])
-// }
-
-// //// Haversine distance
-// #[extendr]
-// ///@export
-// /// @rdname distance
-// fn vincenty_distances(x: Robj, y: List) -> Vec<f64> {
-//     let x: Geom = x.try_into().unwrap();
-//     let x: Point = x.try_into().unwrap();
-//     let y = from_list(y);
-
-//     y.into_iter()
-//         .map(|y| Point::try_from(y.geom).unwrap())
-//         .map(|pnt| x.vincenty_distance(&pnt).unwrap())
-//         .collect::<Vec<f64>>()
-// }
-
-// #[extendr]
-// ///@export
-// ///@rdname distance
-// fn vincenty_distance(x: Robj, y: Robj) -> f64 {
-//     let x: Geom = x.into();
-//     let y: Geom = y.into();
-
-//     let x: Point = x.geom.try_into().unwrap();
-//     let y: Point = y.geom.try_into().unwrap();
-
-//     x.vincenty_distance(&y).unwrap()
-// }
-
-// #[extendr]
-// ///@export
-// /// @rdname distance
-// fn vincenty_distance_matrix(x: List, y: List) -> RMatrix<f64> {
-//     let nr = x.len();
-//     let nc = y.len();
-
-//     let xg = from_list(x);
-//     let yg = from_list(y);
-
-//     let res_vec = xg
-//         .into_iter()
-//         .map(|x| Point::try_from(x).unwrap())
-//         .map(|x| {
-//             yg.to_owned()
-//                 .iter()
-//                 .cloned()
-//                 .map(|y| Point::try_from(y).unwrap())
-//                 .map(|y| x.vincenty_distance(&y).unwrap())
-//                 .collect::<Vec<f64>>()
-//         })
-//         .collect::<Vec<Vec<f64>>>();
-
-//     RMatrix::new_matrix(nr, nc, |r, c| res_vec[r][c])
-// }
+            if xi.is_null() || yi.is_null() {
+                Rfloat::na()
+            } else {
+                let xg = <&Geom>::from_robj(&xi).unwrap();
+                let yg = <&Geom>::from_robj(&yi).unwrap();
+    
+                let d = xg.geom.hausdorff_distance(&yg.geom);
+                Rfloat::from(d)
+            }
+        })
+        .collect::<Doubles>()
+}
 
 // Exporting
 extendr_module! {
     mod distance;
-    // fn euclidean_distance;
-    // fn euclidean_distances;
-    // fn euclidean_distance_pairwise;
-    // fn euclidean_distance_matrix;
-    // fn haversine_distance;
-    // fn haversine_distances;
-    // fn haversine_distance_matrix;
-    // fn geodesic_distance;
-    // fn geodesic_distances;
-    // fn geodesic_distance_matrix;
-    // fn vincenty_distance;
-    // fn vincenty_distances;
-    // fn vincenty_distance_matrix;
-    // fn geodesic_distance;
-    // fn haversine_distance;
-    // fn vicenty_distance;
+    fn euclidean_distance_pairwise;
+    fn hausdorff_distance_pairwise;
 }

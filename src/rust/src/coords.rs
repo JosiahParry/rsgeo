@@ -155,10 +155,8 @@ fn polygon_coords(x: Polygon) -> Vec<((f64, f64), i32)> {
     
     exterior.extend(interior.into_iter());
 
-    // let (xy, ids): (Vec<(f64, f64)>, Vec<i32>) = exterior.into_iter().unzip();
-    // let (x, y): (Vec<f64>, Vec<f64>) = xy.into_iter().unzip();
     exterior
-    // data_frame!(x = x, y = y, ring_id = ids)
+
 }
 
 

@@ -223,153 +223,23 @@ fn locate_point_on_line(x: List, y: List) -> Doubles {
 }
 
 
-
-use geo::algorithm::LinesIter;
-use geo::algorithm::EuclideanLength;
-use geo_types::Coord;
+use geo::LineStringSegmentize;
 
 #[extendr]
-fn split_line(x: Robj, fraction: f64) -> Robj {
+fn segmentize(x: List, n: i32) -> Robj {
 
-    let x = LineString::from(Geom::from(x));
-    
-    let mut lns = x.lines_iter();
-    let mut ln_vec: Vec<Coord> = Vec::new();
-
-    // push the first coord in
-    // each subsequent coord will be the end point
-    ln_vec.push(lns.nth(0).unwrap().start);
-
-
-    let total_length = x.euclidean_length();
-    let fractional_length = total_length * fraction;
-    let mut cum_length = 0_f64;
-    
-    // Pre-allocate LineString vector with `n` elements
-    // iterate up to the first fractional amount collecting 
-    // Coords along the way. Once that fractional piece is 
-    // identified, create the linestring from Vec<Coord> and push.
-    // Reinstantiate a new Vec<Coord> where the first Coord is the 
-    // previous endpoint. Then change the target fractional length
-    // to the next calculated one. Repeat until the last fractional element 
-    // is fetched (which should be the last line segment in the for loop).
-    for segment in lns {
-        let length = segment.euclidean_length();
-        if cum_length + length >= fractional_length {
-            let segment_fraction = (fractional_length - cum_length) / length;
-            let endpoint = segment.line_interpolate_point(segment_fraction).unwrap().0;
-            ln_vec.push(endpoint);
-            break;
-        }
-
-        cum_length += length;
-        ln_vec.push(segment.start);
-    }
-
-    let res = LineString::new(ln_vec);
-    as_rsgeo_vctr(list!(res.into_geom()), "linestring")
-
-}
-
-
-#[extendr]
-fn segmentize(x: Robj, n: i32) -> Robj {
-
-    let x = LineString::from(Geom::from(x));
-
-    // Convert X into an iterator of `Lines` 
-    let mut lns = x.lines_iter();
-    
-    // Vec to allocate the  new LineString segments Coord Vec
-    // will be iterated over at end to create new vecs
-    let mut res_coords: Vec<Vec<Coord>> = Vec::with_capacity(3);
-
-    // calculate total length to track cumulative against
-    let total_length = x.euclidean_length();
-
-    // tracks total length
-    let mut cum_length = 0_f64;
-
-    // calculate the target fraction for the first iteration
-    // fraction will change based on each iteration
-    // let mut fraction = (1_f64 / (n as f64)) * (idx as f64);
-    let segment_prop = 1_f64 / (n as f64);
-    let mut fraction = segment_prop;
-
-    // fractional length will change dependent upon which `n` we're on.
-    let mut fractional_length = total_length * fraction;    
-
-    // instantiate the first Vec<Coord>
-    let mut ln_vec: Vec<Coord> = Vec::new();
-
-    // push the first coord in
-    // each subsequent coord will be the end point
-    ln_vec.push(lns.nth(0).unwrap().start);
-
-    // iterate through each line segment in the LineString
-    for segment in lns {
-
-        let length = segment.euclidean_length();
-
-        // update cumulative length
-        cum_length += length;
-
-        if cum_length >= fractional_length {
-
-            let segment_fraction = (fractional_length - cum_length) / length;
-            
-            // what do we do if the point cannot be unwrapped here? Return None? 
-            // Should this trait return Option<MultiLineString>?
-            let endpoint = segment.line_interpolate_point(segment_fraction).unwrap().0;
-
-            // add final coord to ln_vec
-            ln_vec.push(endpoint);
-
-            // now we drain all elements from the vector into an iterator
-            // this will be collected into a vector to be pushed into the 
-            // results coord vec of vec
-            let to_push = ln_vec.drain(..);
-
-            // now collect & push this vector into the results vector
-            res_coords.push(to_push.collect::<Vec<Coord>>());
-
-            // now add the last endpoint as the first coord
-            ln_vec.push(endpoint);
-
-            // we need to adjust our fraction and fractional length
-            fraction += segment_prop;
-            fractional_length = total_length * fraction;
-
-        }
-
-        // push the end coordinate into the Vec<Coord> to continue
-        // building the linestring
-        ln_vec.push(segment.end);
-    }
-
-    // push the last linestring vector which isn't done by the for loop
-    res_coords.push(ln_vec);
-
-    let res = res_coords
+    let res_vec = x
         .into_iter()
-        .map(|xi| Geom::from(LineString::new(xi)))
-        .collect::<Vec<Geom>>();
+        .map(|(_, x)| 
+            if x.is_null() {
+                NULL.into_robj()
+            } else {
+                LineString::from(Geom::from(x)).line_segmentize(n as usize).unwrap().into_geom().into_robj()
+            })
+        .collect::<Vec<Robj>>();
 
-    as_rsgeo_vctr(List::from_values(res), "linestring")
-
+    as_rsgeo_vctr(List::from_values(res_vec), "multilinestring")
 }
-
-// let total_length = self.euclidean_length();
-//     let fractional_length = total_length * fraction;
-//     let mut cum_length = T::zero();
-//     for segment in self.lines() {
-//         let length = segment.euclidean_length();
-//         if cum_length + length >= fractional_length {
-//             let segment_fraction = (fractional_length - cum_length) / length;
-//             return segment.line_interpolate_point(segment_fraction);
-//         }
-//         cum_length += length;
-//     }
 
 extendr_module! {
     mod query;
@@ -380,6 +250,5 @@ extendr_module! {
     fn is_convex;
     fn line_interpolate_point;
     fn locate_point_on_line;
-    fn split_line;
     fn segmentize;
 }

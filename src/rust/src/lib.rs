@@ -6,7 +6,7 @@ mod length;
 mod query;
 mod similarity;
 mod simplification;
-// mod distance;
+mod distance;
 // mod io;
 mod construction;
 mod spatial_index;
@@ -53,9 +53,11 @@ fn from_sfc(x: List) -> Robj {
 #[extendr]
 fn to_sfc(x: List) -> List {
     // crate::boundary::boun
-    x.into_iter()
+    let res = x.into_iter()
         .map(|(_, xi)| sfconversions::tosf::to_sfg(Geom::from(xi)))
-        .collect::<List>()
+        .collect::<Vec<Robj>>();
+
+    List::from_values(res)
 }
 
 // /// Haversine Destination
@@ -240,6 +242,7 @@ extendr_module! {
     use utils;
     use casting;
     use coords;
+    use distance;
 }
 
 
