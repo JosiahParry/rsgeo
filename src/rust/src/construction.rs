@@ -3,7 +3,7 @@ use geo_types::{coord, point, Coord, LineString, MultiPoint, Point, Polygon};
 use sfconversions::{vctrs::geom_class, Geom};
 use std::collections::HashMap;
 
-trait IsReal {
+pub trait IsReal {
     fn is_real(&self) -> bool;
 }
 
@@ -14,7 +14,17 @@ impl IsReal for Rfloat {
 }
 
 #[extendr]
+/// @export
+/// @rdname construction
 fn geom_point(x: Doubles, y: Doubles) -> Robj {
+
+    let n_x = x.len();
+    let n_y = y.len();
+
+    if n_x != n_y {
+        panic!("`x` and `y` must be the same length")
+    }
+
     let mut res = List::new(x.len());
 
     for (i, (xi, yi)) in x.iter().zip(y.iter()).enumerate() {
@@ -31,7 +41,23 @@ fn geom_point(x: Doubles, y: Doubles) -> Robj {
 }
 
 #[extendr]
-fn geom_multipoint(x: Doubles, y: Doubles, id: Integers) -> Robj {
+fn geom_multipoint_(x: Doubles, y: Doubles, id: Integers) -> Robj {
+
+    let n_id = id.len();
+    let n_x = x.len();
+    let n_y = y.len();
+
+    if n_x != n_y {
+        panic!("`x` and `y` must be the same length")
+    } else if (n_id != n_x) && (n_id != 1) {
+        panic!("`id` must be the same length as `x` or length 1")
+    }
+
+    let id = match n_id == 1 {
+        true => Integers::from_values(vec![1; n_x]),
+        false => id
+    };
+
     // create empty hash map to store unique vectors of points
     let mut map_mpnts: HashMap<i32, Vec<Point>> = HashMap::new();
 
@@ -58,7 +84,23 @@ fn geom_multipoint(x: Doubles, y: Doubles, id: Integers) -> Robj {
 }
 
 #[extendr]
-fn geom_linestring(x: Doubles, y: Doubles, id: Integers) -> Robj {
+fn geom_linestring_(x: Doubles, y: Doubles, id: Integers) -> Robj {
+
+    let n_id = id.len();
+    let n_x = x.len();
+    let n_y = y.len();
+
+    if n_x != n_y {
+        panic!("`x` and `y` must be the same length")
+    } else if (n_id != n_x) && (n_id != 1) {
+        panic!("`id` must be the same length as `x` or length 1")
+    }
+    
+    let id = match n_id == 1 {
+        true => Integers::from_values(vec![1; n_x]),
+        false => id
+    };
+
     // create empty hash map to store unique vectors of points
     let mut map_mpnts: HashMap<i32, Vec<Coord>> = HashMap::new();
 
@@ -80,12 +122,37 @@ fn geom_linestring(x: Doubles, y: Doubles, id: Integers) -> Robj {
 
     // create multipoint vector
     List::from_values(res_vec)
-        .set_class(geom_class("multipoint"))
+        .set_class(geom_class("linestring"))
         .unwrap()
 }
 
 #[extendr]
-fn geom_polygon(x: Doubles, y: Doubles, id: Integers, ring: Integers) -> Robj {
+fn geom_polygon_(x: Doubles, y: Doubles, id: Integers, ring: Integers) -> Robj {
+
+    let n_id = id.len();
+    let n_ring = ring.len();
+    let n_x = x.len();
+    let n_y = y.len();
+
+
+   if n_x != n_y {
+        panic!("`x` and `y` must be the same length")
+    } else if (n_id != n_x) && (n_id != 1) {
+        panic!("`id` must be the same length as `x` or length 1")
+    } else if (n_ring != n_x) && (n_ring != 1) {
+        panic!("`ring` must be the same length as `x` or length 1")
+    }
+    
+    let id = match n_id == 1 {
+        true => Integers::from_values(vec![1; n_x]),
+        false => id
+    };
+
+    let ring: Integers = match n_ring == 1 {
+        true => Integers::from_values(vec![1; n_x]),
+        false => ring
+    };
+
     // create empty hash map to store unique vectors of points for each ring
     let mut map_rings: HashMap<i32, HashMap<i32, Vec<Coord>>> = HashMap::new();
 
@@ -137,7 +204,7 @@ fn geom_polygon(x: Doubles, y: Doubles, id: Integers, ring: Integers) -> Robj {
 extendr_module! {
     mod construction;
     fn geom_point;
-    fn geom_multipoint;
-    fn geom_linestring;
-    fn geom_polygon;
+    fn geom_multipoint_;
+    fn geom_linestring_;
+    fn geom_polygon_;
 }

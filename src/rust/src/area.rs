@@ -5,14 +5,19 @@ use geo::Area;
 use sfconversions::Geom;
 
 #[extendr]
-///@export
+/// Calculate the area of a polygon
+/// 
+/// Functions to calculate different types of area for polygons. 
+/// @param x an object of class `rsgeo`
+/// @export
+/// @rdname area
 fn signed_area(x: List) -> Doubles {
     x.iter()
         .map(|(_, xi)| {
             if xi.is_null() {
                 Rfloat::na()
             } else {
-                let area = Geom::try_from(xi).unwrap().geom.signed_area();
+                let area = <&Geom>::from_robj(&xi).unwrap().geom.signed_area();
                 Rfloat::from(area)
             }
         })
@@ -21,13 +26,14 @@ fn signed_area(x: List) -> Doubles {
 
 #[extendr]
 /// @export
+/// @rdname area
 fn unsigned_area(x: List) -> Doubles {
     x.iter()
         .map(|(_, xi)| {
             if xi.is_null() {
                 Rfloat::na()
             } else {
-                let area = Geom::try_from(xi).unwrap().geom.unsigned_area();
+                let area = <&Geom>::from_robj(&xi).unwrap().geom.unsigned_area();
                 Rfloat::from(area)
             }
         })
@@ -36,13 +42,14 @@ fn unsigned_area(x: List) -> Doubles {
 
 #[extendr]
 /// @export
+/// @rdname area
 fn signed_area_geodesic(x: List) -> Doubles {
     x.iter()
         .map(|(_, xi)| {
             if xi.is_null() {
                 Rfloat::na()
             } else {
-                let area = Geom::try_from(xi)
+                let area = <&Geom>::from_robj(&xi)
                     .unwrap()
                     .geom
                     .chamberlain_duquette_signed_area();
@@ -54,13 +61,15 @@ fn signed_area_geodesic(x: List) -> Doubles {
 
 #[extendr]
 /// @export
+/// @rdname area
 fn unsigned_area_geodesic(x: List) -> Doubles {
     x.iter()
         .map(|(_, xi)| {
             if xi.is_null() {
                 Rfloat::na()
             } else {
-                let area = Geom::try_from(xi)
+                let area = 
+                <&Geom>::from_robj(&xi)
                     .unwrap()
                     .geom
                     .chamberlain_duquette_unsigned_area();

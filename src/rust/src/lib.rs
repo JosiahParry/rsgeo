@@ -14,18 +14,27 @@ mod topology;
 mod union;
 mod coords;
 
+
 use extendr_api::prelude::*;
 pub use sfconversions::{fromsf::sfc_to_rsgeo, vctrs::*, Geom};
 
 mod utils;
 // MISC algos -------
 
-use geo::Centroid;
-/// Find centroid
-/// @param x an object of class `point`
+use geo::{Centroid, HaversineDestination};
+use geo_types::Point;
+
+/// Extract Centroids
+/// 
+/// Given a vector of geometries, extract their centroids. 
+/// 
+/// @param x an object of class `rsgeo`
+/// 
 ///@export
 #[extendr]
 fn centroids(x: List) -> Robj {
+    verify_rsgeo(&x);
+    
     let centroids = x
         .iter()
         .map(|(_, x)| {
@@ -52,32 +61,18 @@ fn from_sfc(x: List) -> Robj {
 
 #[extendr]
 fn to_sfc(x: List) -> List {
-    // crate::boundary::boun
     let res = x.into_iter()
-        .map(|(_, xi)| sfconversions::tosf::to_sfg(Geom::from(xi)))
+        .map(|(_, xi)| {
+            if xi.is_null() {
+                NULL.into_robj()
+            } else {
+                sfconversions::tosf::to_sfg(Geom::from(xi))
+            }
+    })
         .collect::<Vec<Robj>>();
 
     List::from_values(res)
 }
-
-// /// Haversine Destination
-// ///@export
-// #[extendr]
-// fn haversine_destination(x: Robj, bearing: f64, distance: f64) -> Robj {
-//     let x: Geom = x.try_into().unwrap();
-//     let x: Point = x.try_into().unwrap();
-
-//     let point = x.haversine_destination(bearing, distance);
-
-//     let res = Geom::from(point);
-
-//     r![ExternalPtr::new(res)]
-//         .set_attrib("class", "point")
-//         .unwrap()
-// }
-
-use geo::HaversineDestination;
-use geo_types::Point;
 
 #[extendr]
 fn haversine_destination(x: List, bearing: Doubles, distance: Doubles) -> Robj {
@@ -244,5 +239,3 @@ extendr_module! {
     use coords;
     use distance;
 }
-
-

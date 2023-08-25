@@ -7,7 +7,7 @@ use geo::{
 
 };
 use geo_types::Point;
-use sfconversions::vctrs::{as_rsgeo_vctr};
+use sfconversions::vctrs::as_rsgeo_vctr;
 
 use std::rc::Rc;
 
@@ -27,6 +27,12 @@ extendr_module! {
 /// @rdname combine_geoms
 #[extendr]
 fn union_geoms(x: List) -> Robj {
+
+    // Class checking
+    if !x.inherits("rsgeo") {
+        panic!("Must provide an object of class `rsgeo`")
+    }
+
     let mut geom_type = x.class().unwrap();
 
     //match geom_type
@@ -50,7 +56,7 @@ fn union_geoms(x: List) -> Robj {
 fn union_points(x: List) -> Robj {
     let pnts = x  
         .into_iter()
-        .filter(|(_, xi)| xi.is_null())
+        .filter(|(_, xi)| !xi.is_null())
         .map(|(_, robj)| Point::from(Geom::from(robj)))
         .collect::<Vec<Point>>();
 
@@ -69,7 +75,7 @@ fn union_points(x: List) -> Robj {
 fn union_multipoints(x: List) -> Robj {
     let pnts = x  
         .into_iter()
-        .filter(|(_, xi)| xi.is_null())
+        .filter(|(_, xi)| !xi.is_null())
         .flat_map(|(_, robj)| MultiPoint::from(Geom::from(robj)).0)
         .collect::<Vec<Point>>();
 
@@ -87,7 +93,7 @@ fn union_linestrings(x: List) -> Robj {
 
     let lns = x  
         .into_iter()
-        .filter(|(_, xi)| xi.is_null())
+        .filter(|(_, xi)| !xi.is_null())
         .map(|(_, robj)| LineString::from(Geom::from(robj)))
     .collect::<Vec<LineString>>();
 
@@ -102,7 +108,7 @@ fn union_multilinestrings(x: List) -> Robj {
 
     let lns = x  
         .into_iter()
-        .filter(|(_, xi)| xi.is_null())
+        .filter(|(_, xi)| !xi.is_null())
         .flat_map(|(_, robj)| MultiLineString::from(Geom::from(robj)).0)
     .collect::<Vec<LineString>>();
 
@@ -120,18 +126,19 @@ fn union_multipolygons(x: List) -> Robj {
     let x = x
         .into_iter()
         // filter out missing values
-        .filter(|(_, xi)| xi.is_null())
+        .filter(|(_, xi)| !xi.is_null())
         // extract multipolygons in sub polygons
         .flat_map(|(_, x)| {
-            MultiPolygon::from(x.into_geom())
+            let g = Geom::from(x).geom;
+
+            let p = MultiPolygon::try_from(g).unwrap();
+    
+            p
                 .0
                 .into_iter()
-                .map(|xi| Geom::from(xi))
-                .collect::<Vec<Geom>>()
-        })
-        // collect into a vector of geoms
-        .collect::<Vec<Geom>>();
-
+                .map(|x| x.into_geom().into_robj())
+                .collect::<Vec<Robj>>()
+        }).collect::<Vec<Robj>>();
     // convert to a list cannot collect due to list collection bugh
     let x = List::from_values(x);
 

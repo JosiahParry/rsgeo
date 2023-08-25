@@ -7,11 +7,6 @@ use sfconversions::{Geom, IntoGeom};
 
 // use cached envelopes
 pub fn create_cached_rtree(geoms: List) -> RTree<GeomWithData<CachedEnvelope<Geom>, usize>> {
-    // Class checking
-    let cls = geoms.class().unwrap().next().unwrap();
-    if !cls.starts_with("rs_") {
-        panic!("`x` must be a Rust geometry type")
-    }
 
     let all_geoms = geoms
         .iter()

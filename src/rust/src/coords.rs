@@ -1,8 +1,7 @@
 use extendr_api::prelude::*;
 use sfconversions::Geom;
 use geo_types::*;
-
-use geo::{CoordsIter};
+use geo::CoordsIter;
 
 // TODO - missing value handling for coordinate conversions
 #[extendr]
@@ -103,7 +102,7 @@ fn linestring_to_coords(x: List) -> Robj {
             let n = coords.len();
             coords
                 .into_iter()
-                .zip(vec![(i as i32) + 1; n])
+                .zip(vec![(i as i32) + 1; n].into_iter())
                 .collect::<Vec<((f64, f64), i32)>>()
         })
         .collect::<Vec<((f64, f64), i32)>>();
