@@ -1,6 +1,6 @@
 Package: rsgeo
 Title: An Interface to Rust's 'geo-types' Library
-Version: 0.0.0.9000
+Version: 0.1.0
 Authors@R: 
     person("Josiah", "Parry", , "josiah.parry@gmail.com", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0001-9910-865X"))
@@ -12,12 +12,12 @@ Language: en
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.3
 Imports: 
-    pillar,
     rlang,
     vctrs
 Suggests: 
     sf,
-    testthat (>= 3.0.0)
-Config/rextendr/version: 0.3.1.9000
+    testthat (>= 3.0.0),
+    wk
+Config/rextendr/version: 0.4.0
 SystemRequirements: Cargo (rustc package manager)
 Config/testthat/edition: 3

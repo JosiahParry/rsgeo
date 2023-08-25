@@ -4,7 +4,7 @@
 #'
 #' @details
 #'
-#' ### `combine_geoms()`
+#' `combine_geoms()`
 #'
 #' `combine_geoms()` combines a vector of geometries into a vector of lenght one
 #' their `MULTI` counterpart.
@@ -42,17 +42,3 @@ combine_geoms <- function(x) {
 
   restore_geoms(list(res))
 }
-#
-# library(ggplot2)
-# guerry |>
-#   mutate(geoms = as_rsgeom(geometry)) |>
-#   group_by(region) |>
-#   summarise(geoms = st_as_sfc(union_geoms(geoms))) |>
-#   ggplot() +
-#   geom_sf()
-#
-# x <- as_rsgeom(guerry$geometry)
-#
-# union_geoms(x[1:3])
-#
-# union_geoms(geom_points_matrix(matrix(runif(100), ncol = 2)))

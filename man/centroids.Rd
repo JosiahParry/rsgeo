@@ -2,13 +2,13 @@
 % Please edit documentation in R/extendr-wrappers.R
 \name{centroids}
 \alias{centroids}
-\title{Find centroid}
+\title{Extract Centroids}
 \usage{
 centroids(x)
 }
 \arguments{
-\item{x}{an object of class \code{point}}
+\item{x}{an object of class \code{rsgeo}}
 }
 \description{
-Find centroid
+Given a vector of geometries, extract their centroids.
 }

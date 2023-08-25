@@ -18,6 +18,8 @@ format.Geom <- function(x, width = NULL, ...) {
 
 #' @export
 format.rsgeo <- function(x, ...) {
-  vapply(x, format, character(1), ...)
+  chrs <- vapply(x, format, character(1), ...)
+  chrs[which(chrs == "NULL")] <- NA
+  chrs
 }
 

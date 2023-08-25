@@ -1,10 +1,10 @@
 use extendr_api::prelude::*;
 use geo::{Simplify, SimplifyVw, SimplifyVwPreserve};
 use geo_types::Geometry;
-use sfconversions::Geom;
+use sfconversions::{Geom, vctrs::{as_rsgeo_vctr, rsgeo_type}};
 
 #[extendr]
-fn simplify_geoms(x: List, epsilon: Doubles) -> Robj {
+fn simplify_geoms_(x: List, epsilon: Doubles) -> Robj {
     let n_e = epsilon.len();
     let n_x = x.len();
 
@@ -18,9 +18,9 @@ fn simplify_geoms(x: List, epsilon: Doubles) -> Robj {
     };
 
     // determine the input class the output must be the same type
-    let cls = x.class().unwrap();
+    let cls = rsgeo_type(&x);
 
-    x.iter()
+    let res_vec = x.iter()
         .zip(epsilon.iter())
         .map(|((_, xi), ei)| {
             if xi.is_null() || ei.is_na() || ei.is_infinite() || ei.is_nan() {
@@ -38,13 +38,14 @@ fn simplify_geoms(x: List, epsilon: Doubles) -> Robj {
                 }
             }
         })
-        .collect::<List>()
-        .set_class(cls)
-        .unwrap()
+        .collect::<Vec<Robj>>();
+    
+    as_rsgeo_vctr(List::from_values(res_vec), cls.as_str())
+
 }
 
 #[extendr]
-fn simplify_vw_geoms(x: List, epsilon: Doubles) -> Robj {
+fn simplify_vw_geoms_(x: List, epsilon: Doubles) -> Robj {
     let n_e = epsilon.len();
     let n_x = x.len();
 
@@ -58,9 +59,9 @@ fn simplify_vw_geoms(x: List, epsilon: Doubles) -> Robj {
     };
 
     // determine the input class the output must be the same type
-    let cls = x.class().unwrap();
+    let cls = rsgeo_type(&x);
 
-    x.iter()
+    let res_vec = x.iter()
         .zip(epsilon.iter())
         .map(|((_, xi), ei)| {
             if xi.is_null() || ei.is_na() || ei.is_infinite() || ei.is_nan() {
@@ -78,13 +79,14 @@ fn simplify_vw_geoms(x: List, epsilon: Doubles) -> Robj {
                 }
             }
         })
-        .collect::<List>()
-        .set_class(cls)
-        .unwrap()
+        .collect::<Vec<Robj>>();
+
+    as_rsgeo_vctr(List::from_values(res_vec), cls.as_str())
+
 }
 
 #[extendr]
-fn simplify_vw_preserve_geoms(x: List, epsilon: Doubles) -> Robj {
+fn simplify_vw_preserve_geoms_(x: List, epsilon: Doubles) -> Robj {
     let n_e = epsilon.len();
     let n_x = x.len();
 
@@ -98,9 +100,9 @@ fn simplify_vw_preserve_geoms(x: List, epsilon: Doubles) -> Robj {
     };
 
     // determine the input class the output must be the same type
-    let cls = x.class().unwrap();
+    let cls = rsgeo_type(&x);
 
-    x.iter()
+    let res_vec = x.iter()
         .zip(epsilon.iter())
         .map(|((_, xi), ei)| {
             if xi.is_null() || ei.is_na() || ei.is_infinite() || ei.is_nan() {
@@ -122,14 +124,15 @@ fn simplify_vw_preserve_geoms(x: List, epsilon: Doubles) -> Robj {
                 }
             }
         })
-        .collect::<List>()
-        .set_class(cls)
-        .unwrap()
+        .collect::<Vec<Robj>>();
+
+    as_rsgeo_vctr(List::from_values(res_vec), cls.as_str())
+
 }
 
 extendr_module! {
     mod simplification;
-    fn simplify_geoms;
-    fn simplify_vw_geoms;
-    fn simplify_vw_preserve_geoms;
+    fn simplify_geoms_;
+    fn simplify_vw_geoms_;
+    fn simplify_vw_preserve_geoms_;
 }

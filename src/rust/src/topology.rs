@@ -30,7 +30,7 @@ use sfconversions::Geom;
 //     List::from_values(index)
 
 // }
-
+// TODO use rayon
 #[extendr]
 fn intersects_sparse(x: List, y: List) -> List {
     let n = x.len();
