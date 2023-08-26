@@ -1,7 +1,7 @@
 use extendr_api::prelude::*;
 use geo_types::*;
 use sfconversions::{
-    vctrs::{as_rsgeo_vctr},
+    vctrs::as_rsgeo_vctr,
     Geom,
 };
 
@@ -72,20 +72,6 @@ fn expand_linestring(x: Robj) -> Robj {
 
     as_rsgeo_vctr(List::from_values(res), "point")
 }
-
-// #[extendr]
-// fn expand_geom(x: List) -> Robj {
-//     let cls = x.class().unwrap().next().unwrap();
-//     match cls {
-//         "rs_POINT" => x,
-//         "rs_MULTIPOINT" => expand_multipoint(x),
-//         "rs_LINESTRING" => expand_linestring(x),
-//         "rs_MULTILINESTRING" => expand_multilinestring(x),
-//         "rs_POLYGON" => expand_polygon(x),
-//         "rs_MULTIPOLYGON" => expand_multipolygon(x),
-//         &_ => x,
-//     }
-// }
 
 #[extendr]
 fn expand_geoms(x: List) -> List {

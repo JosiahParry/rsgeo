@@ -3,7 +3,7 @@ use geo::{Contains, Intersects, Within};
 
 use crate::spatial_index::create_cached_rtree;
 use rstar::RTreeObject;
-use sfconversions::Geom;
+use sfconversions::{Geom, geometry_from_list};
 
 // This approach is generally slow it works by building two R* trees.
 // using a cached envelope is faster than using a  computer bounding box so we
@@ -50,6 +50,48 @@ fn intersects_sparse(x: List, y: List) -> List {
             }
         });
     }
+
+    index
+        .iter_mut()
+        .for_each(|xi| xi.sort());
+
+    List::from_values(index)
+}
+
+use rayon::prelude::*;
+use std::sync::Mutex;
+
+#[extendr]
+fn intersects_sparse_rayon(x: List, y: List) -> List {
+    let n = x.len();
+    let xtree = create_cached_rtree(x);
+
+    let y = geometry_from_list(y);
+    let index = Mutex::new(vec![Vec::with_capacity(n); n]);
+
+    y
+        .into_par_iter()
+        .enumerate()
+        .for_each(|(i, yi)| {
+            if let Some(yi) = yi {
+                let yi = Geom::from(yi);
+                let env = yi.envelope();
+                let cands = xtree.locate_in_envelope_intersecting(&env);
+
+                cands.for_each(|cnd| {
+                    if yi.geom.intersects(&cnd.geom().geom) {
+                        let mut ind = index.lock().unwrap();
+                        ind[cnd.data].push((i as i32) + 1)
+                    }})
+            }
+        });
+
+    let mut index = index.into_inner().unwrap();
+
+    index
+        .par_iter_mut()
+        .for_each(|xi| xi.sort());   
+
     List::from_values(index)
 }
 
@@ -113,6 +155,7 @@ fn within_sparse(x: List, y: List) -> List {
 extendr_module! {
     mod topology;
     fn intersects_sparse;
+    fn intersects_sparse_rayon;
     fn contains_sparse;
     fn within_sparse;
 }
