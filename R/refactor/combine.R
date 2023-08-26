@@ -15,6 +15,7 @@
 #' - `rs_GEOMETRYCOLLECTION` is not supported
 #'
 #' ### `union_geoms()`
+#'
 #' `union_geoms()` creates a union of all geometries
 #'
 #' - `rs_POINT` - combines and removes repeated points
@@ -25,7 +26,11 @@
 #' - `rs_MULTIPOLYGON` - unions geometries
 #'
 #' @param x a vector of geometries
+#'
 #' @export
+#' @returns
+#' An object of class `rsgeo` of length one.
+#'
 combine_geoms <- function(x) {
   cls <- tolower(class(x)[1])
   cls <- substr(cls, 4, nchar(cls))

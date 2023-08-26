@@ -269,11 +269,38 @@ simplify_vw_preserve_geoms_ <- function(x, epsilon) .Call(wrap__simplify_vw_pres
 #' @export 
 frechet_distance <- function(x, y) .Call(wrap__frechet_distance, x, y)
 
+#' Binary Predicates
+#' 
+#' Functions to ascertain the binary relationship between 
+#' two geometry vectors. Binary predicates are provided both pairwise 
+#' as a sparse matrix.
+#' 
+#' @param x an object of class `rsgeo`
+#' @param y an object of class `rsgeo`
+#' 
+#' @export
+#' @rdname topology
 intersects_sparse <- function(x, y) .Call(wrap__intersects_sparse, x, y)
 
+#' @export
+#' @rdname topology
+intersects_pairwise <- function(x, y) .Call(wrap__intersects_pairwise, x, y)
+
+#' @export
+#' @rdname topology
 contains_sparse <- function(x, y) .Call(wrap__contains_sparse, x, y)
 
+#' @export
+#' @rdname topology
+contains_pairwise <- function(x, y) .Call(wrap__contains_pairwise, x, y)
+
+#' @export
+#' @rdname topology
 within_sparse <- function(x, y) .Call(wrap__within_sparse, x, y)
+
+#' @export
+#' @rdname topology
+within_pairwise <- function(x, y) .Call(wrap__within_pairwise, x, y)
 
 #' @export
 #' @rdname construction
