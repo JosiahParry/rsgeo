@@ -38,6 +38,10 @@ distance_haversine_matrix(x, y)
 
 \item{y}{and object of class \code{rsgeo}}
 }
+\value{
+For \verb{_matrix} functions, returns a dense matrix of distances whereas \verb{_pairwise}
+functions return a numeric vector.
+}
 \description{
 Calculates distances between two vectors of geometries. There are
 a number of different distance methods that can be utilized.

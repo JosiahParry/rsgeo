@@ -18,6 +18,9 @@ length_haversine(x)
 \arguments{
 \item{x}{an object of class \code{rsgeo}}
 }
+\value{
+A numeric vector
+}
 \description{
 For a given LineString or MultiLineString geometry, calculate its length.
 Other geometries will return a value of \code{NA}.

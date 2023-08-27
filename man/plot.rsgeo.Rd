@@ -7,6 +7,8 @@
 \method{plot}{rsgeo}(x, ...)
 }
 \arguments{
+\item{x}{an object of class \code{rsgeo}}
+
 \item{...}{arguments passed to \code{wk::wk_plot()}}
 }
 \description{

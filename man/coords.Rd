@@ -6,6 +6,9 @@
 \usage{
 coords(x)
 }
+\arguments{
+\item{x}{an object of class \code{rsgeo}}
+}
 \value{
 A \code{data.frame} with columns \code{x}, \code{y}. Additional columns are returned based
 on the geometry type. Additional columns are:

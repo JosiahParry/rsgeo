@@ -21,10 +21,29 @@ is_strictly_ccw_convex(x)
 
 is_strictly_cw_convex(x)
 }
+\arguments{
+\item{x}{an object of class \code{rs_LINESTRING}
+
+See \href{https://docs.rs/geo/latest/geo/algorithm/is_convex/trait.IsConvex.html}{\code{geo} docs for further details}}
+}
+\value{
+a logical vector
+}
 \description{
 For a given \code{rs_LINESTRING} vector, test its convexity. Convexity can be tested
 strictly or strongly, as well as based on winding.
 }
-\details{
-See \href{https://docs.rs/geo/latest/geo/algorithm/is_convex/trait.IsConvex.html}{\code{geo} docs for further details}
+\examples{
+lns <- geom_linestring(
+    1:20,
+    runif(20, -5, 5),
+    rep.int(1:5, 4)
+  )
+  
+is_convex(lns)
+is_cw_convex(lns)
+is_ccw_convex(lns)
+is_strictly_convex(lns)
+is_strictly_cw_convex(lns)
+is_strictly_ccw_convex(lns)
 }

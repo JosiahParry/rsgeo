@@ -9,6 +9,13 @@ centroids(x)
 \arguments{
 \item{x}{an object of class \code{rsgeo}}
 }
+\value{
+an object of class \code{rs_POINT}
+}
 \description{
 Given a vector of geometries, extract their centroids.
+}
+\examples{
+lns <- geom_linestring(1:100, runif(100, -10, 10), rep.int(1:5, 20))
+centroids(lns)
 }

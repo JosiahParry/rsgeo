@@ -25,21 +25,40 @@ extreme_coords(x)
 bounding_box(x)
 }
 \arguments{
-\item{x}{a rust geometry either a scalar or a vector for functions ending in \code{s}. See "Details" for more.}
+\item{x}{an object of class \code{rsgeo}}
+
+\item{concavity}{a value between 0 and 1 specifying the concavity of the convex hull}
 }
-\description{
-Compute Geometric Boundaries
-}
-\details{
+\value{
 \itemize{
 \item \code{bounding_box()} returns a named vector of xmin, ymin, xmax, and ymax
-\item \code{bounding_boxes()} returns a list of bounding
-\item \code{bounding_rectangle()} returns a polygon of the bounding rectangle
-\item \code{convex_hull()} returns a polygon of the convex hull for each geometry
-\item \code{concave_hull()} returns a polygon of the specified concavity for each geometry
-\item \code{extreme_coords()} returns the extreme coordinates of a geometry as a named vector of xmin, ymin, xmax, and ymax where each element is a \code{Point} geometry of the extreme value
-\item \code{minimum_rotated_rect()} returns the minimum rotated rectangle covering a geometry
-Note that if you want a convex or concave hull over an entire vector of geometries
-you must first union or combine them.
+\item \code{bounding_boxes()} returns a list of bounding box numeric vectors for each geometry
+\item \code{bounding_rect()} returns an \code{rs_POLYGON} of the bounding rectangle of each geometry
+\item \code{convex_hull()} returns an \code{rs_POLYGON} of the convex hull for each geometry
+\item \code{concave_hull()} returns an \code{rs_POLYGON} of the specified concavity for each geometry
+\item \code{extreme_coords()} returns the extreme coordinates of each geometry as a list where each element
+is a named vector of xmin, ymin, xmax, and ymax where each element is a \code{Point} geometry of the extreme value
+\item \code{minimum_rotated_rect()} returns the minimum rotated rectangle covering a geometry as an \code{rs_POLYGON}
 }
+}
+\description{
+From a vector of geometries idenitfy different types of boundaries.
+}
+\details{
+Note that if you want a convex or concave hull over an entire vector of geometries
+you must first union or combine them using either \code{combine_geoms()} or \code{union_geoms()}
+}
+\examples{
+lns <- geom_linestring(
+  1:20,
+  runif(20, -5, 5),
+  rep.int(1:5, 4)
+)
+bounding_box(lns)
+bounding_boxes(lns)
+minimum_rotated_rect(lns)
+convex_hull(lns)
+concave_hull(lns, 0.5)
+extreme_coords(lns)
+
 }

@@ -3,6 +3,8 @@
 \name{signed_area}
 \alias{signed_area}
 \alias{unsigned_area}
+\alias{signed_area_cd}
+\alias{unsigned_area_cd}
 \alias{signed_area_geodesic}
 \alias{unsigned_area_geodesic}
 \title{Calculate the area of a polygon}
@@ -11,6 +13,10 @@ signed_area(x)
 
 unsigned_area(x)
 
+signed_area_cd(x)
+
+unsigned_area_cd(x)
+
 signed_area_geodesic(x)
 
 unsigned_area_geodesic(x)
@@ -18,6 +24,35 @@ unsigned_area_geodesic(x)
 \arguments{
 \item{x}{an object of class \code{rsgeo}}
 }
+\value{
+a numeric vector of the area contained by the geometry
+}
 \description{
 Functions to calculate different types of area for polygons.
+}
+\details{
+\itemize{
+\item functions assume counter clock-wise winding in accordance with the simple feature
+access standard
+\item functions ending in \verb{_cd} use the Chamberlain-Duquette algorithm for spherical area
+\item Chamberlain-Duquette and Geodesic areas are returned in meters squared and assume non-planar geometries
+}
+
+See geo docs for more:
+\itemize{
+\item \href{https://docs.rs/geo/latest/geo/algorithm/geodesic_area/trait.GeodesicArea.html#}{GeodesicArea}
+\item \href{https://docs.rs/geo/latest/geo/algorithm/area/trait.Area.html#}{Area}
+\item \href{https://docs.rs/geo/latest/geo/algorithm/chamberlain_duquette_area/trait.ChamberlainDuquetteArea.html}{ChamberlainDuquetteArea}
+}
+
+x <- c(0, 1, 1, 0, 0)
+y <- c(0, 0, 1, 1, 0)
+p <- geom_polygon(x, y)
+
+signed_area(p)
+unsigned_area(p)
+signed_area_cd(p)
+unsigned_area_cd(p)
+signed_area_geodesic(p)
+unsigned_area_geodesic(p)
 }

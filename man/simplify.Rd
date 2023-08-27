@@ -12,6 +12,11 @@ simplify_vw_geoms(x, epsilon)
 
 simplify_vw_preserve_geoms(x, epsilon)
 }
+\arguments{
+\item{x}{an object of class of \code{rsgeo}}
+
+\item{epsilon}{a tolerance parameter. Cannot be equal to or less than 0.}
+}
 \description{
 Simplifies LineStrings, Polygons, and their Multi- counterparts.
 }

@@ -9,7 +9,7 @@ line_interpolate_point(x, fraction)
 \arguments{
 \item{x}{an object of class \code{rs_LINESTRING}}
 
-\item{y}{a numeric vector of the same length as \code{x} or length 1}
+\item{fraction}{a numeric vector of length 1 or the same length as \code{x}. Must be a value between 0 and 1 inclusive.}
 }
 \value{
 An object of class \code{rs_POINT}
