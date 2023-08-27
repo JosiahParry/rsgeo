@@ -1,3 +1,7 @@
+# rsgeo 0.1.1
+
+* line_segmentize() is now parallelized
+
 # rsgeo 0.1.0
 
 * Complete rewrite of rsgeo from the ground up.

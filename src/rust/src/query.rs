@@ -1,5 +1,5 @@
 use extendr_api::prelude::*;
-use sfconversions::IntoGeom;
+use sfconversions::geometry_from_list;
 use sfconversions::vctrs::as_rsgeo_vctr;
 use sfconversions::Geom;
 
@@ -10,8 +10,9 @@ use geo::{
 };
 
 use crate::construction::IsReal;
-use geo_types::{LineString, Point};
+use geo_types::{LineString, Point, MultiLineString};
 
+use rayon::prelude::*;
 
 #[extendr]
 /// Calculate Bearing
@@ -421,9 +422,8 @@ fn locate_point_on_line(x: List, y: List) -> Doubles {
         .collect::<Doubles>()
 }
 
-
-#[extendr]
 // wrapped and documented externally
+#[extendr]
 fn line_segmentize_(x: List, n: Integers) -> Robj {
 
     let n_x = x.len();
@@ -438,22 +438,38 @@ fn line_segmentize_(x: List, n: Integers) -> Robj {
         false => n
     };
 
-    let res_vec = x
-        .into_iter()
-        .zip(n.into_iter())
-        .map(|((_, xi), ni)| 
-            if xi.is_null() || ni.is_na() || ni.inner() < 1 {
-                NULL.into_robj()
-            } else {
-                LineString::from(Geom::from(xi))
-                    .line_segmentize(ni.inner() as usize)
-                    .unwrap().into_geom()
-                    .into_robj()
-            })
-        .collect::<Vec<Robj>>();
+    let x = geometry_from_list(x);
 
-    as_rsgeo_vctr(List::from_values(res_vec), "multilinestring")
+    let res_vec = x
+        .into_par_iter()
+        .zip(n.into_par_iter())
+        .map(|(xi, ni)| {
+            if ni.is_na() {
+                None
+            } else {
+                match xi {
+                    Some(g) => LineString::try_from(g)
+                        .unwrap()
+                        .line_segmentize(ni.inner() as usize),
+                    None => None
+                }
+            }
+        })
+        .collect::<Vec<Option<MultiLineString>>>();
+
+    
+    let res = 
+        res_vec
+            .into_iter()
+            .map(|xi| match xi {
+                Some(xi) => Geom::from(xi).into_robj(),
+                None => ().into_robj()
+            })
+            .collect::<Vec<Robj>>();
+
+    as_rsgeo_vctr(List::from_values(res), "multilinestring")
 }
+
 
 extendr_module! {
     mod query;
