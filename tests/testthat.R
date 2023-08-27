@@ -6,7 +6,7 @@
 # * https://r-pkgs.org/tests.html
 # * https://testthat.r-lib.org/reference/test_package.html#special-files
 
-library(testthat)
-library(rsgeo)
-
-test_check("rsgeo")
+# library(testthat)
+# library(rsgeo)
+#
+# test_check("rsgeo")

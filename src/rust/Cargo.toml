@@ -9,14 +9,13 @@ name = 'rsgeo'
 
 [dependencies]
 extendr-api = { version = "0.4.0" }
-# geo = { git = "https://github.com/georust/geo" }
-geo = { path = "../../../geo/geo" }
+geo = { git = "https://github.com/josiahparry/geo", branch = "segmentize"}
 geo-types = "0.7.8"
 geojson = "0.24.0"
 rayon = "1.7.0"
 rstar = "0.11.0"
 #wkb = "0.7.1"
 #wkt = "0.10.3"
-# sfconversions = { version = "0.2.0", git = "https://github.com/JosiahParry/sfconversions"}
-sfconversions = { path = "../../../sfconversions" }
+sfconversions = { git = "https://github.com/JosiahParry/sfconversions" }
+# sfconversions = { path = "../../../sfconversions" }
 

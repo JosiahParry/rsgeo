@@ -18,11 +18,14 @@ knitr::opts_chunk$set(
 `rsgeo` is an interface to the Rust libraries `geo-types` and `geo`. `geo-types` implements pure rust geometry primitives. The `geo` library adds additional algorithm functionalities on top of `geo-types`. This package lets you harness the speed, safety, and memory efficiency of these libraries. `geo-types` does not support Z or M dimensions. There is no support for CRS at this moment.
 
 ```{r}
-# remotes::install_github("josiahparry/rsgeo")
+# install.packages(
+#   'rsgeo', 
+#   repos = c('https://josiahparry.r-universe.dev', 'https://cloud.r-project.org')
+# )
 library(rsgeo)
 ```
 
-Create geometries from sf objects
+rsgeo works with vectors of geometries. When we compare this to `sf` this is always the geometry column which is a class `sfc` object (simple feature column).
 
 ```{r}
 # get geometry from sf
@@ -32,7 +35,7 @@ polys <- guerry[["geometry"]] |>
   sf::st_cast("POLYGON")
 
 # cast to rust geo-types
-rs_polys <- as_rsgeom(polys)
+rs_polys <- as_rsgeo(polys)
 
 head(rs_polys)
 ```
@@ -62,42 +65,41 @@ bench::mark(
   check = FALSE
 )
 ```
-Extract points as matrix
+Extract points coordinates
 
 ```{r}
-rs_polys |> 
-  centroids() |> 
-  as.matrix() |> 
+coords(rs_polys) |> 
   head()
 ```
 
 Plot the polygons and their centroids
+
 ```{r}
 plot(rs_polys)
 plot(centroids(rs_polys), add = TRUE)
 ```
 
-Calculate a distance matrix 
+Calculate a distance matrix. Note that there is often floating point error differences so `check = FALSE` in this case.
 
 ```{r}
 pnts <- centroids(rs_polys)
 pnts_sf <- sf::st_as_sfc(pnts)
 
 bench::mark(
-  rust = euclidean_distance_matrix(pnts, pnts),
-  sf = sf::st_distance(pnts_sf, pnts_sf)
+  rust = distance_euclidean_matrix(pnts, pnts),
+  sf = sf::st_distance(pnts_sf, pnts_sf),
+  check = FALSE
 )
 
 ```
 
-Simplify a geometry
+Simplify geometries. 
 
 ```{r}
-x <- rs_polys[[37]]
-x_simple <- simplify_geom(x, 5000)
+x <- rs_polys
+x_simple <- simplify_geoms(x, 5000)
 
-plot(x)
-plot(x_simple, add = TRUE)
+plot(x_simple)
 ```
 
 ```{r}
@@ -108,10 +110,35 @@ bench::mark(
 )
 ```
 
-Union geometries with `union_geoms()`
+Union geometries with `union_geoms()`. Some things sf is better at! One of which is performing unary unions of complex geometries.
+
 
 ```{r}
 plot(union_geoms(rs_polys))
+
+bench::mark(
+  union_geoms(rs_polys),
+  sf::st_union(polys),
+  check = FALSE
+)
+```
+
+We can cast between geometries as well.
+
+```{r}
+lns <- cast_geoms(rs_polys, "linestring")
+```
+
+Some unions are faster when using rsgeo vectors like linestrings. 
+
+```{r}
+lns_sf <- sf::st_cast(polys, "LINESTRING")
+
+bench::mark(
+  union_geoms(lns),
+  sf::st_union(lns_sf),
+  check = FALSE
+)
 ```
 
 
@@ -119,15 +146,15 @@ Find the closest point to a geometry
 
 ```{r}
 close_pnt <- closest_point(
-  rs_polys[[1]], 
+  rs_polys, 
   geom_point(800000, 2090000)
 )
 
-plot(rs_polys[[1]])
+plot(rs_polys[1])
 plot(close_pnt, pch = 15, add = TRUE)
 ```
 
-Find the haversine destination of a point, bearing, and distance. 
+Find the haversine destination of a point, bearing, and distance. Compare to the very fast geosphere destination point function. 
 
 ```{r}
 bench::mark(
@@ -143,11 +170,10 @@ origin <- geom_point(10, 10)
 
 destination <- haversine_destination(origin, 45, 10000)
 
-plot(origin)
-plot(destination, col = "blue", add = TRUE)
+plot(c(origin, destination), col = c("red", "blue"))
 ```
 
-Find intermediate point.
+Find intermediate point on a great circle.
 
 ```{r}
 middle <- haversine_intermediate(origin, destination, 1/2)
@@ -157,12 +183,12 @@ plot(destination, add = TRUE, col = "red")
 plot(middle, add = TRUE, col = "blue")
 ```
 
-Utilize the chaikin smoothing algorithm with 5 iterations.
+<!-- Utilize the chaikin smoothing algorithm with 5 iterations. -->
 
-```{r}
-region <- rs_polys[[2]]
-plot(chaikin_smoothing(region, 5))
-```
+<!-- ```{r} -->
+<!-- region <- rs_polys[[2]] -->
+<!-- plot(chaikin_smoothing(region, 5)) -->
+<!-- ``` -->
 
 Find extreme coordinates with `extreme_coords()`
 
@@ -170,49 +196,42 @@ Find extreme coordinates with `extreme_coords()`
 ```{r}
 france <- union_geoms(rs_polys)
 
-
 plot(france)
-plot(extreme_coords(france[[1]]), add = TRUE, pch = 15)
+plot(extreme_coords(france)[[1]], add = TRUE, pch = 15)
 ```
 
 Get bounding rectangles
 
 ```{r}
-rects <- bounding_rectangles(rs_polys)
+rects <- bounding_rect(rs_polys)
 plot(rects)
 ```
 
-Convext hulls
+Convex hulls
 
 ```{r}
-convex_hulls(rs_polys) |> 
+convex_hull(rs_polys) |> 
   plot()
 ```
 
-Cast geometries
+Expand into constituent geometries as a list of geometry vectors
 
 ```{r}
-lns <- cast_geoms(rs_polys, "linestring")
-head(lns)
+expand_geoms(rs_polys) |> 
+  head()
 ```
-
-Expand into constituent geometries. 
+We can flatten the resultant geometries into a single vector using `flatten_geoms()`
 
 ```{r}
-expand_geoms(rs_polys, flat = TRUE) |> 
+expand_geoms(rs_polys) |> 
+  flatten_geoms() |> 
   head()
 ```
 
-Combine geometries into a single geometry
+Combine geometries into a single multi- geometry
 
 ```{r}
 combine_geoms(lns)
-```
-
-Union geometries
-
-```{r}
-plot(union_geoms(rs_polys))
 ```
 
 
@@ -224,21 +243,21 @@ intersects_sparse(x, rs_polys)
 ```
 
 
-Convert to and from wkb and wkt
+<!-- Convert to and from wkb and wkt -->
 
-```{r}
-wkt <- wkt_from_geoms(x)
-wkt_to_geoms(wkt)
-```
+<!-- ```{r} -->
+<!-- wkt <- wkt_from_geoms(x) -->
+<!-- wkt_to_geoms(wkt) -->
+<!-- ``` -->
 
-```{r}
-wkb <- wkb_from_geoms(x)
-head(wkb[[1]])
+<!-- ```{r} -->
+<!-- wkb <- wkb_from_geoms(x) -->
+<!-- head(wkb[[1]]) -->
 
-wkb_to_geoms(wkb)
-```
+<!-- wkb_to_geoms(wkb) -->
+<!-- ``` -->
 
 
 #### Notes
 
-Right now plotting is done using `sf` by first casting into R native objects and then assigned the appropriate sf class. That object is then plotted by sf
+Right now plotting is done using `wk` by first casting the rsgeo into an sfc object.

@@ -3,6 +3,7 @@
 #' Given an `rsgeo` class object, extract the object's coordinates as a data frame.
 #' Empty or missing geometries are ignored.
 #'
+#' @param x an object of class `rsgeo`
 #' @returns
 #' A `data.frame` with columns `x`, `y`. Additional columns are returned based
 #' on the geometry type. Additional columns are:

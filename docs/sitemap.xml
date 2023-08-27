@@ -4,10 +4,25 @@
     <loc>/404.html</loc>
   </url>
   <url>
+    <loc>/LICENSE-text.html</loc>
+  </url>
+  <url>
+    <loc>/LICENSE.html</loc>
+  </url>
+  <url>
     <loc>/authors.html</loc>
   </url>
   <url>
     <loc>/index.html</loc>
+  </url>
+  <url>
+    <loc>/news/index.html</loc>
+  </url>
+  <url>
+    <loc>/reference/area.html</loc>
+  </url>
+  <url>
+    <loc>/reference/as_rsgeo.html</loc>
   </url>
   <url>
     <loc>/reference/as_rsgeom.html</loc>
@@ -28,6 +43,9 @@
     <loc>/reference/centroid.html</loc>
   </url>
   <url>
+    <loc>/reference/centroids.html</loc>
+  </url>
+  <url>
     <loc>/reference/chaikin_smoothing.html</loc>
   </url>
   <url>
@@ -37,10 +55,28 @@
     <loc>/reference/combine_geoms.html</loc>
   </url>
   <url>
+    <loc>/reference/construction.html</loc>
+  </url>
+  <url>
+    <loc>/reference/convex.html</loc>
+  </url>
+  <url>
+    <loc>/reference/coords.html</loc>
+  </url>
+  <url>
     <loc>/reference/distance.html</loc>
   </url>
   <url>
+    <loc>/reference/expand_geoms.html</loc>
+  </url>
+  <url>
     <loc>/reference/extreme_coords.html</loc>
+  </url>
+  <url>
+    <loc>/reference/flatten_geoms.html</loc>
+  </url>
+  <url>
+    <loc>/reference/frechet_distance.html</loc>
   </url>
   <url>
     <loc>/reference/geometry.html</loc>
@@ -55,6 +91,21 @@
     <loc>/reference/index.html</loc>
   </url>
   <url>
+    <loc>/reference/length.html</loc>
+  </url>
+  <url>
+    <loc>/reference/line_interpolate_point.html</loc>
+  </url>
+  <url>
+    <loc>/reference/line_segmentize.html</loc>
+  </url>
+  <url>
+    <loc>/reference/locate_point_on_line.html</loc>
+  </url>
+  <url>
+    <loc>/reference/plot.rsgeo.html</loc>
+  </url>
+  <url>
     <loc>/reference/predicates.html</loc>
   </url>
   <url>
@@ -67,7 +118,13 @@
     <loc>/reference/rstar_rtree.html</loc>
   </url>
   <url>
+    <loc>/reference/simplify.html</loc>
+  </url>
+  <url>
     <loc>/reference/simplify_geom.html</loc>
+  </url>
+  <url>
+    <loc>/reference/topology.html</loc>
   </url>
   <url>
     <loc>/reference/vector-compatibility.html</loc>

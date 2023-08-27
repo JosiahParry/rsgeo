@@ -21,27 +21,116 @@ to_sfc <- function(x) .Call(wrap__to_sfc, x)
 #' 
 #' @param x an object of class `rsgeo`
 #' 
-#'@export
+#' @export
+#' @examples
+#' lns <- geom_linestring(1:100, runif(100, -10, 10), rep.int(1:5, 20))
+#' centroids(lns)
+#' @returns an object of class `rs_POINT`
 centroids <- function(x) .Call(wrap__centroids, x)
 
+#' Identify a destination point
+#' 
+#' Given a vector of point geometries, bearings, and distances,
+#' identify a destination location.
+#' 
+#' @param x an object of class `rs_POINT`
+#' @param bearing a numeric vector specifying the degree of the direction where 0 is north
+#' @param distance a numeric vector specifying the distance to travel in the direction specified by `bearing` in meters
+#' @returns an object of class `rs_POINT` 
+#' @examples
+#' # create 10 points at the origin
+#' pnts <- geom_point(rep(0, 10), rep(0, 10))
+#' 
+#' # set seed for reproducibiliy
+#' set.seed(1)
+#' 
+#' # generate random bearings
+#' bearings <- runif(10, 0, 360)
+#' 
+#' # generate random distances
+#' distances <- runif(10, 10000, 100000)
+#' 
+#' # find the destinations
+#' dests <- haversine_destination(pnts, bearings, distances)
+#' 
+#' # plot points
+#' if (rlang::is_installed(c("sf", "wk"))) {
+#'   plot(pnts, pch = 3)
+#'   plot(dests, add = TRUE, pch = 17)
+#' }
+#' @export
 haversine_destination <- function(x, bearing, distance) .Call(wrap__haversine_destination, x, bearing, distance)
 
+#' Identifies a point between two points 
+#' 
+#' Identifies the location between two points on a great circle
+#' along a specified fraction of the distance. 
+#' 
 #' @param x an `rs_POINT` vector
 #' @param y an `rs_POINT` vector
-#' @param distance a numeric vector of either length 1 or the same length as x and y.
+#' 
+#' @param distance a numeric vector of either length 1 or the same length as x and y 
+#' 
+#' @returns an object of class `rs_POINT`
+#' 
+#' @examples
+#' x <- geom_point(1:10, rep(5, 10))
+#' y <- geom_point(1:10, rep(0, 10))
+#' res <- haversine_intermediate(x, y, 0.5)
+#' if (rlang::is_installed(c("wk", "sf"))) {
+#'   plot(
+#'     c(x, y, res),
+#'     col = sort(rep.int(c("red", "blue", "purple"), 10)),
+#'     pch = 16
+#'   )
+#' }
+#' @export
 haversine_intermediate <- function(x, y, distance) .Call(wrap__haversine_intermediate, x, y, distance)
 
 #' Calculate the area of a polygon
 #' 
 #' Functions to calculate different types of area for polygons. 
+#' 
 #' @param x an object of class `rsgeo`
 #' @export
 #' @rdname area
+#' @returns a numeric vector of the area contained by the geometry
+#' @details
+#' 
+#' - functions assume counter clock-wise winding in accordance with the simple feature
+#' access standard
+#' - functions ending in `_cd` use the Chamberlain-Duquette algorithm for spherical area
+#' - Chamberlain-Duquette and Geodesic areas are returned in meters squared and assume non-planar geometries
+#' 
+#' See geo docs for more:
+#' 
+#' - [GeodesicArea](https://docs.rs/geo/latest/geo/algorithm/geodesic_area/trait.GeodesicArea.html#)
+#' - [Area](https://docs.rs/geo/latest/geo/algorithm/area/trait.Area.html#)
+#' - [ChamberlainDuquetteArea](https://docs.rs/geo/latest/geo/algorithm/chamberlain_duquette_area/trait.ChamberlainDuquetteArea.html)
+#' 
+#' x <- c(0, 1, 1, 0, 0)
+#' y <- c(0, 0, 1, 1, 0)
+#' p <- geom_polygon(x, y)
+#' 
+#' signed_area(p)
+#' unsigned_area(p)
+#' signed_area_cd(p)
+#' unsigned_area_cd(p)
+#' signed_area_geodesic(p)
+#' unsigned_area_geodesic(p)
 signed_area <- function(x) .Call(wrap__signed_area, x)
 
 #' @export
 #' @rdname area
 unsigned_area <- function(x) .Call(wrap__unsigned_area, x)
+
+#' @export
+#' @rdname area
+signed_area_cd <- function(x) .Call(wrap__signed_area_cd, x)
+
+#' @export
+#' @rdname area
+unsigned_area_cd <- function(x) .Call(wrap__unsigned_area_cd, x)
 
 #' @export
 #' @rdname area
@@ -79,6 +168,7 @@ unsigned_area_geodesic <- function(x) .Call(wrap__unsigned_area_geodesic, x)
 #' length_haversine(ln)
 #' @export
 #' @rdname length
+#' @returns A numeric vector 
 length_euclidean <- function(x) .Call(wrap__length_euclidean, x)
 
 #' @export
@@ -143,9 +233,25 @@ closest_point_haversine <- function(x, y) .Call(wrap__closest_point_haversine, x
 #' For a given `rs_LINESTRING` vector, test its convexity. Convexity can be tested
 #' strictly or strongly, as well as based on winding.
 #' 
+#' @param x an object of class `rs_LINESTRING`
+#' 
 #' See [`geo` docs for further details](https://docs.rs/geo/latest/geo/algorithm/is_convex/trait.IsConvex.html)
 #' @export
 #' @rdname convex
+#' @returns a logical vector 
+#' @examples
+#' lns <- geom_linestring(
+#'     1:20,
+#'     runif(20, -5, 5),
+#'     rep.int(1:5, 4)
+#'   )
+#'   
+#' is_convex(lns)
+#' is_cw_convex(lns)
+#' is_ccw_convex(lns)
+#' is_strictly_convex(lns)
+#' is_strictly_cw_convex(lns)
+#' is_strictly_ccw_convex(lns)
 is_convex <- function(x) .Call(wrap__is_convex, x)
 
 #' @export
@@ -173,7 +279,7 @@ is_strictly_cw_convex <- function(x) .Call(wrap__is_strictly_cw_convex, x)
 #' Finds the point that lies a given fraction along a line.
 #' 
 #' @param x an object of class `rs_LINESTRING`
-#' @param y a numeric vector of the same length as `x` or length 1
+#' @param fraction a numeric vector of length 1 or the same length as `x`. Must be a value between 0 and 1 inclusive.
 #' 
 #' @export
 #' @returns 
@@ -229,21 +335,40 @@ extreme_coords <- function(x) .Call(wrap__extreme_coords, x)
 
 #' Compute Geometric Boundaries
 #'
+#' From a vector of geometries idenitfy different types of boundaries.
+#' 
+#' Note that if you want a convex or concave hull over an entire vector of geometries 
+#' you must first union or combine them using either `combine_geoms()` or `union_geoms()`
+#' 
+#' @param x an object of class `rsgeo`
+#' @param concavity a value between 0 and 1 specifying the concavity of the convex hull
+#' 
 #' @export
 #' @rdname boundaries
-#' @param x a rust geometry either a scalar or a vector for functions ending in `s`. See "Details" for more.
-#'
-#' @details
-#'
+#' 
+#' @examples
+#' lns <- geom_linestring(
+#'   1:20,
+#'   runif(20, -5, 5),
+#'   rep.int(1:5, 4)
+#' )
+#' bounding_box(lns)
+#' bounding_boxes(lns)
+#' minimum_rotated_rect(lns)
+#' convex_hull(lns)
+#' concave_hull(lns, 0.5)
+#' extreme_coords(lns)
+#' 
+#' @returns 
+#' 
 #' - `bounding_box()` returns a named vector of xmin, ymin, xmax, and ymax
-#' - `bounding_boxes()` returns a list of bounding 
-#' - `bounding_rectangle()` returns a polygon of the bounding rectangle
-#' - `convex_hull()` returns a polygon of the convex hull for each geometry
-#' - `concave_hull()` returns a polygon of the specified concavity for each geometry
-#' - `extreme_coords()` returns the extreme coordinates of a geometry as a named vector of xmin, ymin, xmax, and ymax where each element is a `Point` geometry of the extreme value
-#' - `minimum_rotated_rect()` returns the minimum rotated rectangle covering a geometry
-#' Note that if you want a convex or concave hull over an entire vector of geometries 
-#' you must first union or combine them. 
+#' - `bounding_boxes()` returns a list of bounding box numeric vectors for each geometry
+#' - `bounding_rect()` returns an `rs_POLYGON` of the bounding rectangle of each geometry 
+#' - `convex_hull()` returns an `rs_POLYGON` of the convex hull for each geometry
+#' - `concave_hull()` returns an `rs_POLYGON` of the specified concavity for each geometry
+#' - `extreme_coords()` returns the extreme coordinates of each geometry as a list where each element
+#'  is a named vector of xmin, ymin, xmax, and ymax where each element is a `Point` geometry of the extreme value
+#' - `minimum_rotated_rect()` returns the minimum rotated rectangle covering a geometry as an `rs_POLYGON`
 bounding_box <- function(x) .Call(wrap__bounding_box, x)
 
 simplify_geoms_ <- function(x, epsilon) .Call(wrap__simplify_geoms_, x, epsilon)
@@ -302,9 +427,7 @@ within_sparse <- function(x, y) .Call(wrap__within_sparse, x, y)
 #' @rdname topology
 within_pairwise <- function(x, y) .Call(wrap__within_pairwise, x, y)
 
-#' @export
-#' @rdname construction
-geom_point <- function(x, y) .Call(wrap__geom_point, x, y)
+geom_point_ <- function(x, y) .Call(wrap__geom_point_, x, y)
 
 geom_multipoint_ <- function(x, y, id) .Call(wrap__geom_multipoint_, x, y, id)
 
@@ -312,6 +435,7 @@ geom_linestring_ <- function(x, y, id) .Call(wrap__geom_linestring_, x, y, id)
 
 geom_polygon_ <- function(x, y, id, ring) .Call(wrap__geom_polygon_, x, y, id, ring)
 
+#' Union Geometries
 #' @export
 #' @rdname combine_geoms
 union_geoms <- function(x) .Call(wrap__union_geoms, x)
@@ -342,6 +466,32 @@ expand_multipoint <- function(x) .Call(wrap__expand_multipoint, x)
 
 expand_polygon <- function(x) .Call(wrap__expand_polygon, x)
 
+#' Expand Geometries 
+#' 
+#' Expands geometries into a list of vectors of their components. 
+#' 
+#' @param x an object of class `rsgeo`
+#' 
+#' @details
+#' 
+#' - `rs_MULTIPOINT` expands into a vector of points
+#' - `rs_LINESTRING` expands into a vector points
+#' - `rs_MULTILINESTRING` expands into a vector of linestrings
+#' - `rs_POLYGON` expands into a vector of linestrings
+#' - `rs_MULTIPOLYGON` expands into a vector of polygons
+#' 
+#' If you wish to have a single vector returned, pass the results
+#' into `flatten_geoms()`.
+#' 
+#' @returns
+#' 
+#' A list of `rsgeo` vectors containing each original geometry's
+#' components as a new vector.
+#' 
+#' @export
+#' @examples
+#' mpnts <- geom_multipoint(runif(10), runif(10), rep.int(1:5, 2))
+#' expand_geoms(mpnts)
 expand_geoms <- function(x) .Call(wrap__expand_geoms, x)
 
 combine_points <- function(x) .Call(wrap__combine_points, x)
@@ -408,6 +558,10 @@ multipolygon_to_coords <- function(x) .Call(wrap__multipolygon_to_coords, x)
 #' distance_vicenty_pairwise(x, y)
 #' distance_geodesic_pairwise(x, y)
 #' distance_haversine_pairwise(x, y)
+#' @returns
+#' 
+#' For `_matrix` functions, returns a dense matrix of distances whereas `_pairwise`
+#' functions return a numeric vector.
 distance_euclidean_pairwise <- function(x, y) .Call(wrap__distance_euclidean_pairwise, x, y)
 
 #' @export

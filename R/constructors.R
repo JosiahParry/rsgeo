@@ -15,6 +15,11 @@
 #' geom_multipoint(1:10, 10:1)
 #' geom_linestring(1:10, 10:1)
 #' geom_polygon(c(0, 1, 1, 0, 0), c(0, 0, 1, 1, 0))
+#' @returns an object of class `rsgeo`
+geom_point <- function(x, y) geom_point_(as.double(x), as.double(y))
+
+#' @export
+#' @rdname construction
 geom_multipoint <- function(x, y, id = 1) {
   geom_multipoint_(as.double(x), as.double(y), as.integer(id))
 }

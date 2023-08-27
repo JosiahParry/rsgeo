@@ -6,7 +6,7 @@ st_as_sfc.rsgeo <- function(x) {
     geoms,
     class = new_class,
     bbox = bbox,
-    crs = NA,
+    crs = sf::st_crs(NA),
     precision = 0
   )
 }
@@ -26,6 +26,7 @@ wk_crs.rsgeo <- function(x) NA
 #' handled by first converting to an `sfc` object in the `wk::wk_handle()`
 #' method thus requiring both packages for plotting.
 #'
+#' @param x an object of class `rsgeo`
 #' @param ... arguments passed to `wk::wk_plot()`
 #'
 #' @export
