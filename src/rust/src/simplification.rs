@@ -1,98 +1,138 @@
-use crate::geoms::*;
-use crate::types::Geom;
 use extendr_api::prelude::*;
-use geo::{Geometry, Simplify, SimplifyVW};
+use geo::{Simplify, SimplifyVw, SimplifyVwPreserve};
+use geo_types::Geometry;
+use sfconversions::{Geom, vctrs::{as_rsgeo_vctr, rsgeo_type}};
 
-/// Simplfiy Geometries
-/// @export
 #[extendr]
-fn simplify_geom(x: Robj, epsilon: f64) -> Robj {
-    // check for a valid class
-    let is_lns = x.inherits("linestring");
-    let is_mlns = x.inherits("multilinestring");
-    let is_mply = x.inherits("multipolygon");
-    let is_ply = x.inherits("polygon");
-    let all_inheritances = [is_lns, is_mlns, is_mply, is_ply];
-    let check = all_inheritances.into_iter().any(|cls| cls);
+fn simplify_geoms_(x: List, epsilon: Doubles) -> Robj {
+    let n_e = epsilon.len();
+    let n_x = x.len();
 
-    if !check {
-        panic!("`x` is an invalid geometry type")
+    if (n_x != n_e) && (n_e != 1) {
+        panic!("`epsilon` must be the same length as `x` or length `1`");
     }
-
-    let x = Geom::from(x).geom;
-
-    let res_geom = match x {
-        Geometry::LineString(geom) => Geom::from(geom.simplify(&epsilon)),
-        Geometry::MultiLineString(geom) => Geom::from(geom.simplify(&epsilon)),
-        Geometry::Polygon(geom) => Geom::from(geom.simplify(&epsilon)),
-        Geometry::MultiPolygon(geom) => Geom::from(geom.simplify(&epsilon)),
-        _ => Geom::from(geo::point!(x: 0.0, y: 0.0)),
+    let epsilon = if n_e == 1 {
+        Doubles::from_values(vec![epsilon[0].inner(); n_x])
+    } else {
+        epsilon
     };
 
-    to_pntr(res_geom)
+    // determine the input class the output must be the same type
+    let cls = rsgeo_type(&x);
+
+    let res_vec = x.iter()
+        .zip(epsilon.iter())
+        .map(|((_, xi), ei)| {
+            if xi.is_null() || ei.is_na() || ei.is_infinite() || ei.is_nan() {
+                NULL.into_robj()
+            } else {
+                let geom = Geom::try_from(xi).unwrap().geom;
+                let ei = ei.inner();
+
+                match geom {
+                    Geometry::LineString(geom) => Geom::from(geom.simplify(&ei)).into(),
+                    Geometry::MultiLineString(geom) => Geom::from(geom.simplify(&ei)).into(),
+                    Geometry::Polygon(geom) => Geom::from(geom.simplify(&ei)).into(),
+                    Geometry::MultiPolygon(geom) => Geom::from(geom.simplify(&ei)).into(),
+                    _ => NULL.into_robj(),
+                }
+            }
+        })
+        .collect::<Vec<Robj>>();
+    
+    as_rsgeo_vctr(List::from_values(res_vec), cls.as_str())
+
 }
 
-/// @export
-/// @rdname simplify_geom
 #[extendr]
-fn simplify_geoms(x: List, epsilon: f64) -> Robj {
-    let cls = x.class().unwrap();
+fn simplify_vw_geoms_(x: List, epsilon: Doubles) -> Robj {
+    let n_e = epsilon.len();
+    let n_x = x.len();
 
-    let res = x
-        .into_iter()
-        .map(|(_, x)| simplify_geom(x, epsilon))
-        .collect::<List>();
-
-    res.set_class(cls).unwrap()
-}
-
-/// @export
-/// @rdname simplify_geom
-#[extendr]
-fn simplify_vw_geom(x: Robj, epsilon: f64) -> Robj {
-    // check for a valid class
-    let is_lns = x.inherits("linestring");
-    let is_mlns = x.inherits("multilinestring");
-    let is_mply = x.inherits("multipolygon");
-    let is_ply = x.inherits("polygon");
-    let all_inheritances = [is_lns, is_mlns, is_mply, is_ply];
-    let check = all_inheritances.into_iter().any(|cls| cls);
-
-    if !check {
-        panic!("`x` is an invalid geometry type")
+    if (n_x != n_e) && (n_e != 1) {
+        panic!("`epsilon` must be the same length as `x` or length `1`");
     }
-
-    let x = Geom::from(x).geom;
-
-    let res_geom = match x {
-        Geometry::LineString(geom) => Geom::from(geom.simplifyvw(&epsilon)),
-        Geometry::MultiLineString(geom) => Geom::from(geom.simplifyvw(&epsilon)),
-        Geometry::Polygon(geom) => Geom::from(geom.simplifyvw(&epsilon)),
-        Geometry::MultiPolygon(geom) => Geom::from(geom.simplifyvw(&epsilon)),
-        _ => Geom::from(geo::point!(x: 0.0, y: 0.0)),
+    let epsilon = if n_e == 1 {
+        Doubles::from_values(vec![epsilon[0].inner(); n_x])
+    } else {
+        epsilon
     };
 
-    to_pntr(res_geom)
+    // determine the input class the output must be the same type
+    let cls = rsgeo_type(&x);
+
+    let res_vec = x.iter()
+        .zip(epsilon.iter())
+        .map(|((_, xi), ei)| {
+            if xi.is_null() || ei.is_na() || ei.is_infinite() || ei.is_nan() {
+                NULL.into_robj()
+            } else {
+                let geom = Geom::try_from(xi).unwrap().geom;
+                let ei = ei.inner();
+
+                match geom {
+                    Geometry::LineString(geom) => Geom::from(geom.simplify_vw(&ei)).into(),
+                    Geometry::MultiLineString(geom) => Geom::from(geom.simplify_vw(&ei)).into(),
+                    Geometry::Polygon(geom) => Geom::from(geom.simplify_vw(&ei)).into(),
+                    Geometry::MultiPolygon(geom) => Geom::from(geom.simplify_vw(&ei)).into(),
+                    _ => NULL.into_robj(),
+                }
+            }
+        })
+        .collect::<Vec<Robj>>();
+
+    as_rsgeo_vctr(List::from_values(res_vec), cls.as_str())
+
 }
 
-/// @export
-/// @rdname simplify_geom
 #[extendr]
-fn simplify_vw_geoms(x: List, epsilon: f64) -> Robj {
-    let cls = x.class().unwrap();
+fn simplify_vw_preserve_geoms_(x: List, epsilon: Doubles) -> Robj {
+    let n_e = epsilon.len();
+    let n_x = x.len();
 
-    let res = x
-        .into_iter()
-        .map(|(_, x)| simplify_geom(x, epsilon))
-        .collect::<List>();
+    if (n_x != n_e) && (n_e != 1) {
+        panic!("`epsilon` must be the same length as `x` or length `1`");
+    }
+    let epsilon = if n_e == 1 {
+        Doubles::from_values(vec![epsilon[0].inner(); n_x])
+    } else {
+        epsilon
+    };
 
-    res.set_class(cls).unwrap()
+    // determine the input class the output must be the same type
+    let cls = rsgeo_type(&x);
+
+    let res_vec = x.iter()
+        .zip(epsilon.iter())
+        .map(|((_, xi), ei)| {
+            if xi.is_null() || ei.is_na() || ei.is_infinite() || ei.is_nan() {
+                NULL.into_robj()
+            } else {
+                let geom = Geom::try_from(xi).unwrap().geom;
+                let ei = ei.inner();
+
+                match geom {
+                    Geometry::LineString(geom) => Geom::from(geom.simplify_vw_preserve(&ei)).into(),
+                    Geometry::MultiLineString(geom) => {
+                        Geom::from(geom.simplify_vw_preserve(&ei)).into()
+                    }
+                    Geometry::Polygon(geom) => Geom::from(geom.simplify_vw_preserve(&ei)).into(),
+                    Geometry::MultiPolygon(geom) => {
+                        Geom::from(geom.simplify_vw_preserve(&ei)).into()
+                    }
+                    _ => NULL.into_robj(),
+                }
+            }
+        })
+        .collect::<Vec<Robj>>();
+
+    as_rsgeo_vctr(List::from_values(res_vec), cls.as_str())
+
 }
 
 extendr_module! {
     mod simplification;
-    fn simplify_geom;
-    fn simplify_geoms;
-    fn simplify_vw_geom;
-    fn simplify_vw_geoms;
+    fn simplify_geoms_;
+    fn simplify_vw_geoms_;
+    fn simplify_vw_preserve_geoms_;
 }

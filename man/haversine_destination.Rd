@@ -2,10 +2,43 @@
 % Please edit documentation in R/extendr-wrappers.R
 \name{haversine_destination}
 \alias{haversine_destination}
-\title{Haversine Destination}
+\title{Identify a destination point}
 \usage{
 haversine_destination(x, bearing, distance)
 }
+\arguments{
+\item{x}{an object of class \code{rs_POINT}}
+
+\item{bearing}{a numeric vector specifying the degree of the direction where 0 is north}
+
+\item{distance}{a numeric vector specifying the distance to travel in the direction specified by \code{bearing} in meters}
+}
+\value{
+an object of class \code{rs_POINT}
+}
 \description{
-Haversine Destination
+Given a vector of point geometries, bearings, and distances,
+identify a destination location.
+}
+\examples{
+# create 10 points at the origin
+pnts <- geom_point(rep(0, 10), rep(0, 10))
+
+# set seed for reproducibiliy
+set.seed(1)
+
+# generate random bearings
+bearings <- runif(10, 0, 360)
+
+# generate random distances
+distances <- runif(10, 10000, 100000)
+
+# find the destinations
+dests <- haversine_destination(pnts, bearings, distances)
+
+# plot points
+if (rlang::is_installed(c("sf", "wk"))) {
+  plot(pnts, pch = 3)
+  plot(dests, add = TRUE, pch = 17)
+}
 }

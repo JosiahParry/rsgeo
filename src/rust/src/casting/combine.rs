@@ -1,9 +1,12 @@
+use extendr_api::list;
 use extendr_api::prelude::*;
 use geo_types::*;
+// use sfconversions::vctrs::geom_class;
 //use crate::utils::geom_class;
-use crate::geoms::from_list;
-use crate::to_pntr;
-use crate::types::Geom;
+use sfconversions::{
+    vctrs::{as_rsgeo_vctr, verify_rsgeo},
+    Geom,
+};
 
 // COMBINE ------------------------------------------------------------------------
 
@@ -13,62 +16,74 @@ use crate::types::Geom;
 
 #[extendr]
 fn combine_points(x: List) -> Robj {
-    let x = from_list(x)
+    verify_rsgeo(&x);
+    let x = x
         .into_iter()
-        .map(|x| Point::try_from(x.geom).unwrap())
+        .map(|(_, x)| Point::try_from(Geom::from(x).geom).unwrap())
         .collect::<Vec<Point>>();
 
-    to_pntr(Geom::from(MultiPoint::from(x)))
+    let res = Geom::from(MultiPoint::from(x));
+    as_rsgeo_vctr(list!(res), "point")
 }
 
 #[extendr]
 fn combine_multipoints(x: List) -> Robj {
-    let x = from_list(x)
+    verify_rsgeo(&x);
+    let x = x
         .into_iter()
-        .flat_map(|x| MultiPoint::try_from(x.geom).unwrap().0)
+        .flat_map(|(_, x)| MultiPoint::try_from(Geom::from(x).geom).unwrap().0)
         .collect::<Vec<Point>>();
 
-    to_pntr(Geom::from(MultiPoint::from(x)))
+    let res = Geom::from(MultiPoint::from(x));
+    as_rsgeo_vctr(list!(res), "multipoint")
 }
 
 #[extendr]
 fn combine_linestrings(x: List) -> Robj {
-    let x = from_list(x)
+    verify_rsgeo(&x);
+    let x = x
         .into_iter()
-        .map(|x| LineString::try_from(x.geom).unwrap())
+        .map(|(_, x)| LineString::try_from(Geom::from(x).geom).unwrap())
         .collect::<Vec<LineString>>();
 
-    to_pntr(Geom::from(MultiLineString::new(x)))
+    let res = Geom::from(MultiLineString::new(x));
+    as_rsgeo_vctr(list!(res), "linestring")
 }
 
 #[extendr]
 fn combine_multilinestrings(x: List) -> Robj {
-    let x = from_list(x)
+    verify_rsgeo(&x);
+    let x = x
         .into_iter()
-        .flat_map(|x| MultiLineString::try_from(x.geom).unwrap().0)
+        .flat_map(|(_, x)| MultiLineString::from(Geom::from(x)).0)
         .collect::<Vec<LineString>>();
 
-    to_pntr(Geom::from(MultiLineString::new(x)))
+    let res = Geom::from(MultiLineString::new(x));
+    as_rsgeo_vctr(list!(res), "multilinestring")
 }
 
 #[extendr]
 fn combine_polygons(x: List) -> Robj {
-    let x = from_list(x)
+    verify_rsgeo(&x);
+    let x = x
         .into_iter()
-        .map(|x| Polygon::try_from(x.geom).unwrap())
+        .map(|(_, x)| Polygon::try_from(Geom::from(x).geom).unwrap())
         .collect::<Vec<Polygon>>();
 
-    to_pntr(Geom::from(MultiPolygon::new(x)))
+    let res = Geom::from(MultiPolygon::new(x));
+    as_rsgeo_vctr(list!(res), "polygon")
 }
 
 #[extendr]
 fn combine_multipolygons(x: List) -> Robj {
-    let x = from_list(x)
+    verify_rsgeo(&x);
+    let x = x
         .into_iter()
-        .flat_map(|x| MultiPolygon::try_from(x.geom).unwrap().0)
+        .flat_map(|(_, x)| MultiPolygon::try_from(Geom::from(x).geom).unwrap().0)
         .collect::<Vec<Polygon>>();
 
-    to_pntr(Geom::from(MultiPolygon::new(x)))
+    let res = Geom::from(MultiPolygon::new(x));
+    as_rsgeo_vctr(list!(res), "multipolygon")
 }
 
 extendr_module! {

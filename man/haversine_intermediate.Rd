@@ -2,10 +2,33 @@
 % Please edit documentation in R/extendr-wrappers.R
 \name{haversine_intermediate}
 \alias{haversine_intermediate}
-\title{Haversine Intermediate}
+\title{Identifies a point between two points}
 \usage{
 haversine_intermediate(x, y, distance)
 }
+\arguments{
+\item{x}{an \code{rs_POINT} vector}
+
+\item{y}{an \code{rs_POINT} vector}
+
+\item{distance}{a numeric vector of either length 1 or the same length as x and y}
+}
+\value{
+an object of class \code{rs_POINT}
+}
 \description{
-Haversine Intermediate
+Identifies the location between two points on a great circle
+along a specified fraction of the distance.
+}
+\examples{
+x <- geom_point(1:10, rep(5, 10))
+y <- geom_point(1:10, rep(0, 10))
+res <- haversine_intermediate(x, y, 0.5)
+if (rlang::is_installed(c("wk", "sf"))) {
+  plot(
+    c(x, y, res),
+    col = sort(rep.int(c("red", "blue", "purple"), 10)),
+    pch = 16
+  )
+}
 }

@@ -2,15 +2,29 @@
 % Please edit documentation in R/extendr-wrappers.R
 \name{closest_point}
 \alias{closest_point}
-\title{Find the closest point}
+\alias{closest_point_haversine}
+\title{Find Closest Point}
 \usage{
 closest_point(x, y)
+
+closest_point_haversine(x, y)
 }
 \arguments{
-\item{x}{a single geometry}
+\item{x}{an object of class \code{rsgeo}}
 
-\item{y}{a \code{point}}
+\item{y}{an object of class \code{rs_POINT}}
+}
+\value{
+An \code{rs_POINT} vector
 }
 \description{
-Find the closest point
+For a given geometry, find the closest point on that geometry
+to a point. The closest point may be an intersection, a single point,
+or unable to be determined.
+}
+\examples{
+x <- geom_linestring(1:100, runif(100, 0, 90), rep.int(1:10, 10))
+y <- geom_point(runif(10, 0, 90), rnorm(10, 1, 90))
+closest_point(x, y)
+closest_point_haversine(x, y)
 }

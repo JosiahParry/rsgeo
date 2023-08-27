@@ -1,206 +1,295 @@
 use extendr_api::prelude::*;
 use geo::{Contains, Intersects, Within};
 
-use crate::types::Geom;
-use crate::{geoms::from_list, spatial_index::create_rtree};
+use crate::spatial_index::create_cached_rtree;
+use rstar::RTreeObject;
+use sfconversions::{Geom, geometry_from_list};
 
-// Contains
-#[extendr]
-/// Spatial Predicates
-/// @export
-/// @rdname predicates
-fn contains_sparse(x: List, y: List) -> List {
-    let x = from_list(x);
-    let y = from_list(y);
+use rayon::prelude::*;
+use std::sync::Mutex;
 
-    let xtree = create_rtree(x.clone());
-    let ytree = create_rtree(y.clone());
-
-    let cands = xtree.intersection_candidates_with_other_tree(&ytree);
-
-    let res_cands = cands
-        .map(|(x, y)| (x.data, y.data))
-        .collect::<Vec<(usize, usize)>>();
-
-    // need to create a sparse representation now
-    let nx = x.len();
-    let ny = y.len();
-    let mut res: Vec<Vec<i32>> = Vec::with_capacity(nx);
-
-    // allocate internal vecs
-    for _ in 0..nx {
-        res.push(Vec::with_capacity(ny))
-    }
-
-    for (xin, yin) in res_cands.into_iter() {
-        //if yin == 0 { continue; }
-        if x[xin].geom.contains(&y[yin].geom) {
-            res[xin].push((yin as i32) + 1)
-        }
-    }
-
-    List::from_values(res)
-}
 
 #[extendr]
+/// Binary Predicates
+/// 
+/// Functions to ascertain the binary relationship between 
+/// two geometry vectors. Binary predicates are provided both pairwise 
+/// as a sparse matrix.
+/// 
+/// @param x an object of class `rsgeo`
+/// @param y an object of class `rsgeo`
+/// 
 /// @export
-/// @rdname predicates  
-fn contains(x: Robj, y: List) -> Vec<bool> {
-    let x = Geom::from(x);
-    let y = from_list(y);
-
-    y.into_iter()
-        .map(|y| x.geom.contains(&y.geom))
-        .collect::<Vec<bool>>()
-}
-
-#[extendr]
-/// @export
-/// @rdname predicates
-fn contains_pairwise(x: List, y: List) -> Vec<bool> {
-    let x = from_list(x);
-    let y = from_list(y);
-
-    x.into_iter()
-        .enumerate()
-        .map(|(i, xi)| xi.geom.contains(&y[i].geom))
-        .collect::<Vec<bool>>()
-}
-
-// Intersects ------------------------------------------------------------------------
-
-#[extendr]
-/// @export
-/// @rdname predicates
+/// @rdname topology
 fn intersects_sparse(x: List, y: List) -> List {
-    let x = from_list(x);
-    let y = from_list(y);
 
-    let xtree = create_rtree(x.clone());
-    let ytree = create_rtree(y.clone());
-
-    let cands = xtree.intersection_candidates_with_other_tree(&ytree);
-
-    let res_cands = cands
-        .map(|(x, y)| (x.data, y.data))
-        .collect::<Vec<(usize, usize)>>();
-
-    // need to create a sparse representation now
-    let nx = x.len();
-    let ny = y.len();
-    let mut res: Vec<Vec<i32>> = Vec::with_capacity(nx);
-
-    // allocate internal vecs
-    for _ in 0..nx {
-        res.push(Vec::with_capacity(ny))
+    if !x.inherits("rsgeo") || !y.inherits("rsgeo") {
+        panic!("`x` and `y` must be of class `rsgeo`")
     }
 
-    for (xin, yin) in res_cands.into_iter() {
-        //if yin == 0 { continue; }
-        if x[xin].geom.intersects(&y[yin].geom) {
-            res[xin].push((yin as i32) + 1)
-        }
-    }
+    let n = x.len();
+    let xtree = create_cached_rtree(x);
 
-    List::from_values(res)
-}
+    let y = geometry_from_list(y);
+    let index = Mutex::new(vec![Vec::with_capacity(n); n]);
 
-#[extendr]
-/// @export
-/// @rdname predicates
-fn intersects(x: Robj, y: List) -> Vec<bool> {
-    let x = Geom::from(x);
-    let y = from_list(y);
-
-    y.into_iter()
-        .map(|y| x.geom.intersects(&y.geom))
-        .collect::<Vec<bool>>()
-}
-
-#[extendr]
-/// @export
-/// @rdname predicates
-fn intersects_pairwise(x: List, y: List) -> Vec<bool> {
-    let x = from_list(x);
-    let y = from_list(y);
-
-    x.into_iter()
+    y
+        .into_par_iter()
         .enumerate()
-        .map(|(i, xi)| xi.geom.intersects(&y[i].geom))
-        .collect::<Vec<bool>>()
+        .for_each(|(i, yi)| {
+            if let Some(yi) = yi {
+                let yi = Geom::from(yi);
+                let env = yi.envelope();
+                let cands = xtree.locate_in_envelope_intersecting(&env);
+
+                cands.for_each(|cnd| {
+                    if yi.geom.intersects(&cnd.geom().geom) {
+                        let mut ind = index.lock().unwrap();
+                        ind[cnd.data].push((i as i32) + 1)
+                    }})
+            }
+        });
+
+    let mut index = index.into_inner().unwrap();
+
+    // we sort the results because the order will be different
+    // each and every time. we need the result to be reproducible
+    index
+        .par_iter_mut()
+        .for_each(|xi| xi.sort());   
+
+    List::from_values(index)
 }
 
-// Within ------------------------------------------------------------------
+
 #[extendr]
 /// @export
-/// @rdname predicates
+/// @rdname topology
+fn contains_sparse(x: List, y: List) -> List {
+
+    if !x.inherits("rsgeo") || !y.inherits("rsgeo") {
+        panic!("`x` and `y` must be of class `rsgeo`")
+    }
+
+    let n = x.len();
+    let xtree = create_cached_rtree(x);
+
+    let y = geometry_from_list(y);
+    let index = Mutex::new(vec![Vec::with_capacity(n); n]);
+
+    y
+        .into_par_iter()
+        .enumerate()
+        .for_each(|(i, yi)| {
+            if let Some(yi) = yi {
+                let yi = Geom::from(yi);
+                let env = yi.envelope();
+                let cands = xtree.locate_in_envelope_intersecting(&env);
+
+                cands.for_each(|cnd| {
+                    if yi.geom.contains(&cnd.geom().geom) {
+                        let mut ind = index.lock().unwrap();
+                        ind[cnd.data].push((i as i32) + 1)
+                    }})
+            }
+        });
+
+    let mut index = index.into_inner().unwrap();
+
+    index
+        .par_iter_mut()
+        .for_each(|xi| xi.sort());   
+
+    List::from_values(index)
+}
+
+#[extendr]
+/// @export
+/// @rdname topology
 fn within_sparse(x: List, y: List) -> List {
-    let x = from_list(x);
-    let y = from_list(y);
 
-    let xtree = create_rtree(x.clone());
-    let ytree = create_rtree(y.clone());
-
-    let cands = xtree.intersection_candidates_with_other_tree(&ytree);
-
-    let res_cands = cands
-        .map(|(x, y)| (x.data, y.data))
-        .collect::<Vec<(usize, usize)>>();
-
-    // need to create a sparse representation now
-    let nx = x.len();
-    let ny = y.len();
-    let mut res: Vec<Vec<i32>> = Vec::with_capacity(nx);
-
-    // allocate internal vecs
-    for _ in 0..nx {
-        res.push(Vec::with_capacity(ny))
+    if !x.inherits("rsgeo") || !y.inherits("rsgeo") {
+        panic!("`x` and `y` must be of class `rsgeo`")
     }
 
-    for (xin, yin) in res_cands.into_iter() {
-        //if yin == 0 { continue; }
-        if x[xin].geom.is_within(&y[yin].geom) {
-            res[xin].push((yin as i32) + 1)
-        }
-    }
+    let n = x.len();
+    let xtree = create_cached_rtree(x);
 
-    List::from_values(res)
-}
+    let y = geometry_from_list(y);
+    let index = Mutex::new(vec![Vec::with_capacity(n); n]);
 
-#[extendr]
-/// @export
-/// @rdname predicates
-fn within(x: Robj, y: List) -> Vec<bool> {
-    let x = Geom::from(x);
-    let y = from_list(y);
-
-    y.into_iter()
-        .map(|y| x.geom.is_within(&y.geom))
-        .collect::<Vec<bool>>()
-}
-
-#[extendr]
-/// @export
-/// @rdname predicates
-fn within_pairwise(x: List, y: List) -> Vec<bool> {
-    let x = from_list(x);
-    let y = from_list(y);
-
-    x.into_iter()
+    y
+        .into_par_iter()
         .enumerate()
-        .map(|(i, xi)| xi.geom.is_within(&y[i].geom))
-        .collect::<Vec<bool>>()
+        .for_each(|(i, yi)| {
+            if let Some(yi) = yi {
+                let yi = Geom::from(yi);
+                let env = yi.envelope();
+                let cands = xtree.locate_in_envelope_intersecting(&env);
+
+                cands.for_each(|cnd| {
+                    if yi.geom.is_within(&cnd.geom().geom) {
+                        let mut ind = index.lock().unwrap();
+                        ind[cnd.data].push((i as i32) + 1)
+                    }})
+            }
+        });
+
+    let mut index = index.into_inner().unwrap();
+
+    index
+        .par_iter_mut()
+        .for_each(|xi| xi.sort());   
+
+    List::from_values(index)
 }
+
+
+#[extendr]
+/// @export
+/// @rdname topology
+fn intersects_pairwise(x: List, y: List) -> Logicals {
+
+    if !x.inherits("rsgeo") || !y.inherits("rsgeo") {
+        panic!("`x` and `y` must be of class `rsgeo`")
+    }
+
+    let x = geometry_from_list(x);
+    let y = geometry_from_list(y);
+    
+    let res = x
+        .into_par_iter()
+        .zip(y.into_par_iter())
+        .map(|(xi, yi)| {
+            if let Some(xi) = xi {
+                if let Some(yi) = yi {
+                    Some(xi.intersects(&yi))
+                } else {
+                    None
+                }
+            } else {
+                None
+            }
+        })
+        .collect::<Vec<Option<bool>>>();
+
+    Logicals::from_values(res)
+}
+
+
+#[extendr]
+/// @export
+/// @rdname topology
+fn contains_pairwise(x: List, y: List) -> Logicals {
+
+    if !x.inherits("rsgeo") || !y.inherits("rsgeo") {
+        panic!("`x` and `y` must be of class `rsgeo`")
+    }
+
+    let x = geometry_from_list(x);
+    let y = geometry_from_list(y);
+    
+    let res = x
+        .into_par_iter()
+        .zip(y.into_par_iter())
+        .map(|(xi, yi)| {
+            if let Some(xi) = xi {
+                if let Some(yi) = yi {
+                    Some(xi.contains(&yi))
+                } else {
+                    None
+                }
+            } else {
+                None
+            }
+        })
+        .collect::<Vec<Option<bool>>>();
+    
+    Logicals::from_values(res)
+}
+
+#[extendr]
+/// @export
+/// @rdname topology
+fn within_pairwise(x: List, y: List) -> Logicals {
+
+    if !x.inherits("rsgeo") || !y.inherits("rsgeo") {
+        panic!("`x` and `y` must be of class `rsgeo`")
+    }
+
+    let x = geometry_from_list(x);
+    let y = geometry_from_list(y);
+    
+    let res = x
+        .into_par_iter()
+        .zip(y.into_par_iter())
+        .map(|(xi, yi)| {
+            if let Some(xi) = xi {
+                if let Some(yi) = yi {
+                    Some(xi.is_within(&yi))
+                } else {
+                    None
+                }
+            } else {
+                None
+            }
+        })
+        .collect::<Vec<Option<bool>>>();
+    
+    Logicals::from_values(res)
+}
+
+// TODO
+// disjoint
+// DE-9IM relates
+
+// relates use something called DE-9IM
+// its an intersection matrix between two geometries.
+// Each geometry is evaluated in 3 "parts"
+// I: interrior
+// B: boundary
+// E: exterior
+//
+// There are 4 types of intersections:
+// F: false, or none
+// 0: a single point
+// 1: a shared line
+// 3: an area intersection
 
 extendr_module! {
     mod topology;
-    fn contains; // vectorized along y
-    fn contains_sparse;
-    fn contains_pairwise;
-    fn intersects;
     fn intersects_sparse;
     fn intersects_pairwise;
-    fn within;
+    fn contains_sparse;
+    fn contains_pairwise;
     fn within_sparse;
     fn within_pairwise;
 }
+
+
+
+// This approach is generally slow it works by building two R* trees.
+// using a cached envelope is faster than using a  computer bounding box so we
+// opt to using the cached variant
+// #[extendr]
+// fn intersects_sparse_cached2(x: List, y: List) -> List {
+//     let n = x.len();
+//     let xtree  = create_cached_rtree(x);
+
+//     let ytree = create_cached_rtree(y);
+
+//     let candidates = xtree.intersection_candidates_with_other_tree(&ytree);
+
+//     let mut index = vec![Vec::with_capacity(n); n];
+
+//     for (x, y) in candidates {
+//         let xid = x.data;
+//         let yid = y.data;
+//         let res = x.geom().geom.intersects(&y.geom().geom);
+//         if res {
+//             index[xid].push((yid as i32) + 1i32)
+//         }
+//     }
+//     List::from_values(index)
+
+// }

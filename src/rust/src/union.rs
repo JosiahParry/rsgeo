@@ -1,180 +1,202 @@
 use extendr_api::prelude::*;
 use geo::{
-    BooleanOps, Geometry, LineString, MultiLineString, MultiPoint, MultiPolygon, Point, Polygon,
-    RemoveRepeatedPoints,
+    BooleanOps, 
+    LineString, MultiLineString, 
+    MultiPoint, 
+    MultiPolygon, RemoveRepeatedPoints, 
+
 };
+use geo_types::Point;
+use sfconversions::vctrs::as_rsgeo_vctr;
 
-use crate::geoms::*;
-use crate::types::*;
-//use crate::geoms::to_pntr;
+use std::rc::Rc;
 
-use rstar::primitives::GeomWithData;
-use rstar::{ParentNode, RTree, RTreeNode};
+use sfconversions::{Geom, IntoGeom};
+use crate::spatial_index::create_cached_rtree;
 
-#[extendr]
-/// @export
-/// @rdname combine_geoms
-fn union_geoms(x: List) -> Robj {
-    let mut geom_type = x.class().unwrap();
-    let x = from_list(x);
-    let x: Vec<Geometry> = x.into_iter().map(|x| x.geom).collect();
-
-    //match geom_type
-    let geo_type = geom_type.nth(0).unwrap();
-
-    let res = match geo_type {
-        "rs_POINT" => {
-            let x = x
-                .into_iter()
-                .map(|x| Point::try_from(x).unwrap())
-                .collect::<Vec<Point>>();
-            to_pntr(Geometry::from(union_point(x)).into())
-        }
-
-        "rs_POLYGON" => {
-            let x = x
-                .into_iter()
-                .map(|x| Polygon::try_from(x).unwrap())
-                .collect::<Vec<Polygon>>();
-            to_pntr(Geometry::from(union_polygon(x)).into())
-        }
-
-        "rs_MULTIPOLYGON" => {
-            let x = x
-                .into_iter()
-                .map(|x| MultiPolygon::try_from(x).unwrap())
-                .collect::<Vec<MultiPolygon>>();
-            to_pntr(Geometry::from(union_multipolygon(x)).into())
-        }
-
-        "rs_MULTIPOINT" => {
-            let x = x
-                .into_iter()
-                .map(|x| MultiPoint::try_from(x).unwrap())
-                .collect::<Vec<MultiPoint>>();
-            to_pntr(Geometry::from(union_multipoint(x)).into())
-        }
-        "rs_LINESTRING" => {
-            let x = x
-                .into_iter()
-                .map(|x| LineString::try_from(x).unwrap())
-                .collect::<Vec<LineString>>();
-            to_pntr(Geometry::from(union_linestring(x)).into())
-        }
-        "rs_MULTILINESTRING" => {
-            let x = x
-                .into_iter()
-                .map(|x| MultiLineString::try_from(x).unwrap())
-                .collect::<Vec<MultiLineString>>();
-            to_pntr(Geom::from(Geometry::from(union_multilinestring(x))))
-        }
-        _ => Robj::from(extendr_api::NULL),
-    };
-
-    //let lst = List::from_values(&[res]);
-    crate::utils::restore_geoms(list!(res).into())
-}
-
-//#[extendr]
-fn union_polygon(x: Vec<Polygon>) -> MultiPolygon {
-    let mut r_tree = RTree::new();
-
-    // insert into rtree with index as data
-    for (index, geom) in x.into_iter().enumerate() {
-        let geom = GeomWithData::new(geom, index);
-        r_tree.insert(geom);
-    }
-
-    let papa = r_tree.root();
-
-    inner(papa)
-}
-
-// #[extendr]
-// fn union_polys(x: List) -> Robj {
-//     let x = from_list(x);
-
-//     let x: Vec<Polygon> = x.into_iter()
-//         .map(|x| Polygon::try_from(x.geom).unwrap())
-//         .collect();
-
-//         // create the tree
-//     let mut r_tree = RTree::new();
-
-//     // insert into rtree with index as data
-//     for (index, geom) in x.into_iter().enumerate() {
-//         let geom = GeomWithData::new(geom, index);
-//         r_tree.insert(geom);
-//     }
-
-//     let papa = r_tree.root();
-
-//     let x = inner(papa);
-
-//     to_pntr(Geom { geom: Geometry::from(x)})
-
-// }
-
-fn union_multipolygon(x: Vec<MultiPolygon>) -> MultiPolygon {
-    // first extract the underlying multipolygons into a single
-    // vector only then do we insert it into the tree.
-    let x = x.into_iter().flat_map(|x| x.0).collect::<Vec<Polygon>>();
-
-    let mut r_tree = RTree::new();
-
-    // insert into rtree with index as data
-    for (index, geom) in x.into_iter().enumerate() {
-        let geom = GeomWithData::new(geom, index);
-        r_tree.insert(geom);
-    }
-
-    let papa = r_tree.root();
-
-    inner(papa)
-}
-
-// duplicate points are
-fn union_point(x: Vec<Point>) -> MultiPoint {
-    let res: MultiPoint = x.try_into().unwrap();
-
-    // remove repeated points (similar to sf::st_union())
-    res.remove_repeated_points()
-}
-
-// duplicate points are not removed
-fn union_multipoint(x: Vec<MultiPoint>) -> MultiPoint {
-    let point_vec = x.into_iter().flat_map(|x| x.0).collect::<Vec<Point>>();
-
-    MultiPoint::new(point_vec)
-}
-
-fn union_linestring(x: Vec<LineString>) -> MultiLineString {
-    let res = MultiLineString::new(x);
-    res.remove_repeated_points()
-}
-
-fn union_multilinestring(x: Vec<MultiLineString>) -> MultiLineString {
-    let line_vecs = x.into_iter().flat_map(|x| x.0).collect::<Vec<LineString>>();
-
-    MultiLineString::new(line_vecs).remove_repeated_points()
-}
+use rstar::primitives::{GeomWithData, CachedEnvelope};
+use rstar::{ParentNode, RTreeNode};
 
 extendr_module! {
     mod union;
     fn union_geoms;
 }
 
-fn inner(papa: &ParentNode<GeomWithData<Polygon, usize>>) -> MultiPolygon {
-    papa.children()
-        .iter()
-        .fold(MultiPolygon::new(vec![]), |accum, child| match child {
-            RTreeNode::Leaf(value) => {
-                let v = MultiPolygon::try_from(value.geom().to_owned()).unwrap();
-                accum.union(&v)
+
+#[extendr]
+/// Union Geometries
+/// @export
+/// @rdname combine_geoms
+fn union_geoms(x: List) -> Robj {
+
+    // Class checking
+    if !x.inherits("rsgeo") {
+        panic!("Must provide an object of class `rsgeo`")
+    }
+    let mut geom_type = x.class().unwrap();
+
+    //match geom_type
+    let geo_type = geom_type.nth(0).unwrap();
+
+    let res = match geo_type {
+        "rs_POINT" => union_points(x),
+        "rs_MULTIPOINT" => union_multipoints(x),
+        "rs_POLYGON" => union_polygons(x),
+        "rs_MULTIPOLYGON" => union_multipolygons(x),
+        "rs_LINESTRING" => union_linestrings(x),
+        "rs_MULTILINESTRING" => union_multilinestrings(x),
+        _ => as_rsgeo_vctr(list!(extendr_api::NULL), "geometry")
+    };
+    res
+}
+
+
+
+#[extendr]
+fn union_points(x: List) -> Robj {
+    let pnts = x  
+        .into_iter()
+        .filter(|(_, xi)| !xi.is_null())
+        .map(|(_, robj)| Point::from(Geom::from(robj)))
+        .collect::<Vec<Point>>();
+
+    let mpnt = MultiPoint::from(pnts);
+
+    let res = mpnt
+        .remove_repeated_points()
+        .into_geom();
+
+    as_rsgeo_vctr(list!(res), "multipoint")
+}
+
+
+// duplicate points are not removed
+#[extendr]
+fn union_multipoints(x: List) -> Robj {
+    let pnts = x  
+        .into_iter()
+        .filter(|(_, xi)| !xi.is_null())
+        .flat_map(|(_, robj)| MultiPoint::from(Geom::from(robj)).0)
+        .collect::<Vec<Point>>();
+
+    let mpnt = MultiPoint::from(pnts);
+
+    let res = mpnt
+        .remove_repeated_points()
+        .into_geom();
+
+    as_rsgeo_vctr(list!(res), "multipoint")
+
+}
+
+fn union_linestrings(x: List) -> Robj {
+
+    let lns = x  
+        .into_iter()
+        .filter(|(_, xi)| !xi.is_null())
+        .map(|(_, robj)| LineString::from(Geom::from(robj)))
+    .collect::<Vec<LineString>>();
+
+    let res = MultiLineString::new(lns)
+        .remove_repeated_points()
+        .into_geom();
+
+    as_rsgeo_vctr(list!(res), "multilinestring")
+}
+
+fn union_multilinestrings(x: List) -> Robj {
+
+    let lns = x  
+        .into_iter()
+        .filter(|(_, xi)| !xi.is_null())
+        .flat_map(|(_, robj)| MultiLineString::from(Geom::from(robj)).0)
+    .collect::<Vec<LineString>>();
+
+    let res = MultiLineString::new(lns)
+        .remove_repeated_points()
+        .into_geom();
+
+    as_rsgeo_vctr(list!(res), "multilinestring")
+}
+
+
+fn union_multipolygons(x: List) -> Robj {
+    // first extract the underlying multipolygons into a single
+    // vector only then do we insert it into the tree.
+    let x = x
+        .into_iter()
+        // filter out missing values
+        .filter(|(_, xi)| !xi.is_null())
+        // extract multipolygons in sub polygons
+        .flat_map(|(_, x)| {
+            let g = Geom::from(x).geom;
+
+            let p = MultiPolygon::try_from(g).unwrap();
+    
+            p
+                .0
+                .into_iter()
+                .map(|x| x.into_geom().into_robj())
+                .collect::<Vec<Robj>>()
+        }).collect::<Vec<Robj>>();
+    // convert to a list cannot collect due to list collection bugh
+    let x = List::from_values(x);
+
+    union_polygons(x)
+}
+
+
+fn union_polygons(x: List) -> Robj {
+
+    let shared_geo = Rc::new(x);
+
+    let tree = create_cached_rtree(shared_geo.clone().as_list().unwrap());
+
+    let res = tree
+        .root()
+        .children()
+        .into_iter()
+        .fold(MultiPolygon::new(vec![]), |accum, child| {
+            match child {
+                RTreeNode::Leaf(val) => {
+                    let robj = MultiPolygon::from(shared_geo.elt(val.data).unwrap().into_geom());
+                    accum.union(&robj)
+                }
+                RTreeNode::Parent(parent) => {
+                    accum.union(&inner(parent, shared_geo.clone()))
+                }
             }
-            RTreeNode::Parent(parent) => {
-                let value = inner(parent);
-                accum.union(&value)
+        }).into_geom();
+
+    as_rsgeo_vctr(list!(res), "multipolygon")
+}
+
+
+fn inner(papa: &ParentNode<GeomWithData<CachedEnvelope<Geom>, usize>>, shared_geo: Rc<List>) -> MultiPolygon {
+    papa
+        .children()
+        .into_iter()
+        .fold(MultiPolygon::new(vec![]), |accum, child| {
+            match child {
+                RTreeNode::Leaf(val) => {
+                    let robj = MultiPolygon::from(shared_geo.elt(val.data).unwrap().into_geom());
+                    accum.union(&robj)
+                }
+                RTreeNode::Parent(parent) => {
+                    let value = inner(parent, shared_geo.clone());
+                    accum.union(&value)
+                }
             }
         })
 }
+
+// fn sort_points(x: &mut Vec<Point>) -> MultiPoint {
+//     x
+//         .sort_by(|a, b| {
+//             a.x_y().partial_cmp(&b.x_y()).unwrap()
+//         });
+
+//     x.dedup_by(|a, b| a.eq(&b));
+
+//     MultiPoint::new(x.to_vec())
+// }

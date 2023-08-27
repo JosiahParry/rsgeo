@@ -10,7 +10,10 @@ combine_geoms(x)
 union_geoms(x)
 }
 \arguments{
-\item{x}{a vector of geometries}
+\item{x}{an object of class \code{rsgeo}}
+}
+\value{
+An object of class \code{rsgeo} of length one.
 }
 \description{
 Given a vector of geometries combine them into a single geometry.
@@ -18,7 +21,7 @@ Given a vector of geometries combine them into a single geometry.
 \details{
 \subsection{\code{combine_geoms()}}{
 
-\code{combine_geoms()} combines a vector of geometries into a vector of lenght one
+\code{combine_geoms()} combines a vector of geometries into a vector of length one
 their \code{MULTI} counterpart.
 \itemize{
 \item \code{rs_POINT} and \code{rs_MULTIPOINT} -> \code{rs_MULTIPOINT}
@@ -30,14 +33,39 @@ their \code{MULTI} counterpart.
 
 \subsection{\code{union_geoms()}}{
 
-\code{union_geoms()} creates a union of all geometries
+\code{union_geoms()} creates a union of all geometries removing repeated points
+or dissolving shared boundaries.
 \itemize{
 \item \code{rs_POINT} - combines and removes repeated points
-\item \code{rs_MULTIPOINT} - combines and does not remove repeated points
-\item \code{rs_LINESTRING} - combines and  removes duplicated points
+\item \code{rs_MULTIPOINT} - combines removes repeated points
+\item \code{rs_LINESTRING} - combines and removes duplicated points
 \item \code{rs_MULTILINESTRING} - combines and removes duplicated points
-\item \code{rs_POLYGON} - unions geometries
-\item \code{rs_MULTIPOLYGON} - unions geometries
+\item \code{rs_POLYGON} - unions geometries into a single geometry
+\item \code{rs_MULTIPOLYGON} - unions geometries into a single geometry
 }
+}
+}
+\examples{
+pnts <- geom_point(runif(10), runif(10))
+combine_geoms(pnts)
+
+lns <- geom_linestring(1:100, runif(100, -10, 10), rep.int(1:5, 20))
+union_geoms(lns)
+
+x <- c(0, 1, 1, 0, 0)
+y <- c(0, 0, 1, 1, 0)
+
+p1 <- geom_polygon(x, y)
+p2 <- geom_polygon(x - 1, y + 0.5)
+
+z <- c(p1, p2)
+
+res <- union_geoms(z)
+res
+
+if (rlang::is_installed(c("sf", "wk"))) {
+  par(mfrow = c(1, 2))
+  plot(z)
+  plot(res)
 }
 }

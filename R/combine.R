@@ -6,7 +6,7 @@
 #'
 #' ### `combine_geoms()`
 #'
-#' `combine_geoms()` combines a vector of geometries into a vector of lenght one
+#' `combine_geoms()` combines a vector of geometries into a vector of length one
 #' their `MULTI` counterpart.
 #'
 #' - `rs_POINT` and `rs_MULTIPOINT` -> `rs_MULTIPOINT`
@@ -15,22 +15,50 @@
 #' - `rs_GEOMETRYCOLLECTION` is not supported
 #'
 #' ### `union_geoms()`
-#' `union_geoms()` creates a union of all geometries
+#'
+#' `union_geoms()` creates a union of all geometries removing repeated points
+#' or dissolving shared boundaries.
 #'
 #' - `rs_POINT` - combines and removes repeated points
-#' - `rs_MULTIPOINT` - combines and does not remove repeated points
-#' - `rs_LINESTRING` - combines and  removes duplicated points
+#' - `rs_MULTIPOINT` - combines removes repeated points
+#' - `rs_LINESTRING` - combines and removes duplicated points
 #' - `rs_MULTILINESTRING` - combines and removes duplicated points
-#' - `rs_POLYGON` - unions geometries
-#' - `rs_MULTIPOLYGON` - unions geometries
+#' - `rs_POLYGON` - unions geometries into a single geometry
+#' - `rs_MULTIPOLYGON` - unions geometries into a single geometry
 #'
-#' @param x a vector of geometries
+#' @param x an object of class `rsgeo`
+#'
+#' @examples
+#' pnts <- geom_point(runif(10), runif(10))
+#' combine_geoms(pnts)
+#'
+#' lns <- geom_linestring(1:100, runif(100, -10, 10), rep.int(1:5, 20))
+#' union_geoms(lns)
+#'
+#' x <- c(0, 1, 1, 0, 0)
+#' y <- c(0, 0, 1, 1, 0)
+#'
+#' p1 <- geom_polygon(x, y)
+#' p2 <- geom_polygon(x - 1, y + 0.5)
+#'
+#' z <- c(p1, p2)
+#'
+#' res <- union_geoms(z)
+#' res
+#'
+#' if (rlang::is_installed(c("sf", "wk"))) {
+#'   par(mfrow = c(1, 2))
+#'   plot(z)
+#'   plot(res)
+#' }
 #' @export
+#' @returns
+#' An object of class `rsgeo` of length one.
 combine_geoms <- function(x) {
   cls <- tolower(class(x)[1])
   cls <- substr(cls, 4, nchar(cls))
 
-  res <- switch(
+  switch(
     cls,
     "point" = combine_points(x),
     "multipoint" = combine_multipoints(x),
@@ -39,20 +67,4 @@ combine_geoms <- function(x) {
     "polygon" = combine_polygons(x),
     "multipolygon" = combine_multipolygons(x)
   )
-
-  restore_geoms(list(res))
 }
-#
-# library(ggplot2)
-# guerry |>
-#   mutate(geoms = as_rsgeom(geometry)) |>
-#   group_by(region) |>
-#   summarise(geoms = st_as_sfc(union_geoms(geoms))) |>
-#   ggplot() +
-#   geom_sf()
-#
-# x <- as_rsgeom(guerry$geometry)
-#
-# union_geoms(x[1:3])
-#
-# union_geoms(geom_points_matrix(matrix(runif(100), ncol = 2)))
