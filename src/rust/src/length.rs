@@ -32,6 +32,7 @@ use geo::{EuclideanLength, Geometry};
 /// length_haversine(ln)
 /// @export
 /// @rdname length
+/// @returns A numeric vector 
 fn length_euclidean(x: List) -> Doubles {
     
     if !x.inherits("rsgeo") {

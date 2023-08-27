@@ -53,6 +53,10 @@ use geo::{
 /// distance_vicenty_pairwise(x, y)
 /// distance_geodesic_pairwise(x, y)
 /// distance_haversine_pairwise(x, y)
+/// @returns
+/// 
+/// For `_matrix` functions, returns a dense matrix of distances whereas `_pairwise`
+/// functions return a numeric vector.
 fn distance_euclidean_pairwise(x: List, y: List) -> Doubles {
 
     if !x.inherits("rsgeo") || !y.inherits("rsgeo") {

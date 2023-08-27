@@ -9,24 +9,46 @@ use geo::{BoundingRect, ConcaveHull, ConvexHull, Extremes, MinimumRotatedRect};
 use geo_types::{Geometry, Point, Polygon};
 use crate::construction::IsReal;
 
+
+
 #[extendr]
 /// Compute Geometric Boundaries
 ///
+/// From a vector of geometries idenitfy different types of boundaries.
+/// 
+/// Note that if you want a convex or concave hull over an entire vector of geometries 
+/// you must first union or combine them using either `combine_geoms()` or `union_geoms()`
+/// 
+/// @param x an object of class `rsgeo`
+/// @param concavity a value between 0 and 1 specifying the concavity of the convex hull
+/// 
 /// @export
 /// @rdname boundaries
-/// @param x a rust geometry either a scalar or a vector for functions ending in `s`. See "Details" for more.
-///
-/// @details
-///
+/// 
+/// @examples
+/// lns <- geom_linestring(
+///   1:20,
+///   runif(20, -5, 5),
+///   rep.int(1:5, 4)
+/// )
+/// bounding_box(lns)
+/// bounding_boxes(lns)
+/// minimum_rotated_rect(lns)
+/// convex_hull(lns)
+/// concave_hull(lns, 0.5)
+/// extreme_coords(lns)
+/// 
+/// @returns 
+/// 
 /// - `bounding_box()` returns a named vector of xmin, ymin, xmax, and ymax
-/// - `bounding_boxes()` returns a list of bounding 
-/// - `bounding_rectangle()` returns a polygon of the bounding rectangle
-/// - `convex_hull()` returns a polygon of the convex hull for each geometry
-/// - `concave_hull()` returns a polygon of the specified concavity for each geometry
-/// - `extreme_coords()` returns the extreme coordinates of a geometry as a named vector of xmin, ymin, xmax, and ymax where each element is a `Point` geometry of the extreme value
-/// - `minimum_rotated_rect()` returns the minimum rotated rectangle covering a geometry
-/// Note that if you want a convex or concave hull over an entire vector of geometries 
-/// you must first union or combine them. 
+/// - `bounding_boxes()` returns a list of bounding box numeric vectors for each geometry
+/// - `bounding_rect()` returns an `rs_POLYGON` of the bounding rectangle of each geometry 
+/// - `convex_hull()` returns an `rs_POLYGON` of the convex hull for each geometry
+/// - `concave_hull()` returns an `rs_POLYGON` of the specified concavity for each geometry
+/// - `extreme_coords()` returns the extreme coordinates of each geometry as a list where each element
+///  is a named vector of xmin, ymin, xmax, and ymax where each element is a `Point` geometry of the extreme value
+/// - `minimum_rotated_rect()` returns the minimum rotated rectangle covering a geometry as an `rs_POLYGON`
+
 fn bounding_box(x: List) -> Robj {
     let bbox = x
         .iter()

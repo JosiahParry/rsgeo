@@ -21,6 +21,8 @@ pub use sfconversions::{fromsf::sfc_to_rsgeo, vctrs::*, Geom};
 mod utils;
 // MISC algos -------
 
+use crate::construction::IsReal;
+
 use geo::{Centroid, HaversineDestination};
 use geo_types::Point;
 
@@ -30,7 +32,11 @@ use geo_types::Point;
 /// 
 /// @param x an object of class `rsgeo`
 /// 
-///@export
+/// @export
+/// @examples
+/// lns <- geom_linestring(1:100, runif(100, -10, 10), rep.int(1:5, 20))
+/// centroids(lns)
+/// @returns an object of class `rs_POINT`
 #[extendr]
 fn centroids(x: List) -> Robj {
     verify_rsgeo(&x);
@@ -41,7 +47,7 @@ fn centroids(x: List) -> Robj {
             if x.is_null() {
                 x
             } else {
-                let geo = Geom::try_from(x).unwrap().geom.centroid();
+                let geo = <&Geom>::from_robj(&x).unwrap().geom.centroid();
 
                 match geo {
                     Some(cnt) => Geom::from(cnt).into_robj(),
@@ -49,9 +55,9 @@ fn centroids(x: List) -> Robj {
                 }
             }
         })
-        .collect::<List>();
+        .collect::<Vec<Robj>>();
 
-    as_rsgeo_vctr(centroids, "point")
+    as_rsgeo_vctr(List::from_values(centroids), "point")
 }
 
 #[extendr]
@@ -75,7 +81,43 @@ fn to_sfc(x: List) -> List {
 }
 
 #[extendr]
+/// Identify a destination point
+/// 
+/// Given a vector of point geometries, bearings, and distances,
+/// identify a destination location.
+/// 
+/// @param x an object of class `rs_POINT`
+/// @param bearing a numeric vector specifying the degree of the direction where 0 is north
+/// @param distance a numeric vector specifying the distance to travel in the direction specified by `bearing` in meters
+/// @returns an object of class `rs_POINT` 
+/// @examples
+/// # create 10 points at the origin
+/// pnts <- geom_point(rep(0, 10), rep(0, 10))
+/// 
+/// # set seed for reproducibiliy
+/// set.seed(1)
+/// 
+/// # generate random bearings
+/// bearings <- runif(10, 0, 360)
+/// 
+/// # generate random distances
+/// distances <- runif(10, 10000, 100000)
+/// 
+/// # find the destinations
+/// dests <- haversine_destination(pnts, bearings, distances)
+/// 
+/// # plot points
+/// if (rlang::is_installed(c("sf", "wk"))) {
+///   plot(pnts, pch = 3)
+///   plot(dests, add = TRUE, pch = 17)
+/// }
+/// @export
 fn haversine_destination(x: List, bearing: Doubles, distance: Doubles) -> Robj {
+
+    if !x.inherits("rs_POINT") {
+        panic!("`x` must be of class `rs_POINT`")
+    }
+
     let n = x.len();
     let n_b = bearing.len();
     let n_d = distance.len();
@@ -100,13 +142,7 @@ fn haversine_destination(x: List, bearing: Doubles, distance: Doubles) -> Robj {
         let b = bearing[i];
         let d = distance[i];
 
-        let xi = if b.is_na()
-            || b.is_infinite()
-            || b.is_nan()
-            || d.is_na()
-            || d.is_infinite()
-            || d.is_nan()
-        {
+        let xi = if !b.is_real() || !d.is_real() {
             NULL.into_robj()
         } else {
             match geo {
@@ -122,18 +158,43 @@ fn haversine_destination(x: List, bearing: Doubles, distance: Doubles) -> Robj {
         res.push(xi);
     }
 
-    List::from_values(res)
-        .set_attrib("class", geom_class("point"))
-        .unwrap()
+    as_rsgeo_vctr(List::from_values(res), "point")
+
 }
 
 use geo::HaversineIntermediate;
 
 #[extendr]
+/// Identifies a point between two points 
+/// 
+/// Identifies the location between two points on a great circle
+/// along a specified fraction of the distance. 
+/// 
 /// @param x an `rs_POINT` vector
 /// @param y an `rs_POINT` vector
-/// @param distance a numeric vector of either length 1 or the same length as x and y.
+/// 
+/// @param distance a numeric vector of either length 1 or the same length as x and y 
+/// 
+/// @returns an object of class `rs_POINT`
+/// 
+/// @examples
+/// x <- geom_point(1:10, rep(5, 10))
+/// y <- geom_point(1:10, rep(0, 10))
+/// res <- haversine_intermediate(x, y, 0.5)
+/// if (rlang::is_installed(c("wk", "sf"))) {
+///   plot(
+///     c(x, y, res),
+///     col = sort(rep.int(c("red", "blue", "purple"), 10)),
+///     pch = 16
+///   )
+/// }
+/// @export
 fn haversine_intermediate(x: List, y: List, distance: Doubles) -> Robj {
+
+    if !x.inherits("rs_POINT") || !y.inherits("rs_POINT") {
+        panic!("`x` and `y` must be of class `rs_POINT`")
+    }
+
     let n_x = x.len();
     let n_y = y.len();
     let n = n_x.max(n_y);
@@ -147,8 +208,6 @@ fn haversine_intermediate(x: List, y: List, distance: Doubles) -> Robj {
 
     let n_d = distance.len();
 
-    //rprintln!("nd {} nx {} ny {}", n_d, n_x, n_y);
-    //rprintln!("cond1 {} cond 2 {}", ((n_d != n_x) && (n_d != n_y)), (n_d != 1));
     if ((n_d != n_x) && (n_d != n_y)) && (n_d != 1) {
         panic!("`distance` must be the same length as `x`, `y`, or length 1");
     }

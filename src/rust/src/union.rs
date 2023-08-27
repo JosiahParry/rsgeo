@@ -1,4 +1,4 @@
-use extendr_api::{prelude::*};
+use extendr_api::prelude::*;
 use geo::{
     BooleanOps, 
     LineString, MultiLineString, 
@@ -23,16 +23,16 @@ extendr_module! {
 }
 
 
+#[extendr]
+/// Union Geometries
 /// @export
 /// @rdname combine_geoms
-#[extendr]
 fn union_geoms(x: List) -> Robj {
 
     // Class checking
     if !x.inherits("rsgeo") {
         panic!("Must provide an object of class `rsgeo`")
     }
-
     let mut geom_type = x.class().unwrap();
 
     //match geom_type
@@ -163,7 +163,7 @@ fn union_polygons(x: List) -> Robj {
                     accum.union(&robj)
                 }
                 RTreeNode::Parent(parent) => {
-                    inner(parent, shared_geo.clone())
+                    accum.union(&inner(parent, shared_geo.clone()))
                 }
             }
         }).into_geom();

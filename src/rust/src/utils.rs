@@ -16,5 +16,4 @@ extendr_module! {
     mod utils;
     fn null_pntr;
     fn print_geom;
-    // fn restore_geoms;
 }

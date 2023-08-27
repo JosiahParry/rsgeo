@@ -14,9 +14,7 @@ impl IsReal for Rfloat {
 }
 
 #[extendr]
-/// @export
-/// @rdname construction
-fn geom_point(x: Doubles, y: Doubles) -> Robj {
+fn geom_point_(x: Doubles, y: Doubles) -> Robj {
 
     let n_x = x.len();
     let n_y = y.len();
@@ -203,7 +201,7 @@ fn geom_polygon_(x: Doubles, y: Doubles, id: Integers, ring: Integers) -> Robj {
 
 extendr_module! {
     mod construction;
-    fn geom_point;
+    fn geom_point_;
     fn geom_multipoint_;
     fn geom_linestring_;
     fn geom_polygon_;

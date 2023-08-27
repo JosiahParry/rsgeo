@@ -164,9 +164,25 @@ fn closest_point_haversine(x: List, y: List) -> Robj {
 /// For a given `rs_LINESTRING` vector, test its convexity. Convexity can be tested
 /// strictly or strongly, as well as based on winding.
 /// 
+/// @param x an object of class `rs_LINESTRING`
+/// 
 /// See [`geo` docs for further details](https://docs.rs/geo/latest/geo/algorithm/is_convex/trait.IsConvex.html)
 /// @export
 /// @rdname convex
+/// @returns a logical vector 
+/// @examples
+/// lns <- geom_linestring(
+///     1:20,
+///     runif(20, -5, 5),
+///     rep.int(1:5, 4)
+///   )
+///   
+/// is_convex(lns)
+/// is_cw_convex(lns)
+/// is_ccw_convex(lns)
+/// is_strictly_convex(lns)
+/// is_strictly_cw_convex(lns)
+/// is_strictly_ccw_convex(lns)
 fn is_convex(x: List) -> Logicals {
     // check that y is a point
     if !x.inherits("rs_LINESTRING") {
@@ -310,7 +326,7 @@ fn is_strictly_cw_convex(x: List) -> Logicals {
 /// Finds the point that lies a given fraction along a line.
 /// 
 /// @param x an object of class `rs_LINESTRING`
-/// @param y a numeric vector of the same length as `x` or length 1
+/// @param fraction a numeric vector of length 1 or the same length as `x`. Must be a value between 0 and 1 inclusive.
 /// 
 /// @export
 /// @returns 

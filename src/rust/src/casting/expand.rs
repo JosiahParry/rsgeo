@@ -74,6 +74,32 @@ fn expand_linestring(x: Robj) -> Robj {
 }
 
 #[extendr]
+/// Expand Geometries 
+/// 
+/// Expands geometries into a list of vectors of their components. 
+/// 
+/// @param x an object of class `rsgeo`
+/// 
+/// @details
+/// 
+/// - `rs_MULTIPOINT` expands into a vector of points
+/// - `rs_LINESTRING` expands into a vector points
+/// - `rs_MULTILINESTRING` expands into a vector of linestrings
+/// - `rs_POLYGON` expands into a vector of linestrings
+/// - `rs_MULTIPOLYGON` expands into a vector of polygons
+/// 
+/// If you wish to have a single vector returned, pass the results
+/// into `flatten_geoms()`.
+/// 
+/// @returns
+/// 
+/// A list of `rsgeo` vectors containing each original geometry's
+/// components as a new vector.
+/// 
+/// @export
+/// @examples
+/// mpnts <- geom_multipoint(runif(10), runif(10), rep.int(1:5, 2))
+/// expand_geoms(mpnts)
 fn expand_geoms(x: List) -> List {
     let cls = x.class().unwrap().next().unwrap();
     let f = match cls {
