@@ -136,7 +136,7 @@ fn haversine_destination(x: List, bearing: Doubles, distance: Doubles) -> Robj {
 
     let mut res: Vec<Robj> = Vec::with_capacity(n);
 
-    for i in 0..(n - 1) {
+    for i in 0..n {
         let geo = x.elt(i);
 
         let b = bearing[i];
@@ -220,7 +220,7 @@ fn haversine_intermediate(x: List, y: List, distance: Doubles) -> Robj {
 
     let mut res: Vec<Robj> = Vec::with_capacity(n);
 
-    for i in 0..(n - 1) {
+    for i in 0..n {
         // early return for missing distance
         let d = distance[i];
         if d.is_na() || d.is_infinite() || d.is_nan() {
