@@ -109,7 +109,7 @@ fn union_multilinestrings(x: List) -> Robj {
     let lns = x  
         .into_iter()
         .filter(|(_, xi)| !xi.is_null())
-        .flat_map(|(_, robj)| MultiLineString::from(Geom::from(robj)).0)
+        .flat_map(|(_, robj)| MultiLineString::try_from(Geom::from(robj).geom).unwrap().0)
     .collect::<Vec<LineString>>();
 
     let res = MultiLineString::new(lns)
