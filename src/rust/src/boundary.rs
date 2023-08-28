@@ -1,6 +1,7 @@
 use sfconversions::{
     vctrs::{geom_class, verify_rsgeo, as_rsgeo_vctr},
     Geom, IntoGeom,
+    geometry_from_list
 };
 
 use extendr_api::prelude::*;
@@ -9,7 +10,7 @@ use geo::{BoundingRect, ConcaveHull, ConvexHull, Extremes, MinimumRotatedRect};
 use geo_types::{Geometry, Point, Polygon};
 use crate::construction::IsReal;
 
-
+use rayon::prelude::*;
 
 #[extendr]
 /// Compute Geometric Boundaries
@@ -245,21 +246,48 @@ fn extreme_coords(x: List) -> List {
 /// @rdname boundaries
 /// @export
 fn minimum_rotated_rect(x: List) -> Robj {
-    let res_vec = x.iter()
-        .map(|(_, xi)| {
-            if xi.is_null() {
-                ().into_robj()
-            } else {
-                let bb = <&Geom>::from_robj(&xi).unwrap().geom.minimum_rotated_rect();
-                match bb {
-                    Some(b) => b.into_geom().into_robj(),
-                    None => NULL.into_robj(),
-                }
+
+    if !x.inherits("rsgeo") {
+        panic!("`x` must be of class `rsgeo`")
+    }
+
+    let geoms = geometry_from_list(x);
+
+    let res_vec = geoms
+        .into_par_iter()
+        .map(|xi| {
+            match xi {
+                Some(g) => g.minimum_rotated_rect(),
+                None => None
             }
         })
-        .collect::<Vec<Robj>>();
+        .collect::<Vec<Option<Polygon>>>();
 
-    as_rsgeo_vctr(List::from_values(res_vec), "polygon")
+    
+    let res = res_vec
+        .into_iter()
+        .map(|xi| {
+            match xi {
+                Some(p) => Geom::from(p).into_robj(),
+                None => ().into_robj()
+            }
+        }).collect::<Vec<Robj>>();
+
+    // let res_vec = x.iter()
+    //     .map(|(_, xi)| {
+    //         if xi.is_null() {
+    //             ().into_robj()
+    //         } else {
+    //             let bb = <&Geom>::from_robj(&xi).unwrap().geom.minimum_rotated_rect();
+    //             match bb {
+    //                 Some(b) => b.into_geom().into_robj(),
+    //                 None => NULL.into_robj(),
+    //             }
+    //         }
+    //     })
+    //     .collect::<Vec<Robj>>();
+
+    as_rsgeo_vctr(List::from_values(res), "polygon")
 }
 
 extendr_module! {

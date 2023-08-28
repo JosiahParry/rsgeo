@@ -1,7 +1,9 @@
 use extendr_api::prelude::*;
-use sfconversions::Geom;
+use rayon::prelude::*;
+use sfconversions::{Geom, geometry_from_list};
 use geo::prelude::*;
 use geo::{EuclideanLength, Geometry};
+
 
 #[extendr]
 /// Calculate LineString Length
@@ -57,6 +59,8 @@ fn length_euclidean(x: List) -> Doubles {
         .collect::<Doubles>()
 }
 
+
+
 #[extendr]
 /// @export
 /// @rdname length
@@ -65,22 +69,21 @@ fn length_geodesic(x: List) -> Doubles {
         panic!("`x` must be an object of class `rsgeo`")
     }
 
-    x.iter()
-        .map(|(_, xi)| {
-            if xi.is_null() {
-                Rfloat::na()
-            } else {
-                let geom = <&Geom>::from_robj(&xi).unwrap();
+    let x = geometry_from_list(x);
 
-                match &geom.geom {
-                    Geometry::Line(geom) => geom.geodesic_length().into(),
-                    Geometry::LineString(geom) => geom.geodesic_length().into(),
-                    Geometry::MultiLineString(geom) => geom.geodesic_length().into(),
-                    _ => Rfloat::na(),
-                }
+    let res_vec = x
+        .into_par_iter()
+        .map(|xi| {
+            match xi {
+                Some(Geometry::Line(geom)) => Some(geom.geodesic_length()),
+                Some(Geometry::LineString(geom)) => Some(geom.geodesic_length()),
+                Some(Geometry::MultiLineString(geom)) => Some(geom.geodesic_length()),
+                _ => None
             }
         })
-        .collect::<Doubles>()
+        .collect::<Vec<Option<f64>>>();
+    
+    Doubles::from_values(res_vec)
 }
 
 #[extendr]
@@ -92,53 +95,69 @@ fn length_haversine(x: List) -> Doubles {
         panic!("`x` must be an object of class `rsgeo`")
     }
 
-    x.iter()
-        .map(|(_, xi)| {
-            if xi.is_null() {
-                Rfloat::na()
-            } else {
-                let geom = <&Geom>::from_robj(&xi).unwrap();
+    let x = geometry_from_list(x);
 
-                match &geom.geom {
-                    Geometry::Line(geom) => geom.haversine_length().into(),
-                    Geometry::LineString(geom) => geom.haversine_length().into(),
-                    Geometry::MultiLineString(geom) => geom.haversine_length().into(),
-                    _ => Rfloat::na(),
-                }
+    let res_vec = x
+        .into_par_iter()
+        .map(|xi| {
+            match xi {
+                Some(Geometry::Line(geom)) => Some(geom.haversine_length()),
+                Some(Geometry::LineString(geom)) => Some(geom.haversine_length()),
+                Some(Geometry::MultiLineString(geom)) => Some(geom.haversine_length()),
+                _ => None
             }
         })
-        .collect::<Doubles>()
+        .collect::<Vec<Option<f64>>>();
+
+    Doubles::from_values(res_vec)
 }
 
 #[extendr]
 /// @export
 /// @rdname length
 fn length_vincenty(x: List) -> Doubles {
-    x.iter()
-        .map(|(_, xi)| {
-            if xi.is_null() {
-                Rfloat::na()
-            } else {
-                let geom = <&Geom>::from_robj(&xi).unwrap();
 
-                match &geom.geom {
-                    Geometry::Line(geom) => match geom.vincenty_length().into() {
-                        Ok(l) => l.into(),
-                        Err(_) => Rfloat::na(),
-                    },
-                    Geometry::LineString(geom) => match geom.vincenty_length().into() {
-                        Ok(l) => l.into(),
-                        Err(_) => Rfloat::na(),
-                    },
-                    Geometry::MultiLineString(geom) => match geom.vincenty_length().into() {
-                        Ok(l) => l.into(),
-                        Err(_) => Rfloat::na(),
-                    },
-                    _ => Rfloat::na(),
-                }
+    let x = geometry_from_list(x);
+
+    let res_vec = x
+        .into_par_iter()
+        .map(|xi| {
+            match xi {
+                Some(Geometry::Line(geom)) => geom.vincenty_length().ok(),
+                Some(Geometry::LineString(geom)) => geom.vincenty_length().ok(),
+                Some(Geometry::MultiLineString(geom)) => geom.vincenty_length().ok(),
+                _ => None
             }
         })
-        .collect::<Doubles>()
+        .collect::<Vec<Option<f64>>>();
+
+    Doubles::from_values(res_vec)
+
+    // x.iter()
+    //     .map(|(_, xi)| {
+    //         if xi.is_null() {
+    //             Rfloat::na()
+    //         } else {
+    //             let geom = <&Geom>::from_robj(&xi).unwrap();
+
+    //             match &geom.geom {
+    //                 Geometry::Line(geom) => match geom.vincenty_length().into() {
+    //                     Ok(l) => l.into(),
+    //                     Err(_) => Rfloat::na(),
+    //                 },
+    //                 Geometry::LineString(geom) => match geom.vincenty_length().into() {
+    //                     Ok(l) => l.into(),
+    //                     Err(_) => Rfloat::na(),
+    //                 },
+    //                 Geometry::MultiLineString(geom) => match geom.vincenty_length().into() {
+    //                     Ok(l) => l.into(),
+    //                     Err(_) => Rfloat::na(),
+    //                 },
+    //                 _ => Rfloat::na(),
+    //             }
+    //         }
+    //     })
+    //     .collect::<Doubles>()
 }
 
 extendr_module! {

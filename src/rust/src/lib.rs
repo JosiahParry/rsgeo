@@ -40,7 +40,6 @@ use geo_types::Point;
 #[extendr]
 fn centroids(x: List) -> Robj {
     verify_rsgeo(&x);
-    
     let centroids = x
         .iter()
         .map(|(_, x)| {
