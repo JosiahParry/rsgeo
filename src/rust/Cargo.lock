@@ -373,7 +373,7 @@ checksum = "cbf4a6aa5f6d6888f39e980649f3ad6b666acdce1d78e95b8a2cb076e687ae30"
 
 [[package]]
 name = "rsgeo"
-version = "0.1.0"
+version = "0.1.2"
 dependencies = [
  "extendr-api",
  "geo 0.26.0 (git+https://github.com/josiahparry/geo?branch=segmentize)",
