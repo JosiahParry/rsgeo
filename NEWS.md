@@ -1,7 +1,7 @@
-# rsgeo 0.1.2
+# rsgeo 0.1.3
 
-# rsgeo 0.1.1
-
+* adding additional parallelization to geodesic, haversine, and vincenty lengths
+* paralellization added to minimum bouunding rect
 * line_segmentize() is now parallelized
 
 # rsgeo 0.1.0
