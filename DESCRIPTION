@@ -1,6 +1,6 @@
 Package: rsgeo
 Title: An Interface to Rust's 'geo-types' Library
-Version: 0.1.1
+Version: 0.1.2
 Authors@R: 
     person("Josiah", "Parry", , "josiah.parry@gmail.com", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0001-9910-865X"))
