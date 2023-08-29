@@ -1,3 +1,7 @@
+# rsgeo 0.1.4
+
+* vendoring rust dependencies to make rsgeo capable of being published on CRAN
+
 # rsgeo 0.1.3
 
 * adding additional parallelization to geodesic, haversine, and vincenty lengths

@@ -9,5 +9,6 @@
 ^\.DS_Store$
 ^srcv/rust/\.vscode$
 ^tests$
-^src/rust/\.vscode$
 ^LICENSE\.md$
+^src/vendor$
+^src/rust/\.vscode*$
