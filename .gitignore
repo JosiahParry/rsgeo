@@ -1,2 +1,3 @@
 .Rproj.user
 src/.cargo*
+src/vendor
