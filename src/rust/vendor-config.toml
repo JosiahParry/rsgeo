@@ -1,5 +1,14 @@
 [source.crates-io]
 replace-with = "vendored-sources"
 
+[source."https://github.com/JosiahParry/sfconversions"]
+git = "https://github.com/JosiahParry/sfconversions"
+replace-with = "vendored-sources"
+
+[source."https://github.com/josiahparry/geo"]
+git = "https://github.com/josiahparry/geo"
+branch = "segmentize"
+replace-with = "vendored-sources"
+
 [source.vendored-sources]
 directory = "vendor"
