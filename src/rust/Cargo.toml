@@ -9,7 +9,7 @@ name = 'rsgeo'
 
 [dependencies]
 extendr-api = { version = "0.4.0" }
-geo = { git = "https://github.com/josiahparry/geo", branch = "segmentize"}
+geo = { version = "0.26.0" }
 geo-types = "0.7.8"
 rayon = "1.7.0"
 rstar = "0.11.0"
