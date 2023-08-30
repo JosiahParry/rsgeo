@@ -12,3 +12,4 @@
 ^LICENSE\.md$
 ^src/vendor$
 ^src/rust/\.vscode*$
+^src/rust/vendor$
