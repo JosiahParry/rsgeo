@@ -29,7 +29,7 @@ cast an \code{rs_MULTIPOINT} to an \code{rs_POLYGON}, the validity of the polygo
 cannot be guaranteed.
 
 Conversions from an \code{rs_POLYGON} into an \code{rs_LINESTRING} will result in only
-the exterior ring of the polygon ignoring any interrior rings if there are any.\tabular{ll}{
+the exterior ring of the polygon ignoring any interior rings if there are any.\tabular{ll}{
    From \tab To \cr
    \code{rs_POINT} \tab \code{rs_MULTIPOINT} \cr
    \code{rs_MULTIPOINT} \tab \code{rs_POLYGON}, \code{rs_MULTIPOLYGON}, \code{rs_LINESTRING}, \code{rs_MULTILINESTRING} \cr

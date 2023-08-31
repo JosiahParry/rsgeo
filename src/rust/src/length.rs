@@ -13,7 +13,7 @@ use geo::{EuclideanLength, Geometry};
 /// 
 /// ### Notes
 /// 
-/// * Vicenty, Geodeisc, and Haversine methods will return in units of meters.
+/// * Vicenty, Geodesic, and Haversine methods will return in units of meters.
 /// * Geodesic length will always converge and is more accurate than the Vicenty methods.
 /// * Haversine uses a mean earth radius of 6371.088 km.
 /// 

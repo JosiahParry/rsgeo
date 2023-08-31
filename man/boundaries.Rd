@@ -42,7 +42,7 @@ is a named vector of xmin, ymin, xmax, and ymax where each element is a \code{Po
 }
 }
 \description{
-From a vector of geometries idenitfy different types of boundaries.
+From a vector of geometries identify different types of boundaries.
 }
 \details{
 Note that if you want a convex or concave hull over an entire vector of geometries

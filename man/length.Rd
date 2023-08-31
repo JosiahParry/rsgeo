@@ -28,7 +28,7 @@ Other geometries will return a value of \code{NA}.
 \details{
 \subsection{Notes}{
 \itemize{
-\item Vicenty, Geodeisc, and Haversine methods will return in units of meters.
+\item Vicenty, Geodesic, and Haversine methods will return in units of meters.
 \item Geodesic length will always converge and is more accurate than the Vicenty methods.
 \item Haversine uses a mean earth radius of 6371.088 km.
 }

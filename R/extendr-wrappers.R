@@ -148,7 +148,7 @@ unsigned_area_geodesic <- function(x) .Call(wrap__unsigned_area_geodesic, x)
 #' 
 #' ### Notes
 #' 
-#' * Vicenty, Geodeisc, and Haversine methods will return in units of meters.
+#' * Vicenty, Geodesic, and Haversine methods will return in units of meters.
 #' * Geodesic length will always converge and is more accurate than the Vicenty methods.
 #' * Haversine uses a mean earth radius of 6371.088 km.
 #' 
@@ -301,7 +301,7 @@ line_interpolate_point <- function(x, fraction) .Call(wrap__line_interpolate_poi
 #' @export
 #' @returns 
 #' A numeric vector containing the fraction of of the LineString that
-#' would need to be travelled to reach the closest point.
+#' would need to be traveled to reach the closest point.
 #' @examples
 #' x <- geom_linestring(c(-1, 0, 0), c(0, 0, 1))
 #' y <- geom_point(-0.5, 0)
@@ -336,7 +336,7 @@ extreme_coords <- function(x) .Call(wrap__extreme_coords, x)
 
 #' Compute Geometric Boundaries
 #'
-#' From a vector of geometries idenitfy different types of boundaries.
+#' From a vector of geometries identify different types of boundaries.
 #' 
 #' Note that if you want a convex or concave hull over an entire vector of geometries 
 #' you must first union or combine them using either `combine_geoms()` or `union_geoms()`

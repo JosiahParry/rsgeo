@@ -16,7 +16,7 @@
 #' cannot be guaranteed.
 #'
 #' Conversions from an `rs_POLYGON` into an `rs_LINESTRING` will result in only
-#' the exterior ring of the polygon ignoring any interrior rings if there are any.
+#' the exterior ring of the polygon ignoring any interior rings if there are any.
 #'
 #' | From        | To          |
 #' | ----------- | ----------- |

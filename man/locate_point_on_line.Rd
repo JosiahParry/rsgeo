@@ -13,7 +13,7 @@ locate_point_on_line(x, y)
 }
 \value{
 A numeric vector containing the fraction of of the LineString that
-would need to be travelled to reach the closest point.
+would need to be traveled to reach the closest point.
 }
 \description{
 Calculates the fraction of a LineString's length to a point

@@ -15,7 +15,7 @@ use rayon::prelude::*;
 #[extendr]
 /// Compute Geometric Boundaries
 ///
-/// From a vector of geometries idenitfy different types of boundaries.
+/// From a vector of geometries identify different types of boundaries.
 /// 
 /// Note that if you want a convex or concave hull over an entire vector of geometries 
 /// you must first union or combine them using either `combine_geoms()` or `union_geoms()`

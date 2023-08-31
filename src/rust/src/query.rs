@@ -387,7 +387,7 @@ fn line_interpolate_point(x: List, fraction: Doubles) -> Robj {
 /// @export
 /// @returns 
 /// A numeric vector containing the fraction of of the LineString that
-/// would need to be travelled to reach the closest point.
+/// would need to be traveled to reach the closest point.
 /// @examples
 /// x <- geom_linestring(c(-1, 0, 0), c(0, 0, 1))
 /// y <- geom_point(-0.5, 0)

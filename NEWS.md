@@ -4,14 +4,14 @@
 
 # rsgeo 0.1.3
 
-* adding additional parallelization to geodesic, haversine, and vincenty lengths
-* paralellization added to minimum bouunding rect
+* adding additional parallelization to geodesic, Haversine, and Vincenty lengths
+* parallelization added to minimum bounding rect
 * line_segmentize() is now parallelized
 
 # rsgeo 0.1.0
 
 * Complete rewrite of rsgeo from the ground up.
-* distances matrixes are calculated in parallel using rayon
+* distances matrices are calculated in parallel using rayon
 * removes cloning where possible reducing the overall memory footprint even more
 
 
