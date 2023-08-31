@@ -1,5 +1,8 @@
 
-<!-- README.md is generated from README.Rmd. Please edit that file -->
+<!-- badges: start -->
+
+[![R-CMD-check](https://github.com/JosiahParry/rsgeo/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/JosiahParry/rsgeo/actions/workflows/R-CMD-check.yaml)
+<!-- badges: end -->
 
 # rsgeo
 
@@ -70,8 +73,8 @@ bench::mark(
 #> # A tibble: 2 × 6
 #>   expression      min   median `itr/sec` mem_alloc `gc/sec`
 #>   <bch:expr> <bch:tm> <bch:tm>     <dbl> <bch:byt>    <dbl>
-#> 1 rust        53.96µs   55.8µs    17616.     3.8KB      0  
-#> 2 sf           1.34ms    1.4ms      709.   786.9KB     10.7
+#> 1 rust         55.6µs  57.65µs    16411.     3.8KB     0   
+#> 2 sf           1.36ms   1.44ms      649.   786.9KB     8.42
 ```
 
 Find centroids
@@ -85,8 +88,8 @@ bench::mark(
 #> # A tibble: 2 × 6
 #>   expression                  min   median `itr/sec` mem_alloc `gc/sec`
 #>   <bch:expr>             <bch:tm> <bch:tm>     <dbl> <bch:byt>    <dbl>
-#> 1 centroids(rs_polys)    162.61µs 203.24µs     4166.     3.8KB    14.6 
-#> 2 sf::st_centroid(polys)   2.34ms   2.46ms      404.   892.9KB     6.70
+#> 1 centroids(rs_polys)    174.95µs    213µs     3720.     3.8KB     9.53
+#> 2 sf::st_centroid(polys)   2.43ms    2.6ms      359.   892.9KB     4.70
 ```
 
 Extract points coordinates
@@ -127,8 +130,8 @@ bench::mark(
 #> # A tibble: 2 × 6
 #>   expression      min   median `itr/sec` mem_alloc `gc/sec`
 #>   <bch:expr> <bch:tm> <bch:tm>     <dbl> <bch:byt>    <dbl>
-#> 1 rust          305µs 429.43µs     2266.     108KB     6.15
-#> 2 sf            3.4ms   3.56ms      280.     351KB     2.03
+#> 1 rust       323.53µs 573.06µs     1540.     108KB     4.08
+#> 2 sf           3.48ms   3.69ms      256.     351KB     0
 ```
 
 Simplify geometries.
@@ -151,8 +154,8 @@ bench::mark(
 #> # A tibble: 2 × 6
 #>   expression      min   median `itr/sec` mem_alloc `gc/sec`
 #>   <bch:expr> <bch:tm> <bch:tm>     <dbl> <bch:byt>    <dbl>
-#> 1 rust         5.95ms   6.23ms      161.    1.91KB     2.04
-#> 2 sf           7.94ms   8.29ms      121.    1.24MB     4.17
+#> 1 rust         6.29ms   6.76ms      141.    1.91KB     0   
+#> 2 sf           8.52ms   9.02ms      108.    1.24MB     2.08
 ```
 
 Union geometries with `union_geoms()`. Some things sf is better at! One
@@ -174,8 +177,8 @@ bench::mark(
 #> # A tibble: 2 × 6
 #>   expression                 min   median `itr/sec` mem_alloc `gc/sec`
 #>   <bch:expr>            <bch:tm> <bch:tm>     <dbl> <bch:byt>    <dbl>
-#> 1 union_geoms(rs_polys)    195ms    198ms      5.01        0B        0
-#> 2 sf::st_union(polys)      111ms    113ms      8.91     921KB        0
+#> 1 union_geoms(rs_polys)    205ms    209ms      4.78        0B        0
+#> 2 sf::st_union(polys)      120ms    134ms      7.49     921KB        0
 ```
 
 We can cast between geometries as well.
@@ -197,8 +200,8 @@ bench::mark(
 #> # A tibble: 2 × 6
 #>   expression                min   median `itr/sec` mem_alloc `gc/sec`
 #>   <bch:expr>           <bch:tm> <bch:tm>     <dbl> <bch:byt>    <dbl>
-#> 1 union_geoms(lns)      119.7µs  175.2µs    5015.         0B     0   
-#> 2 sf::st_union(lns_sf)   83.5ms   84.5ms      11.8    2.46MB     2.95
+#> 1 union_geoms(lns)      117.5µs    174µs    4275.         0B     0   
+#> 2 sf::st_union(lns_sf)   87.8ms     94ms      10.7    2.46MB     2.68
 ```
 
 Find the closest point to a geometry
@@ -227,8 +230,8 @@ bench::mark(
 #> # A tibble: 2 × 6
 #>   expression      min   median `itr/sec` mem_alloc `gc/sec`
 #>   <bch:expr> <bch:tm> <bch:tm>     <dbl> <bch:byt>    <dbl>
-#> 1 rust         5.33µs   6.36µs   145500.     3.2KB     14.6
-#> 2 Cpp         15.87µs   17.1µs    50544.    11.8MB     30.3
+#> 1 rust         5.86µs   7.34µs   120442.     3.2KB     12.0
+#> 2 Cpp         17.06µs  19.11µs    34150.    11.8MB     34.2
 ```
 
 ``` r
