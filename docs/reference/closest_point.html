@@ -14,7 +14,7 @@ or unable to be determined."><!-- mathjax --><script src="https://cdnjs.cloudfla
     
     <a class="navbar-brand me-2" href="../index.html">rsgeo</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.5</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -85,28 +85,28 @@ or unable to be determined.</p>
 <span class="r-in"><span><span class="va">y</span> <span class="op">&lt;-</span> <span class="fu"><a href="construction.html">geom_point</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">10</span>, <span class="fl">0</span>, <span class="fl">90</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">10</span>, <span class="fl">1</span>, <span class="fl">90</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">closest_point</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> &lt;rs_POINT[10]&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [1] Point(Coord { x: 42.105933494785695, y: 66.06050124702755 }))</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [2] Point(Coord { x: 50.04989634195688, y: 74.61122189706461 })) </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [3] Point(Coord { x: 29.0, y: 2.5417980761267245 }))             </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [4] Point(Coord { x: 67.0, y: 89.15954707190394 }))              </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [5] Point(Coord { x: 10.0, y: 0.10015812702476978 }))            </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [6] Point(Coord { x: 21.0, y: 30.82952815806493 }))              </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [7] Point(Coord { x: 18.0, y: 77.03447380336002 }))              </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [8] Point(Coord { x: 73.0, y: 4.822875838726759 }))              </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [9] Point(Coord { x: 4.0, y: 16.481087976135314 }))              </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [10] Point(Coord { x: 56.0, y: 4.848692351952195 }))              </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [1] Point(Coord { x: 84.0, y: 11.483372070360929 }))            </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [2] Point(Coord { x: 10.0, y: 18.85957977734506 }))             </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [3] Point(Coord { x: 77.61921156519773, y: 33.40977802142936 }))</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [4] Point(Coord { x: 96.0, y: 75.87950785411522 }))             </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [5] Point(Coord { x: 41.0, y: 43.84337919065729 }))             </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [6] Point(Coord { x: 58.0, y: 7.718244781717658 }))             </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [7] Point(Coord { x: 23.0, y: 11.542766445782036 }))            </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [8] Point(Coord { x: 37.0, y: 7.24323813803494 }))              </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [9] Point(Coord { x: 55.0, y: 17.83652296056971 }))             </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [10] Point(Coord { x: 83.51254260478824, y: 52.68513819522518 }))</span>
 <span class="r-in"><span><span class="fu">closest_point_haversine</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> &lt;rs_POINT[10]&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [1] Point(Coord { x: 36.84497877613438, y: 67.96936835838562 }))</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [2] Point(Coord { x: 68.22521853475159, y: 74.57662287461321 }))</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [3] Point(Coord { x: 29.0, y: 2.5417980761267245 }))            </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [4] Point(Coord { x: 67.0, y: 89.15954707190394 }))             </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [5] Point(Coord { x: 10.0, y: 0.10015812702476978 }))           </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [6] Point(Coord { x: 21.0, y: 30.82952815806493 }))             </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [7] Point(Coord { x: 98.0, y: 65.52344706840813 }))             </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [8] Point(Coord { x: 73.0, y: 4.822875838726759 }))             </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [9] Point(Coord { x: 4.0, y: 16.481087976135314 }))             </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [10] Point(Coord { x: 56.0, y: 4.848692351952195 }))             </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [1] Point(Coord { x: 84.0, y: 11.483372070360929 }))             </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [2] Point(Coord { x: 10.0, y: 18.85957977734506 }))              </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [3] Point(Coord { x: 76.30118630977954, y: 33.758957313218794 }))</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [4] Point(Coord { x: 6.0, y: 89.2960596922785 }))                </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [5] Point(Coord { x: 41.0, y: 43.84337919065729 }))              </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [6] Point(Coord { x: 28.0, y: 2.9271399811841547 }))             </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [7] Point(Coord { x: 73.0, y: 80.77474147779867 }))              </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [8] Point(Coord { x: 37.0, y: 7.24323813803494 }))               </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [9] Point(Coord { x: 55.0, y: 17.83652296056971 }))              </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [10] Point(Coord { x: 79.33013341522914, y: 52.7517525104448 }))  </span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>

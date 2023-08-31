@@ -10,6 +10,13 @@
 #' @param epsilon a tolerance parameter. Cannot be equal to or less than 0.
 #' @export
 #' @rdname simplify
+#' @returns an object of class `rsgeo`
+#' @examples
+#' x <- geom_linestring(1:100, runif(100, 5, 10))
+#'
+#' simplify_geoms(x, 3)
+#' simplify_vw_geoms(x, 2)
+#' simplify_vw_preserve_geoms(x, 100)
 simplify_geoms <- function(x, epsilon) simplify_geoms_(x, as.double(epsilon))
 
 #' @export

@@ -19,3 +19,8 @@ Plotting geometries utilizes \code{wk::wk_plot()}. The rust geometries are
 handled by first converting to an \code{sfc} object in the \code{wk::wk_handle()}
 method thus requiring both packages for plotting.
 }
+\examples{
+if (rlang::is_installed(c("sf", "wk"))) {
+  plot(geom_linestring(1:10, runif(10)))
+}
+}

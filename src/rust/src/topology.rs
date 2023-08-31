@@ -21,6 +21,31 @@ use std::sync::Mutex;
 /// 
 /// @export
 /// @rdname topology
+/// @examples
+/// if (rlang::is_installed("sf")) {
+///     nc <- sf::st_read(
+///       system.file("shape/nc.shp", package = "sf"),
+///       quiet = TRUE
+///     )
+///     
+///     x <- as_rsgeo(nc$geometry[1:5])
+///     y <- rev(x)
+///     
+///     # intersects
+///     intersects_sparse(x, y)
+///     intersects_pairwise(x, y)
+///     # contains 
+///     contains_sparse(x, y)
+///     contains_pairwise(x, y)
+///     # within
+///     within_sparse(x, y)
+///     within_pairwise(x, y)
+/// }
+/// @returns 
+/// - For `_sparse` a list of integer vectors containing the position 
+/// of the geometry in `y`
+/// 
+/// - For `_pairwise` a logical vector
 fn intersects_sparse(x: List, y: List) -> List {
 
     if !x.inherits("rsgeo") || !y.inherits("rsgeo") {

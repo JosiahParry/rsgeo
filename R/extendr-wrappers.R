@@ -108,6 +108,7 @@ haversine_intermediate <- function(x, y, distance) .Call(wrap__haversine_interme
 #' - [Area](https://docs.rs/geo/latest/geo/algorithm/area/trait.Area.html#)
 #' - [ChamberlainDuquetteArea](https://docs.rs/geo/latest/geo/algorithm/chamberlain_duquette_area/trait.ChamberlainDuquetteArea.html)
 #' 
+#' @examples
 #' x <- c(0, 1, 1, 0, 0)
 #' y <- c(0, 0, 1, 1, 0)
 #' p <- geom_polygon(x, y)
@@ -405,6 +406,31 @@ frechet_distance <- function(x, y) .Call(wrap__frechet_distance, x, y)
 #' 
 #' @export
 #' @rdname topology
+#' @examples
+#' if (rlang::is_installed("sf")) {
+#'     nc <- sf::st_read(
+#'       system.file("shape/nc.shp", package = "sf"),
+#'       quiet = TRUE
+#'     )
+#'     
+#'     x <- as_rsgeo(nc$geometry[1:5])
+#'     y <- rev(x)
+#'     
+#'     # intersects
+#'     intersects_sparse(x, y)
+#'     intersects_pairwise(x, y)
+#'     # contains 
+#'     contains_sparse(x, y)
+#'     contains_pairwise(x, y)
+#'     # within
+#'     within_sparse(x, y)
+#'     within_pairwise(x, y)
+#' }
+#' @returns 
+#' - For `_sparse` a list of integer vectors containing the position 
+#' of the geometry in `y`
+#' 
+#' - For `_pairwise` a logical vector
 intersects_sparse <- function(x, y) .Call(wrap__intersects_sparse, x, y)
 
 #' @export
@@ -544,7 +570,7 @@ multipolygon_to_coords <- function(x) .Call(wrap__multipolygon_to_coords, x)
 #' @rdname distance
 #' @examples
 #' set.seed(1)
-#' x <- geom_point(runif(10, -1, 1), runif(10, -1, 1))
+#' x <- geom_point(runif(5, -1, 1), runif(5, -1, 1))
 #' y <- rev(x)
 #'
 #' distance_euclidean_matrix(x, y)

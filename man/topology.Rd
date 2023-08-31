@@ -26,8 +26,36 @@ within_pairwise(x, y)
 
 \item{y}{an object of class \code{rsgeo}}
 }
+\value{
+\itemize{
+\item For \verb{_sparse} a list of integer vectors containing the position
+of the geometry in \code{y}
+\item For \verb{_pairwise} a logical vector
+}
+}
 \description{
 Functions to ascertain the binary relationship between
 two geometry vectors. Binary predicates are provided both pairwise
 as a sparse matrix.
+}
+\examples{
+if (rlang::is_installed("sf")) {
+    nc <- sf::st_read(
+      system.file("shape/nc.shp", package = "sf"),
+      quiet = TRUE
+    )
+    
+    x <- as_rsgeo(nc$geometry[1:5])
+    y <- rev(x)
+    
+    # intersects
+    intersects_sparse(x, y)
+    intersects_pairwise(x, y)
+    # contains 
+    contains_sparse(x, y)
+    contains_pairwise(x, y)
+    # within
+    within_sparse(x, y)
+    within_pairwise(x, y)
+}
 }

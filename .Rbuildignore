@@ -13,3 +13,5 @@
 ^src/vendor$
 ^src/rust/\.vscode*$
 ^src/rust/vendor$
+^cran-comments\.md$
+^\.github$

@@ -17,6 +17,9 @@ simplify_vw_preserve_geoms(x, epsilon)
 
 \item{epsilon}{a tolerance parameter. Cannot be equal to or less than 0.}
 }
+\value{
+an object of class \code{rsgeo}
+}
 \description{
 Simplifies LineStrings, Polygons, and their Multi- counterparts.
 }
@@ -25,4 +28,11 @@ Simplify functions use the Ramer–Douglas–Peucker algorithm. Functions with \
 the Visvalingam-Whyatt algorithm.
 
 For more see \href{https://docs.rs/geo/latest/geo/index.html#simplification}{\code{geo} docs}.
+}
+\examples{
+x <- geom_linestring(1:100, runif(100, 5, 10))
+
+simplify_geoms(x, 3)
+simplify_vw_geoms(x, 2)
+simplify_vw_preserve_geoms(x, 100)
 }

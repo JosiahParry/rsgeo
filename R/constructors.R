@@ -10,7 +10,6 @@
 #' @export
 #' @rdname construction
 #' @examples
-#'
 #' geom_point(3, 0.14)
 #' geom_multipoint(1:10, 10:1)
 #' geom_linestring(1:10, 10:1)

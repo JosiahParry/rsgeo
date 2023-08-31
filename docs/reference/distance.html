@@ -12,7 +12,7 @@ a number of different distance methods that can be utilized."><!-- mathjax --><s
     
     <a class="navbar-brand me-2" href="../index.html">rsgeo</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.5</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -116,150 +116,65 @@ geometries in rsgeo, so choose your distance measure appropriately.</p><div clas
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">x</span> <span class="op">&lt;-</span> <span class="fu"><a href="construction.html">geom_point</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">10</span>, <span class="op">-</span><span class="fl">1</span>, <span class="fl">1</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">10</span>, <span class="op">-</span><span class="fl">1</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">x</span> <span class="op">&lt;-</span> <span class="fu"><a href="construction.html">geom_point</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">5</span>, <span class="op">-</span><span class="fl">1</span>, <span class="fl">1</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">5</span>, <span class="op">-</span><span class="fl">1</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">y</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/rev.html" class="external-link">rev</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu">distance_euclidean_matrix</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>            [,1]      [,2]      [,3]      [,4]      [,5]      [,6]      [,7]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [1,] 1.2133944 0.8062406 1.7594793 1.7006432 1.3937599 1.1349355 1.3338548</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [2,] 1.3525922 0.6555834 1.7298869 1.5755163 1.2330258 1.2345642 1.1497159</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [3,] 1.0380092 0.6242009 0.6346275 0.7461572 0.7531728 0.7605975 0.9038199</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [4,] 1.8667050 0.5582468 1.3124564 0.6710052 0.2280381 1.6099346 0.0000000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [5,] 0.2802043 1.1569738 1.0200002 1.4896528 1.4959453 0.0000000 1.6099346</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [6,] 1.7642711 0.5877217 1.0967047 0.4494745 0.0000000 1.4959453 0.2280381</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [7,] 1.7698274 0.9242108 0.7894811 0.0000000 0.4494745 1.4896528 0.6710052</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [8,] 1.2724909 1.2253814 0.0000000 0.7894811 1.0967047 1.0200002 1.3124564</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [9,] 1.3853455 0.0000000 1.2253814 0.9242108 0.5877217 1.1569738 0.5582468</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [10,] 0.0000000 1.3853455 1.2724909 1.7698274 1.7642711 0.2802043 1.8667050</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>            [,8]      [,9]     [,10]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [1,] 1.1416973 0.2211987 0.0000000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [2,] 1.0970286 0.0000000 0.2211987</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [3,] 0.0000000 1.0970286 1.1416973</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [4,] 0.9038199 1.1497159 1.3338548</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [5,] 0.7605975 1.2345642 1.1349355</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [6,] 0.7531728 1.2330258 1.3937599</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [7,] 0.7461572 1.5755163 1.7006432</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [8,] 0.6346275 1.7298869 1.7594793</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [9,] 0.6242009 0.6555834 0.8062406</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [10,] 1.0380092 1.3525922 1.2133944</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>          [,1]      [,2]      [,3]      [,4]      [,5]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1,] 1.678069 1.3936593 0.7769445 0.2324579 0.0000000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [2,] 1.798381 1.2441299 0.6953524 0.0000000 0.2324579</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [3,] 1.409373 0.6736956 0.0000000 0.6953524 0.7769445</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [4,] 1.812225 0.0000000 0.6736956 1.2441299 1.3936593</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [5,] 0.000000 1.8122247 1.4093730 1.7983809 1.6780693</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> attr(,"class")</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "matrix" "array" </span>
 <span class="r-in"><span><span class="fu">distance_hausdorff_matrix</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>            [,1]      [,2]      [,3]      [,4]      [,5]      [,6]      [,7]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [1,] 1.2133944 0.8062406 1.7594793 1.7006432 1.3937599 1.1349355 1.3338548</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [2,] 1.3525922 0.6555834 1.7298869 1.5755163 1.2330258 1.2345642 1.1497159</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [3,] 1.0380092 0.6242009 0.6346275 0.7461572 0.7531728 0.7605975 0.9038199</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [4,] 1.8667050 0.5582468 1.3124564 0.6710052 0.2280381 1.6099346 0.0000000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [5,] 0.2802043 1.1569738 1.0200002 1.4896528 1.4959453 0.0000000 1.6099346</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [6,] 1.7642711 0.5877217 1.0967047 0.4494745 0.0000000 1.4959453 0.2280381</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [7,] 1.7698274 0.9242108 0.7894811 0.0000000 0.4494745 1.4896528 0.6710052</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [8,] 1.2724909 1.2253814 0.0000000 0.7894811 1.0967047 1.0200002 1.3124564</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [9,] 1.3853455 0.0000000 1.2253814 0.9242108 0.5877217 1.1569738 0.5582468</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [10,] 0.0000000 1.3853455 1.2724909 1.7698274 1.7642711 0.2802043 1.8667050</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>            [,8]      [,9]     [,10]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [1,] 1.1416973 0.2211987 0.0000000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [2,] 1.0970286 0.0000000 0.2211987</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [3,] 0.0000000 1.0970286 1.1416973</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [4,] 0.9038199 1.1497159 1.3338548</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [5,] 0.7605975 1.2345642 1.1349355</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [6,] 0.7531728 1.2330258 1.3937599</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [7,] 0.7461572 1.5755163 1.7006432</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [8,] 0.6346275 1.7298869 1.7594793</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [9,] 0.6242009 0.6555834 0.8062406</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [10,] 1.0380092 1.3525922 1.2133944</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>          [,1]      [,2]      [,3]      [,4]      [,5]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1,] 1.678069 1.3936593 0.7769445 0.2324579 0.0000000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [2,] 1.798381 1.2441299 0.6953524 0.0000000 0.2324579</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [3,] 1.409373 0.6736956 0.0000000 0.6953524 0.7769445</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [4,] 1.812225 0.0000000 0.6736956 1.2441299 1.3936593</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [5,] 0.000000 1.8122247 1.4093730 1.7983809 1.6780693</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> attr(,"class")</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "matrix" "array" </span>
 <span class="r-in"><span><span class="fu">distance_vicenty_matrix</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>            [,1]      [,2]      [,3]      [,4]      [,5]      [,6]      [,7]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [1,] 134272.26  89636.58 194817.22 188855.18 154968.89 125505.43 148409.63</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [2,] 149774.17  72789.93 191424.33 174831.28 137008.98 136581.25 127870.95</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [3,] 115523.55  69035.72  70209.61  83056.06  83700.88  84639.96 100310.40</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [4,] 207552.27  62143.14 145262.60  74201.85  25216.41 178940.79      0.00</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [5,]  31190.18 128402.20 113393.90 165815.99 166378.62      0.00 178940.79</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [6,] 196263.22  65354.70 121420.16  49714.56      0.00 166378.62  25216.41</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [7,] 197002.96 102515.35  87597.49      0.00  49714.56 165815.99  74201.85</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [8,] 141534.10 135498.20      0.00  87597.49 121420.16 113393.90 145262.60</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [9,] 153875.69      0.00 135498.20 102515.35  65354.70 128402.20  62143.14</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [10,]      0.00 153875.69 141534.10 197002.96 196263.22  31190.18 207552.27</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>            [,8]      [,9]     [,10]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [1,] 126489.10  24610.78      0.00</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [2,] 121412.72      0.00  24610.78</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [3,]      0.00 121412.72 126489.10</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [4,] 100310.40 127870.95 148409.63</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [5,]  84639.96 136581.25 125505.43</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [6,]  83700.88 137008.98 154968.89</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [7,]  83056.06 174831.28 188855.18</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [8,]  70209.61 191424.33 194817.22</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [9,]  69035.72  72789.93  89636.58</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [10,] 115523.55 149774.17 134272.26</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>          [,1]      [,2]      [,3]      [,4]      [,5]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1,] 185558.6 154980.77  86270.25  25847.36      0.00</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [2,] 198902.8 138252.31  77059.72      0.00  25847.36</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [3,] 156131.3  74990.08      0.00  77059.72  86270.25</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [4,] 201203.9      0.00  74990.08 138252.31 154980.77</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [5,]      0.0 201203.87 156131.25 198902.84 185558.65</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> attr(,"class")</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "matrix" "array" </span>
 <span class="r-in"><span><span class="fu">distance_geodesic_matrix</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>            [,1]      [,2]      [,3]      [,4]      [,5]      [,6]      [,7]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [1,] 134272.26  89636.58 194817.22 188855.18 154968.89 125505.43 148409.63</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [2,] 149774.17  72789.93 191424.33 174831.28 137008.98 136581.25 127870.95</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [3,] 115523.55  69035.72  70209.61  83056.06  83700.88  84639.96 100310.40</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [4,] 207552.27  62143.14 145262.60  74201.85  25216.41 178940.79      0.00</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [5,]  31190.18 128402.20 113393.90 165815.99 166378.62      0.00 178940.79</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [6,] 196263.22  65354.70 121420.16  49714.56      0.00 166378.62  25216.41</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [7,] 197002.96 102515.35  87597.49      0.00  49714.56 165815.99  74201.85</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [8,] 141534.10 135498.20      0.00  87597.49 121420.16 113393.90 145262.60</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [9,] 153875.69      0.00 135498.20 102515.35  65354.70 128402.20  62143.14</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [10,]      0.00 153875.69 141534.10 197002.96 196263.22  31190.18 207552.27</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>            [,8]      [,9]     [,10]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [1,] 126489.10  24610.78      0.00</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [2,] 121412.72      0.00  24610.78</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [3,]      0.00 121412.72 126489.10</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [4,] 100310.40 127870.95 148409.63</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [5,]  84639.96 136581.25 125505.43</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [6,]  83700.88 137008.98 154968.89</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [7,]  83056.06 174831.28 188855.18</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [8,]  70209.61 191424.33 194817.22</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [9,]  69035.72  72789.93  89636.58</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [10,] 115523.55 149774.17 134272.26</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>          [,1]      [,2]      [,3]      [,4]      [,5]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1,] 185558.6 154980.77  86270.25  25847.36      0.00</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [2,] 198902.8 138252.31  77059.72      0.00  25847.36</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [3,] 156131.3  74990.08      0.00  77059.72  86270.25</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [4,] 201203.9      0.00  74990.08 138252.31 154980.77</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [5,]      0.0 201203.87 156131.25 198902.84 185558.65</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> attr(,"class")</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "matrix" "array" </span>
 <span class="r-in"><span><span class="fu">distance_haversine_matrix</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>            [,1]      [,2]      [,3]      [,4]      [,5]      [,6]      [,7]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [1,] 134923.24  89647.97 195643.97 189101.44 154976.98 126199.22 148314.34</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [2,] 150401.00  72896.21 192354.10 175188.13 137104.27 137277.27 127839.24</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [3,] 115417.79  69408.06  70567.05  82966.95  83748.67  84572.11 100500.02</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [4,] 207566.40  62073.77 145937.86  74612.47  25356.71 179015.27      0.00</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [5,]  31155.92 128649.02 113410.65 165636.07 166339.64      0.00 179015.27</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [6,] 196175.53  65351.60 121947.05  49979.34      0.00 166339.64  25356.71</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [7,] 196788.75 102767.34  87782.76      0.00  49979.34 165636.07  74612.47</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [8,] 141483.13 136256.37      0.00  87782.76 121947.05 113410.65 145937.86</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [9,] 154042.39      0.00 136256.37 102767.34  65351.60 128649.02  62073.77</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [10,]      0.00 154042.39 141483.13 196788.75 196175.53  31155.92 207566.40</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>            [,8]      [,9]     [,10]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [1,] 126950.63  24594.88      0.00</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [2,] 121983.92      0.00  24594.88</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [3,]      0.00 121983.92 126950.63</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [4,] 100500.02 127839.24 148314.34</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [5,]  84572.11 137277.27 126199.22</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [6,]  83748.67 137104.27 154976.98</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [7,]  82966.95 175188.13 189101.44</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [8,]  70567.05 192354.10 195643.97</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [9,]  69408.06  72896.21  89647.97</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [10,] 115417.79 150401.00 134923.24</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>          [,1]      [,2]      [,3]      [,4]      [,5]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1,] 186593.0 154961.98  86389.67  25845.81      0.00</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [2,] 199970.8 138335.46  77318.22      0.00  25845.81</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [3,] 156714.0  74910.69      0.00  77318.22  86389.67</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [4,] 201506.7      0.00  74910.69 138335.46 154961.98</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [5,]      0.0 201506.69 156714.04 199970.82 186593.01</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> attr(,"class")</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "matrix" "array" </span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu">distance_euclidean_pairwise</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [1] 1.2133944 0.6555834 0.6346275 0.6710052 1.4959453 1.4959453 0.6710052</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [8] 0.6346275 0.6555834 1.2133944</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 1.678069 1.244130 0.000000 1.244130 1.678069</span>
 <span class="r-in"><span><span class="fu">distance_hausdorff_pairwise</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [1] 1.2133944 0.6555834 0.6346275 0.6710052 1.4959453 1.4959453 0.6710052</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [8] 0.6346275 0.6555834 1.2133944</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 1.678069 1.244130 0.000000 1.244130 1.678069</span>
 <span class="r-in"><span><span class="fu">distance_vicenty_pairwise</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [1] 134272.26  72789.93  70209.61  74201.85 166378.62 166378.62  74201.85</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [8]  70209.61  72789.93 134272.26</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 185558.6 138252.3      0.0 138252.3 185558.6</span>
 <span class="r-in"><span><span class="fu">distance_geodesic_pairwise</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [1] 134272.26  72789.93  70209.61  74201.85 166378.62 166378.62  74201.85</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [8]  70209.61  72789.93 134272.26</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 185558.6 138252.3      0.0 138252.3 185558.6</span>
 <span class="r-in"><span><span class="fu">distance_haversine_pairwise</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [1] 134923.24  72896.21  70567.05  74612.47 166339.64 166339.64  74612.47</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [8]  70567.05  72896.21 134923.24</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 186593.0 138335.5      0.0 138335.5 186593.0</span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>

@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">rsgeo</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.5</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -78,11 +78,11 @@
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">x</span> <span class="op">&lt;-</span> <span class="fu"><a href="construction.html">geom_point</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">10</span>, <span class="fl">0</span>, <span class="fl">90</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">10</span>, <span class="fl">1</span>, <span class="fl">90</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">y</span> <span class="op">&lt;-</span> <span class="fu"><a href="construction.html">geom_point</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">10</span>, <span class="fl">0</span>, <span class="fl">90</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">10</span>, <span class="fl">1</span>, <span class="fl">90</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">bearing_geodesic</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [1]       NaN       NaN       NaN       NaN       NaN       NaN -156.0372</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [8]       NaN -171.1058       NaN</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [1]        NaN        NaN  179.14615        NaN -169.78704  -21.37059</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [7]  -35.43528        NaN        NaN        NaN</span>
 <span class="r-in"><span><span class="fu">bearing_haversine</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [1]  171.1833  -13.2571 -135.6593 -149.9801 -152.2839 -177.8303 -156.0393</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [8] -173.6608 -171.1432 -108.8116</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [1]  104.46485 -172.50379  179.14814 -174.39653 -169.83134  -21.29559</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [7]  -35.40982  -39.02401 -169.45350  134.68699</span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>

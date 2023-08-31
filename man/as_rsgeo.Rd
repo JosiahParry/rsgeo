@@ -9,6 +9,15 @@ as_rsgeo(x)
 \arguments{
 \item{x}{a geometry vector}
 }
+\value{
+an object of class \code{rsgeo}
+}
 \description{
-Convert to an \code{rsgeo} vector
+Given an vector of geometries, cast it as an \code{rsgeo} class object.
+}
+\examples{
+\dontshow{if (rlang::is_installed("sf")) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
+x <- sf::st_sfc(sf::st_point(c(0,0)))
+as_rsgeo(x)
+\dontshow{\}) # examplesIf}
 }

@@ -44,7 +44,8 @@ See geo docs for more:
 \item \href{https://docs.rs/geo/latest/geo/algorithm/area/trait.Area.html#}{Area}
 \item \href{https://docs.rs/geo/latest/geo/algorithm/chamberlain_duquette_area/trait.ChamberlainDuquetteArea.html}{ChamberlainDuquetteArea}
 }
-
+}
+\examples{
 x <- c(0, 1, 1, 0, 0)
 y <- c(0, 0, 1, 1, 0)
 p <- geom_polygon(x, y)

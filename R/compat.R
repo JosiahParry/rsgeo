@@ -30,6 +30,11 @@ wk_crs.rsgeo <- function(x) NA
 #' @param ... arguments passed to `wk::wk_plot()`
 #'
 #' @export
+#' @returns NULL
+#' @examples
+#' if (rlang::is_installed(c("sf", "wk"))) {
+#'   plot(geom_linestring(1:10, runif(10)))
+#' }
 plot.rsgeo <- function(x, ...) {
   rlang::check_installed(c("wk", "sf"))
   wk::wk_plot(x, ...)

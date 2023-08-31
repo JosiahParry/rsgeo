@@ -39,7 +39,7 @@ use geo::{
 /// @rdname distance
 /// @examples
 /// set.seed(1)
-/// x <- geom_point(runif(10, -1, 1), runif(10, -1, 1))
+/// x <- geom_point(runif(5, -1, 1), runif(5, -1, 1))
 /// y <- rev(x)
 ///
 /// distance_euclidean_matrix(x, y)
