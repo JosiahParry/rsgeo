@@ -7,31 +7,28 @@ all: C_clean
 
 $(SHLIB): $(STATLIB)
 
-CRAN_FLAGS=-j 2 --offline
 CARGOTMP = $(CURDIR)/.cargo
+VENDOR_DIR = ./rust/vendor
 
 $(STATLIB):
-
-		if [ -f rust/vendor.tar.xz ]; then tar xf rust/vendor.tar.xz && mkdir -p $(CARGOTMP) && cp ./rust/vendor-config.toml $(CARGOTMP)/config.toml;	fi
+	if [ -f ./rust/vendor.tar.xz ]; then \
+		mkdir -p $(VENDOR_DIR) && \
+		$(TAR) --extract --xz --file ./rust/vendor.tar.xz -C $(VENDOR_DIR) && \
+		mkdir -p $(CARGOTMP) && \
+		cp ./rust/vendor-config.toml $(CARGOTMP)/config.toml; \
+	fi
 
 	# In some environments, ~/.cargo/bin might not be included in PATH, so we need
 	# to set it here to ensure cargo can be invoked. It is appended to PATH and
 	# therefore is only used if cargo is absent from the user's PATH.
 	if [ "$(NOT_CRAN)" != "true" ]; then \
 		export CARGO_HOME=$(CARGOTMP); \
+		export CARGO_BUILD_JOBS=2; \
 	fi && \
-		export PATH="$(PATH):$(HOME)/.cargo/bin" \
-		# To comply with CRAN policy the versions of cargo and rustc
-		# need to be inlcuded in the installation log
-	  echo `cargo --version` && echo `rustc --version` && \
-		cargo build $(CRAN_FLAGS) --lib --release --manifest-path=./rust/Cargo.toml --target-dir $(TARGET_DIR)
+		export PATH="$(PATH):$(HOME)/.cargo/bin" && \
+		cargo build --lib --release --manifest-path=./rust/Cargo.toml --target-dir $(TARGET_DIR)
 	if [ "$(NOT_CRAN)" != "true" ]; then \
-		rm -Rf $(CARGOTMP) vendor && \
-		rm -Rf $(LIBDIR)/build; \
-	fi
-
-	if [ "$(NOT_CRAN)" != "true" ]; then \
-		rm -Rf $(CARGOTMP) ./rust/vendor $(LIBDIR)/build; \
+		rm -Rf $(CARGOTMP) $(VENDOR_DIR) $(LIBDIR)/build; \
 	fi
 
 C_clean:
