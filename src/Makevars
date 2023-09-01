@@ -11,18 +11,16 @@ CRAN_FLAGS=-j 2 --offline
 CARGOTMP = $(CURDIR)/.cargo
 
 $(STATLIB):
+
+		if [ -f rust/vendor.tar.xz ]; then tar xf rust/vendor.tar.xz && mkdir -p $(CARGOTMP) && cp ./rust/vendor-config.toml $(CARGOTMP)/config.toml;	fi
+
 	# In some environments, ~/.cargo/bin might not be included in PATH, so we need
 	# to set it here to ensure cargo can be invoked. It is appended to PATH and
 	# therefore is only used if cargo is absent from the user's PATH.
 	if [ "$(NOT_CRAN)" != "true" ]; then \
 		export CARGO_HOME=$(CARGOTMP); \
 	fi && \
-		export PATH="$(PATH):$(HOME)/.cargo/bin" && \
-		if [ -f rust/vendor.tar.xz ]; then \
-				tar xf rust/vendor.tar.xz && \
-				mkdir -p $(CARGOTMP) && \
-				cp ./rust/vendor-config.toml $(CARGOTMP)/config.toml; \
-		fi \
+		export PATH="$(PATH):$(HOME)/.cargo/bin" \
 		# To comply with CRAN policy the versions of cargo and rustc
 		# need to be inlcuded in the installation log
 	  echo `cargo --version` && echo `rustc --version` && \
