@@ -1,3 +1,7 @@
+# rsgeo 0.1.5
+
+* Initial CRAN release. This couldn't have been possible without the attention to detail of @eitsupi, and the guidance and help from [@cgmossa](https://github.com/CGMossa/), [@Ilia-Kosenkov](https://github.com/Ilia-Kosenkov), [@sorhwell](https://github.com/sorhawell) and the prior art of [@yutannihilation](https://github.com/yutannihilation) and [@jeroen](https://github.com/jeroen)
+
 # rsgeo 0.1.4
 
 * vendoring rust dependencies to make rsgeo capable of being published on CRAN

@@ -44,9 +44,6 @@ $(STATLIB):
 		rm -Rf $(CARGOTMP) $(VENDOR_DIR) $(LIBDIR)/build; \
 	fi
 
-
-
-
 C_clean:
 	rm -Rf $(SHLIB) $(STATLIB) $(OBJECTS)
 
