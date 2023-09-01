@@ -11,6 +11,9 @@
 
 \item{...}{arguments passed to \code{wk::wk_plot()}}
 }
+\value{
+Nothing.
+}
 \description{
 Plot Geometries
 }

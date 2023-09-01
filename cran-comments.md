@@ -7,6 +7,8 @@
 
 ### Notes
 
+- Addresses previous rejection missing Value tags for flatten_geoms and plot.rsgeo and quoting in DESCRIPTION's description
+
 - This is a Rust based package. Follows the requirements in [Using Rust in CRAN Packages](https://cran.r-project.org/web/packages/using_rust.html)
   - dependencies are vendored
   - uses 2 threads with `-J 2` to build dependencies

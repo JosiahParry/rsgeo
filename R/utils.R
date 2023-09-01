@@ -1,6 +1,6 @@
 #' Flatten a list of rsgeo vectors
 #'
-#' @param x an object of class `rsgeo`
+#' @param x list object where each element is an object of class `rsgeo`
 #' @export
 #' @examples
 #' pnts <- replicate(
@@ -11,6 +11,8 @@
 #'
 #' flatten_geoms(pnts)
 #'
+#' @returns
+#' Returns an object of class `rsgeo`
 flatten_geoms <- function(x) {
   stopifnot(all(vapply(x, inherits, logical(1), "rsgeo")))
   do.call(`c`, x)

@@ -7,7 +7,10 @@
 flatten_geoms(x)
 }
 \arguments{
-\item{x}{an object of class \code{rsgeo}}
+\item{x}{list object where each element is an object of class \code{rsgeo}}
+}
+\value{
+Returns an object of class \code{rsgeo}
 }
 \description{
 Flatten a list of rsgeo vectors

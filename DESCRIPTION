@@ -4,7 +4,7 @@ Version: 0.1.5
 Authors@R: 
     person("Josiah", "Parry", , "josiah.parry@gmail.com", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0001-9910-865X"))
-Description: An R interface to the geo-rust crates geo and geo-types providing 
+Description: An R interface to the GeoRust crates 'geo' and 'geo-types' providing 
   access to geometry primitives and algorithms.
 URL: https://github.com/JosiahParry/rsgeo, https://josiahparry.r-universe.dev/rsgeo, https://rsgeo.josiahparry.com/
 License: MIT + file LICENSE
@@ -20,5 +20,5 @@ Suggests:
     testthat (>= 3.0.0),
     wk
 Config/rextendr/version: 0.3.1.9000
-SystemRequirements: Cargo (rustc package manager)
+SystemRequirements: Cargo (Rust's package manager), rustc
 Config/testthat/edition: 3
