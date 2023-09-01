@@ -12,10 +12,9 @@ CRAN_FLAGS=-j 2 --offline
 
 $(STATLIB):
 	if [ -f ./rust/vendor.tar.xz ]; then \
-		mkdir -p ./rust/vendor && \
-		$(TAR) --extract --xz --file ./rust/vendor.tar.xz && \
+		tar xf rust/vendor.tar.xz && \
 		mkdir -p $(CARGOTMP) && \
-		cp ./rust/vendor-config.toml $(CARGOTMP)/config.toml; \
+		cp rust/vendor-config.toml $(CARGOTMP)/config.toml; \
 	fi
 
 	# print cargo and rust versions

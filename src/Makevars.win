@@ -15,10 +15,9 @@ CARGOTMP = $(CURDIR)/.cargo
 $(STATLIB):
 	# uncompress vendored deps
 	if [ -f ./rust/vendor.tar.xz ]; then \
-		mkdir -p ./rust/vendor && \
-		$(TAR) --extract --xz --file ./rust/vendor.tar.xz && \
+		tar xf rust/vendor.tar.xz && \
 		mkdir -p $(CARGOTMP) && \
-		cp ./rust/vendor-config.toml $(CARGOTMP)/config.toml; \
+		cp rust/vendor-config.toml $(CARGOTMP)/config.toml; \
 	fi
 
 	# print cargo and rust versions
@@ -32,9 +31,11 @@ $(STATLIB):
 	# https://github.com/r-windows/rtools-packages/blob/2407b23f1e0925bbb20a4162c963600105236318/mingw-w64-gcc/PKGBUILD#L313-L316
 	touch $(TARGET_DIR)/libgcc_mock/libgcc_eh.a
 
+
 	# CARGO_LINKER is provided in Makevars.ucrt for R >= 4.2
 	if [ "$(NOT_CRAN)" != "true" ]; then \
 		export CARGO_HOME=$(CARGOTMP); \
+		export CARGO_BUILD_JOBS=2; \
 	fi && \
 		export CARGO_TARGET_X86_64_PC_WINDOWS_GNU_LINKER="$(CARGO_LINKER)" && \
 		export LIBRARY_PATH="$${LIBRARY_PATH};$(CURDIR)/$(TARGET_DIR)/libgcc_mock" && \
@@ -42,6 +43,9 @@ $(STATLIB):
 	if [ "$(NOT_CRAN)" != "true" ]; then \
 		rm -Rf $(CARGOTMP) $(VENDOR_DIR) $(LIBDIR)/build; \
 	fi
+
+
+
 
 C_clean:
 	rm -Rf $(SHLIB) $(STATLIB) $(OBJECTS)
