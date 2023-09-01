@@ -9,7 +9,7 @@ all: C_clean
 
 $(SHLIB): $(STATLIB)
 
-CRAN_FLAGS=-j 2 --offline --no-cache
+CRAN_FLAGS=-j 2 --offline
 CARGOTMP = $(CURDIR)/.cargo
 
 $(STATLIB):
