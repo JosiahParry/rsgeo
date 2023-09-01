@@ -271,7 +271,7 @@ fn within_pairwise(x: List, y: List) -> Logicals {
 // relates use something called DE-9IM
 // its an intersection matrix between two geometries.
 // Each geometry is evaluated in 3 "parts"
-// I: interrior
+// I: interior
 // B: boundary
 // E: exterior
 //

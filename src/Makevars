@@ -18,7 +18,11 @@ $(STATLIB):
 		export CARGO_HOME=$(CARGOTMP); \
 	fi && \
 		export PATH="$(PATH):$(HOME)/.cargo/bin" && \
-		if [ -f rust/vendor.tar.xz ]; then tar xf rust/vendor.tar.xz && mkdir -p $(CARGOTMP) && cp rust/vendor-config.toml $(CARGOTMP)/config.toml; fi
+		if [ -f rust/vendor.tar.xz ]; then \
+				tar xf rust/vendor.tar.xz && \
+				mkdir -p $(CARGOTMP) && \
+				cp ./rust/vendor-config.toml $(CARGOTMP)/config.toml; \
+		fi
 		# To comply with CRAN policy the versions of cargo and rustc
 		# need to be inlcuded in the installation log
 	  echo `cargo --version` && echo `rustc --version`
@@ -28,8 +32,12 @@ $(STATLIB):
 		rm -Rf $(LIBDIR)/build; \
 	fi
 
+	if [ "$(NOT_CRAN)" != "true" ]; then \
+		rm -Rf $(CARGOTMP) ./rust/vendor $(LIBDIR)/build; \
+	fi
+
 C_clean:
 	rm -Rf $(SHLIB) $(STATLIB) $(OBJECTS)
 
 clean:
-	rm -Rf $(SHLIB) $(STATLIB) $(OBJECTS) rust/target
+	rm -Rf $(SHLIB) $(STATLIB) $(OBJECTS) ./rust/target
