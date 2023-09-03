@@ -21,6 +21,12 @@
       <ul class="navbar-nav me-auto"><li class="active nav-item">
   <a class="nav-link" href="../reference/index.html">Reference</a>
 </li>
+<li class="nav-item dropdown">
+  <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
+  <div class="dropdown-menu" aria-labelledby="dropdown-articles">
+    <a class="dropdown-item" href="../articles/Getting-Started.html">Getting Started</a>
+  </div>
+</li>
 <li class="nav-item">
   <a class="nav-link" href="../news/index.html">Changelog</a>
 </li>
@@ -83,7 +89,7 @@ class that it will can be cast to.</p>
 cast an <code>rs_MULTIPOINT</code> to an <code>rs_POLYGON</code>, the validity of the polygon
 cannot be guaranteed.</p>
 <p>Conversions from an <code>rs_POLYGON</code> into an <code>rs_LINESTRING</code> will result in only
-the exterior ring of the polygon ignoring any interrior rings if there are any.</p><table class="table table"><tr><td>From</td><td>To</td></tr><tr><td><code>rs_POINT</code></td><td><code>rs_MULTIPOINT</code></td></tr><tr><td><code>rs_MULTIPOINT</code></td><td><code>rs_POLYGON</code>, <code>rs_MULTIPOLYGON</code>, <code>rs_LINESTRING</code>, <code>rs_MULTILINESTRING</code></td></tr><tr><td><code>rs_POLYGON</code></td><td><code>rs_MULTIPOINT</code>, <code>rs_MULTIPOLYGON</code>, <code>rs_LINESTRING</code>, <code>rs_MULTILINESTRING</code></td></tr><tr><td><code>rs_MULTIPOLYGON</code></td><td><code>rs_MULTIPOINT</code>, <code>rs_MULTILINESTRING</code></td></tr><tr><td><code>rs_LINESTRING</code></td><td><code>rs_MULTIPOINT</code>, <code>rs_MULTILINESTRING</code>, <code>rs_POLYGON</code></td></tr><tr><td><code>rs_MULTILINESTRING</code></td><td><code>rs_MULTIPOINT</code>, <code>rs_MULTIPOLYGON</code></td></tr></table></div>
+the exterior ring of the polygon ignoring any interior rings if there are any.</p><table class="table table"><tr><td>From</td><td>To</td></tr><tr><td><code>rs_POINT</code></td><td><code>rs_MULTIPOINT</code></td></tr><tr><td><code>rs_MULTIPOINT</code></td><td><code>rs_POLYGON</code>, <code>rs_MULTIPOLYGON</code>, <code>rs_LINESTRING</code>, <code>rs_MULTILINESTRING</code></td></tr><tr><td><code>rs_POLYGON</code></td><td><code>rs_MULTIPOINT</code>, <code>rs_MULTIPOLYGON</code>, <code>rs_LINESTRING</code>, <code>rs_MULTILINESTRING</code></td></tr><tr><td><code>rs_MULTIPOLYGON</code></td><td><code>rs_MULTIPOINT</code>, <code>rs_MULTILINESTRING</code></td></tr><tr><td><code>rs_LINESTRING</code></td><td><code>rs_MULTIPOINT</code>, <code>rs_MULTILINESTRING</code>, <code>rs_POLYGON</code></td></tr><tr><td><code>rs_MULTILINESTRING</code></td><td><code>rs_MULTIPOINT</code>, <code>rs_MULTIPOLYGON</code></td></tr></table></div>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>

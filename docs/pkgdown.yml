@@ -1,6 +1,7 @@
 pandoc: 3.1.2
 pkgdown: 2.0.7.9000
 pkgdown_sha: 39083f38bbb2de2e1126529392bddf3e6e262ab4
-articles: {}
-last_built: 2023-08-31T17:10Z
+articles:
+  Getting-Started: Getting-Started.html
+last_built: 2023-09-03T17:24Z
 
