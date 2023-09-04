@@ -1,6 +1,6 @@
 Package: rsgeo
 Title: An Interface to Rust's 'geo' Library
-Version: 0.1.5
+Version: 0.1.6
 Authors@R: 
     person("Josiah", "Parry", , "josiah.parry@gmail.com", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0001-9910-865X"))
@@ -22,3 +22,4 @@ Suggests:
 Config/rextendr/version: 0.3.1.9000
 SystemRequirements: Cargo (Rust's package manager), rustc
 Config/testthat/edition: 3
+Config/Needs/website: rmarkdown

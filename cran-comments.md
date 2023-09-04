@@ -1,19 +1,20 @@
 ## R CMD check results
 
-0 errors | 0 warnings | 2 notes
+0 errors | 0 warnings | 1 notes
 
-* This is a new release.
 * installed size is  7.0Mb
 
 ### Notes
 
-- Addresses previous rejection missing Value tags for flatten_geoms and plot.rsgeo and quoting in DESCRIPTION's description
+This release addresses comments from Dr. Ripley:
 
-- This is a Rust based package. Follows the requirements in [Using Rust in CRAN Packages](https://cran.r-project.org/web/packages/using_rust.html)
-  - dependencies are vendored
-  - uses 2 threads with `-J 2` to build dependencies
-  - builds entirely offline using `--offline` flag
-  - prints the version of `cargo` and `rustc` in the installation log
-- The installed size is slightly bigger due to the vendoring of dependencies
-  
+> On platforms without a system Rust:
+# print cargo and rust versions  
+echo `cargo --version` && echo `rustc --version`  
+/bin/sh: cargo: command not found  
+/bin/sh: rustc: command not found  
+Please correct before 2023-09-16 to safely retain your package on CRAN.
+
+This release adds `configure` and `configure.win` to catch this build error. 
+
   
