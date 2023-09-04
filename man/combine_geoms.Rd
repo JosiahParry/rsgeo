@@ -64,8 +64,7 @@ res <- union_geoms(z)
 res
 
 if (rlang::is_installed(c("sf", "wk"))) {
-  par(mfrow = c(1, 2))
   plot(z)
-  plot(res)
+  plot(res, lty = 3, border = "blue", add = TRUE, lwd = 4)
 }
 }
