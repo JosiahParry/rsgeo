@@ -25,7 +25,7 @@ $(STATLIB):
 	fi && \
 		export PATH="$(PATH):$(HOME)/.cargo/bin" \
 			# print cargo and rust versions
-			echo `cargo --version` && echo `rustc --version` && \
+			echo `cargo --version` && echo `rustc --version`; \
 			cargo build $(CRAN_FLAGS) --lib --release --manifest-path=./rust/Cargo.toml --target-dir $(TARGET_DIR)
 	if [ "$(NOT_CRAN)" != "true" ]; then \
 		rm -Rf $(CARGOTMP) $(VENDOR_DIR) $(LIBDIR)/build; \
