@@ -12,3 +12,4 @@ if [ ! "$(command -v cargo)" ]; then
 fi
 
 exit 0
+
