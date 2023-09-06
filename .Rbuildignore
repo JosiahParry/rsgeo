@@ -7,7 +7,7 @@
 ^src/\.cargo$
 ^src/\.DS_Store$
 ^\.DS_Store$
-^srcv/rust/\.vscode$
+^src/rust/\.vscode$
 ^tests$
 ^LICENSE\.md$
 ^src/vendor$
@@ -16,3 +16,4 @@
 ^cran-comments\.md$
 ^\.github$
 ^CRAN-SUBMISSION$
+^vignettes/*$
