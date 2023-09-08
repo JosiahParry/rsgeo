@@ -6,15 +6,53 @@
 
 ### Notes
 
-This release addresses comments from Dr. Ripley:
+This release addresses comments regarding:
 
-> On platforms without a system Rust:
-# print cargo and rust versions  
-echo `cargo --version` && echo `rustc --version`  
-/bin/sh: cargo: command not found  
-/bin/sh: rustc: command not found  
-Please correct before 2023-09-16 to safely retain your package on CRAN.
+- `cargo` being available at `~/.cargo/bin` and not compiling in the Makevars
+- `/.cargo/.package-cache` being modified 
 
-This release adds `configure` and `configure.win` to catch this build error. 
+As issues were reported with Fedora, I have used Fedora to validate 
+the package. To reproduce: 
 
-  
+1. Pull and run `rhub/fedora` Docker image
+
+```
+docker pull rhub/fedora
+docker run -it rhub/fedora bash
+```
+
+2. Install R, git, and cargo. 
+
+```
+dnf install R
+dnf install git
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+```
+
+Note: do not reload environment ariables to ensure that cargo is not on the PATH.
+
+3. Check that `~/.cargo/.package-cache` does not exist
+
+```
+~/.cargo/.package-cache
+# sh: /root/.cargo/.package-cache: No such file or directory
+```
+
+3. Clone the repository (same as submission)
+4. Install package using `R CMD INSTALL`
+
+```
+mkdir github
+cd github
+git clone rsgeo
+cd rsgeo
+chmod +x configure
+R CMD INSTALL .
+```
+
+5. Confirm that `~/.cargo/.package-cache` does not exist
+
+```
+~/.cargo/.package-cache
+# sh: /root/.cargo/.package-cache: No such file or directory
+```
