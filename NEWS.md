@@ -1,10 +1,9 @@
 # unreleased
 
-* fixes a bug in `format.rsgeo` where `...` were passed into `vapply()` and not `format()` 
-
 # rsgeo 0.1.6
 
 * Adds `configure` and `configure.win` scripts to ensure the package remains on CRAN
+* fixes a bug in `format.rsgeo` where `...` were passed into `vapply()` and not `format()` 
 
 # rsgeo 0.1.5
 
