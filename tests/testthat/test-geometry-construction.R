@@ -16,6 +16,9 @@ test_that("LineStrings are constructed in order", {
 
 
 test_that("Polygons are constructed in order", {
+  skip_if_not_installed("sf")
+  skip_on_cran()
+
   m <- matrix(c(0, 1, 1, 0, 0, 0, 0, 1, 1, 0), ncol = 2)
   m2 <- m - 0.5
   all_m <- cbind(rbind(m, m2), rep(1:2, each = 5))
