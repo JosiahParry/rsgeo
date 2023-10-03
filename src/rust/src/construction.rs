@@ -1,7 +1,7 @@
 use extendr_api::prelude::*;
 use geo_types::{coord, point, Coord, LineString, MultiPoint, Point, Polygon};
 use sfconversions::{vctrs::geom_class, Geom};
-use std::collections::HashMap;
+use std::collections::BTreeMap;
 
 pub trait IsReal {
     fn is_real(&self) -> bool;
@@ -57,7 +57,7 @@ fn geom_multipoint_(x: Doubles, y: Doubles, id: Integers) -> Robj {
     };
 
     // create empty hash map to store unique vectors of points
-    let mut map_mpnts: HashMap<i32, Vec<Point>> = HashMap::new();
+    let mut map_mpnts: BTreeMap<i32, Vec<Point>> = BTreeMap::new();
 
     // iterate through everything and create points
     for ((xi, yi), idx) in x.iter().zip(y.iter()).zip(id.iter()) {
@@ -100,7 +100,7 @@ fn geom_linestring_(x: Doubles, y: Doubles, id: Integers) -> Robj {
     };
 
     // create empty hash map to store unique vectors of points
-    let mut map_mpnts: HashMap<i32, Vec<Coord>> = HashMap::new();
+    let mut map_mpnts: BTreeMap<i32, Vec<Coord>> = BTreeMap::new();
 
     // iterate through everything and create points
     for ((xi, yi), idx) in x.iter().zip(y.iter()).zip(id.iter()) {
@@ -152,7 +152,7 @@ fn geom_polygon_(x: Doubles, y: Doubles, id: Integers, ring: Integers) -> Robj {
     };
 
     // create empty hash map to store unique vectors of points for each ring
-    let mut map_rings: HashMap<i32, HashMap<i32, Vec<Coord>>> = HashMap::new();
+    let mut map_rings: BTreeMap<i32, BTreeMap<i32, Vec<Coord>>> = BTreeMap::new();
 
     // iterate through everything and create points
     for (((xi, yi), idx), ring_idx) in x.iter().zip(y.iter()).zip(id.iter()).zip(ring.iter()) {
@@ -162,7 +162,7 @@ fn geom_polygon_(x: Doubles, y: Doubles, id: Integers, ring: Integers) -> Robj {
 
             map_rings
                 .entry(ring_idx.inner())
-                .or_insert(HashMap::new())
+                .or_insert(BTreeMap::new())
                 .entry(idx.inner())
                 .or_insert(Vec::new())
                 .push(pnt);

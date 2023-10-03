@@ -35,8 +35,8 @@ geom_polygon <- function(x, y, id = 1, ring = 1) {
   geom_polygon_(
     as.double(x),
     as.double(y),
-    as.integer(id),
-    as.integer(ring)
+    as.integer(ring),
+    as.integer(id)
   )
 }
 
