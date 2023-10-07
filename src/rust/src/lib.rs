@@ -2,6 +2,7 @@
 mod area;
 mod boundary;
 mod casting;
+mod coord_utils;
 mod length;
 mod query;
 mod similarity;
@@ -287,6 +288,7 @@ extendr_module! {
     use area;
     use boundary;
     use coords;
+    use coord_utils;
     use construction;
     use densify;
     use distance;
