@@ -141,6 +141,202 @@ signed_area_geodesic <- function(x) .Call(wrap__signed_area_geodesic, x)
 #' @rdname area
 unsigned_area_geodesic <- function(x) .Call(wrap__unsigned_area_geodesic, x)
 
+#' @rdname boundaries
+#' @export
+bounding_boxes <- function(x) .Call(wrap__bounding_boxes, x)
+
+#' @rdname boundaries
+#' @export
+bounding_rect <- function(x) .Call(wrap__bounding_rect, x)
+
+#' @rdname boundaries
+#' @export
+minimum_rotated_rect <- function(x) .Call(wrap__minimum_rotated_rect, x)
+
+#' @rdname boundaries
+#' @export
+convex_hull <- function(x) .Call(wrap__convex_hull, x)
+
+#' @rdname boundaries
+#' @export
+concave_hull <- function(x, concavity) .Call(wrap__concave_hull, x, concavity)
+
+#' @rdname boundaries
+#' @export
+extreme_coords <- function(x) .Call(wrap__extreme_coords, x)
+
+#' Compute Geometric Boundaries
+#'
+#' From a vector of geometries identify different types of boundaries.
+#' 
+#' Note that if you want a convex or concave hull over an entire vector of geometries 
+#' you must first union or combine them using either `combine_geoms()` or `union_geoms()`
+#' 
+#' @param x an object of class `rsgeo`
+#' @param concavity a value between 0 and 1 specifying the concavity of the convex hull
+#' 
+#' @export
+#' @rdname boundaries
+#' 
+#' @examples
+#' lns <- geom_linestring(
+#'   1:20,
+#'   runif(20, -5, 5),
+#'   rep.int(1:5, 4)
+#' )
+#' bounding_box(lns)
+#' bounding_boxes(lns)
+#' minimum_rotated_rect(lns)
+#' convex_hull(lns)
+#' concave_hull(lns, 0.5)
+#' extreme_coords(lns)
+#' 
+#' @returns 
+#' 
+#' - `bounding_box()` returns a named vector of xmin, ymin, xmax, and ymax
+#' - `bounding_boxes()` returns a list of bounding box numeric vectors for each geometry
+#' - `bounding_rect()` returns an `rs_POLYGON` of the bounding rectangle of each geometry 
+#' - `convex_hull()` returns an `rs_POLYGON` of the convex hull for each geometry
+#' - `concave_hull()` returns an `rs_POLYGON` of the specified concavity for each geometry
+#' - `extreme_coords()` returns the extreme coordinates of each geometry as a list where each element
+#'  is a named vector of xmin, ymin, xmax, and ymax where each element is a `Point` geometry of the extreme value
+#' - `minimum_rotated_rect()` returns the minimum rotated rectangle covering a geometry as an `rs_POLYGON`
+bounding_box <- function(x) .Call(wrap__bounding_box, x)
+
+point_to_coords <- function(x) .Call(wrap__point_to_coords, x)
+
+multipoint_to_coords <- function(x) .Call(wrap__multipoint_to_coords, x)
+
+linestring_to_coords <- function(x) .Call(wrap__linestring_to_coords, x)
+
+multilinestring_to_coords <- function(x) .Call(wrap__multilinestring_to_coords, x)
+
+polygon_to_coords <- function(x) .Call(wrap__polygon_to_coords, x)
+
+multipolygon_to_coords <- function(x) .Call(wrap__multipolygon_to_coords, x)
+
+geom_point_ <- function(x, y) .Call(wrap__geom_point_, x, y)
+
+geom_multipoint_ <- function(x, y, id) .Call(wrap__geom_multipoint_, x, y, id)
+
+geom_linestring_ <- function(x, y, id) .Call(wrap__geom_linestring_, x, y, id)
+
+geom_polygon_ <- function(x, y, id, ring) .Call(wrap__geom_polygon_, x, y, id, ring)
+
+#' Densify linear geometries 
+#' 
+#' Adds coordinates along a `LineString` ensuring that no two coordinates are
+#' further than a maximum distance apart from eachother. 
+#' 
+#' @param x an object with linear geometries. Can be an `rsgeo` object _except_
+#'   `"rs_POINT"` or `"rs_MULTIPOINT"`.
+#' @param max_distance the maximum allowed distance between coordinates.
+#' 
+#' @details
+#' 
+#' `max_distance` expects meters for `densify_haversine()` whereas
+#' `densify_euclidean()` expects the units of the geometry. 
+#' 
+#' Be sure to use the appropriate densification function based on
+#' the type of geometries you have. rsgeo does not check if your coordinates
+#' are geographic or planar. It is up to you to choose the correct algorithm.
+#' 
+#' @examples
+#' 
+#' line <- geom_linestring(1:10, 10:1)
+#' densify_euclidean(line, 0.5)
+#' densify_haversine(line, 100000)
+#' 
+#' @export
+#' @rdname densify
+densify_euclidean <- function(x, max_distance) .Call(wrap__densify_euclidean, x, max_distance)
+
+#' @export
+#' @rdname densify
+densify_haversine <- function(x, max_distance) .Call(wrap__densify_haversine, x, max_distance)
+
+#' Calculate Distances
+#' 
+#' Calculates distances between two vectors of geometries. There are 
+#' a number of different distance methods that can be utilized.
+#' 
+#' There are `_pairwise()` and `_matrix()` suffixed functions to 
+#' generate distances pairwise or as a dense matrix respectively.
+#' The pairwise functions calculate distances between the ith element
+#' of each vector. Whereas the matrix functions calculate the distance
+#' between each and every geometry. 
+#' 
+#' Euclidean distance should be used for planar geometries. Haversine, 
+#' Geodesic, and Vicenty are all methods of calculating distance
+#' based on spherical geometries. There is no concept of spherical
+#' geometries in rsgeo, so choose your distance measure appropriately. 
+#' 
+#' ### Notes
+#' 
+#' * Hausdorff distance is calculated using Euclidean distance. 
+#' * Haversine, Geodesic, and Vicenty distances only work with `rs_POINT` geometries.
+#' @param x and object of class `rsgeo`
+#' @param y and object of class `rsgeo`
+#' @export
+#' @rdname distance
+#' @examples
+#' set.seed(1)
+#' x <- geom_point(runif(5, -1, 1), runif(5, -1, 1))
+#' y <- rev(x)
+#'
+#' distance_euclidean_matrix(x, y)
+#' distance_hausdorff_matrix(x, y)
+#' distance_vicenty_matrix(x, y)
+#' distance_geodesic_matrix(x, y)
+#' distance_haversine_matrix(x, y)
+#'
+#' distance_euclidean_pairwise(x, y)
+#' distance_hausdorff_pairwise(x, y)
+#' distance_vicenty_pairwise(x, y)
+#' distance_geodesic_pairwise(x, y)
+#' distance_haversine_pairwise(x, y)
+#' @returns
+#' 
+#' For `_matrix` functions, returns a dense matrix of distances whereas `_pairwise`
+#' functions return a numeric vector.
+distance_euclidean_pairwise <- function(x, y) .Call(wrap__distance_euclidean_pairwise, x, y)
+
+#' @export
+#' @rdname distance
+distance_hausdorff_pairwise <- function(x, y) .Call(wrap__distance_hausdorff_pairwise, x, y)
+
+#' @export
+#' @rdname distance
+distance_vicenty_pairwise <- function(x, y) .Call(wrap__distance_vicenty_pairwise, x, y)
+
+#' @export
+#' @rdname distance
+distance_geodesic_pairwise <- function(x, y) .Call(wrap__distance_geodesic_pairwise, x, y)
+
+#' @export
+#' @rdname distance
+distance_haversine_pairwise <- function(x, y) .Call(wrap__distance_haversine_pairwise, x, y)
+
+#' @export
+#' @rdname distance
+distance_euclidean_matrix <- function(x, y) .Call(wrap__distance_euclidean_matrix, x, y)
+
+#' @export
+#' @rdname distance
+distance_hausdorff_matrix <- function(x, y) .Call(wrap__distance_hausdorff_matrix, x, y)
+
+#' @export
+#' @rdname distance
+distance_vicenty_matrix <- function(x, y) .Call(wrap__distance_vicenty_matrix, x, y)
+
+#' @export
+#' @rdname distance
+distance_geodesic_matrix <- function(x, y) .Call(wrap__distance_geodesic_matrix, x, y)
+
+#' @export
+#' @rdname distance
+distance_haversine_matrix <- function(x, y) .Call(wrap__distance_haversine_matrix, x, y)
+
 #' Calculate LineString Length
 #' 
 #' For a given LineString or MultiLineString geometry, calculate its length. 
@@ -310,68 +506,6 @@ locate_point_on_line <- function(x, y) .Call(wrap__locate_point_on_line, x, y)
 
 line_segmentize_ <- function(x, n) .Call(wrap__line_segmentize_, x, n)
 
-#' @rdname boundaries
-#' @export
-bounding_boxes <- function(x) .Call(wrap__bounding_boxes, x)
-
-#' @rdname boundaries
-#' @export
-bounding_rect <- function(x) .Call(wrap__bounding_rect, x)
-
-#' @rdname boundaries
-#' @export
-minimum_rotated_rect <- function(x) .Call(wrap__minimum_rotated_rect, x)
-
-#' @rdname boundaries
-#' @export
-convex_hull <- function(x) .Call(wrap__convex_hull, x)
-
-#' @rdname boundaries
-#' @export
-concave_hull <- function(x, concavity) .Call(wrap__concave_hull, x, concavity)
-
-#' @rdname boundaries
-#' @export
-extreme_coords <- function(x) .Call(wrap__extreme_coords, x)
-
-#' Compute Geometric Boundaries
-#'
-#' From a vector of geometries identify different types of boundaries.
-#' 
-#' Note that if you want a convex or concave hull over an entire vector of geometries 
-#' you must first union or combine them using either `combine_geoms()` or `union_geoms()`
-#' 
-#' @param x an object of class `rsgeo`
-#' @param concavity a value between 0 and 1 specifying the concavity of the convex hull
-#' 
-#' @export
-#' @rdname boundaries
-#' 
-#' @examples
-#' lns <- geom_linestring(
-#'   1:20,
-#'   runif(20, -5, 5),
-#'   rep.int(1:5, 4)
-#' )
-#' bounding_box(lns)
-#' bounding_boxes(lns)
-#' minimum_rotated_rect(lns)
-#' convex_hull(lns)
-#' concave_hull(lns, 0.5)
-#' extreme_coords(lns)
-#' 
-#' @returns 
-#' 
-#' - `bounding_box()` returns a named vector of xmin, ymin, xmax, and ymax
-#' - `bounding_boxes()` returns a list of bounding box numeric vectors for each geometry
-#' - `bounding_rect()` returns an `rs_POLYGON` of the bounding rectangle of each geometry 
-#' - `convex_hull()` returns an `rs_POLYGON` of the convex hull for each geometry
-#' - `concave_hull()` returns an `rs_POLYGON` of the specified concavity for each geometry
-#' - `extreme_coords()` returns the extreme coordinates of each geometry as a list where each element
-#'  is a named vector of xmin, ymin, xmax, and ymax where each element is a `Point` geometry of the extreme value
-#' - `minimum_rotated_rect()` returns the minimum rotated rectangle covering a geometry as an `rs_POLYGON`
-bounding_box <- function(x) .Call(wrap__bounding_box, x)
-
 simplify_geoms_ <- function(x, epsilon) .Call(wrap__simplify_geoms_, x, epsilon)
 
 simplify_vw_geoms_ <- function(x, epsilon) .Call(wrap__simplify_vw_geoms_, x, epsilon)
@@ -453,14 +587,6 @@ within_sparse <- function(x, y) .Call(wrap__within_sparse, x, y)
 #' @rdname topology
 within_pairwise <- function(x, y) .Call(wrap__within_pairwise, x, y)
 
-geom_point_ <- function(x, y) .Call(wrap__geom_point_, x, y)
-
-geom_multipoint_ <- function(x, y, id) .Call(wrap__geom_multipoint_, x, y, id)
-
-geom_linestring_ <- function(x, y, id) .Call(wrap__geom_linestring_, x, y, id)
-
-geom_polygon_ <- function(x, y, id, ring) .Call(wrap__geom_polygon_, x, y, id, ring)
-
 #' Union Geometries
 #' @export
 #' @rdname combine_geoms
@@ -531,100 +657,6 @@ combine_multilinestrings <- function(x) .Call(wrap__combine_multilinestrings, x)
 combine_polygons <- function(x) .Call(wrap__combine_polygons, x)
 
 combine_multipolygons <- function(x) .Call(wrap__combine_multipolygons, x)
-
-point_to_coords <- function(x) .Call(wrap__point_to_coords, x)
-
-multipoint_to_coords <- function(x) .Call(wrap__multipoint_to_coords, x)
-
-linestring_to_coords <- function(x) .Call(wrap__linestring_to_coords, x)
-
-multilinestring_to_coords <- function(x) .Call(wrap__multilinestring_to_coords, x)
-
-polygon_to_coords <- function(x) .Call(wrap__polygon_to_coords, x)
-
-multipolygon_to_coords <- function(x) .Call(wrap__multipolygon_to_coords, x)
-
-#' Calculate Distances
-#' 
-#' Calculates distances between two vectors of geometries. There are 
-#' a number of different distance methods that can be utilized.
-#' 
-#' There are `_pairwise()` and `_matrix()` suffixed functions to 
-#' generate distances pairwise or as a dense matrix respectively.
-#' The pairwise functions calculate distances between the ith element
-#' of each vector. Whereas the matrix functions calculate the distance
-#' between each and every geometry. 
-#' 
-#' Euclidean distance should be used for planar geometries. Haversine, 
-#' Geodesic, and Vicenty are all methods of calculating distance
-#' based on spherical geometries. There is no concept of spherical
-#' geometries in rsgeo, so choose your distance measure appropriately. 
-#' 
-#' ### Notes
-#' 
-#' * Hausdorff distance is calculated using Euclidean distance. 
-#' * Haversine, Geodesic, and Vicenty distances only work with `rs_POINT` geometries.
-#' @param x and object of class `rsgeo`
-#' @param y and object of class `rsgeo`
-#' @export
-#' @rdname distance
-#' @examples
-#' set.seed(1)
-#' x <- geom_point(runif(5, -1, 1), runif(5, -1, 1))
-#' y <- rev(x)
-#'
-#' distance_euclidean_matrix(x, y)
-#' distance_hausdorff_matrix(x, y)
-#' distance_vicenty_matrix(x, y)
-#' distance_geodesic_matrix(x, y)
-#' distance_haversine_matrix(x, y)
-#'
-#' distance_euclidean_pairwise(x, y)
-#' distance_hausdorff_pairwise(x, y)
-#' distance_vicenty_pairwise(x, y)
-#' distance_geodesic_pairwise(x, y)
-#' distance_haversine_pairwise(x, y)
-#' @returns
-#' 
-#' For `_matrix` functions, returns a dense matrix of distances whereas `_pairwise`
-#' functions return a numeric vector.
-distance_euclidean_pairwise <- function(x, y) .Call(wrap__distance_euclidean_pairwise, x, y)
-
-#' @export
-#' @rdname distance
-distance_hausdorff_pairwise <- function(x, y) .Call(wrap__distance_hausdorff_pairwise, x, y)
-
-#' @export
-#' @rdname distance
-distance_vicenty_pairwise <- function(x, y) .Call(wrap__distance_vicenty_pairwise, x, y)
-
-#' @export
-#' @rdname distance
-distance_geodesic_pairwise <- function(x, y) .Call(wrap__distance_geodesic_pairwise, x, y)
-
-#' @export
-#' @rdname distance
-distance_haversine_pairwise <- function(x, y) .Call(wrap__distance_haversine_pairwise, x, y)
-
-#' @export
-#' @rdname distance
-distance_euclidean_matrix <- function(x, y) .Call(wrap__distance_euclidean_matrix, x, y)
-
-#' @export
-#' @rdname distance
-distance_hausdorff_matrix <- function(x, y) .Call(wrap__distance_hausdorff_matrix, x, y)
-
-#' @export
-#' @rdname distance
-distance_vicenty_matrix <- function(x, y) .Call(wrap__distance_vicenty_matrix, x, y)
-
-#' @export
-#' @rdname distance
-distance_geodesic_matrix <- function(x, y) .Call(wrap__distance_geodesic_matrix, x, y)
-
-#' @export
-#' @rdname distance
-distance_haversine_matrix <- function(x, y) .Call(wrap__distance_haversine_matrix, x, y)
 
 
 # nolint end
