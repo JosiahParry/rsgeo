@@ -215,6 +215,35 @@ polygon_to_coords <- function(x) .Call(wrap__polygon_to_coords, x)
 
 multipolygon_to_coords <- function(x) .Call(wrap__multipolygon_to_coords, x)
 
+#' Coordinate Utilities
+#' 
+#' Utility functions for accessing coordinates from a geometry. 
+#' 
+#' @details
+#' 
+#' - `n_coords` returns the total number of coordinates in a geometry
+#' - `coord_first()` returns the first coordinate in a geometry
+#' - `coord_last()` returns the last coordinate in a geometry
+#' - `coord_n()` returns the nth coordinate in a geometry
+#' 
+#' @returns an object of class `rs_POINT`. 
+#' Whereas `n_coords()` returns an integer vector of the same length as `x`.
+#' @param x an object of class `rsgeo`
+#' @param n the index position of the coordinate
+#' @export 
+#' @rdname coord_utils
+n_coords <- function(x) .Call(wrap__n_coords, x)
+
+#' @export
+#' @rdname coord_utils
+coord_first <- function(x) .Call(wrap__coord_first, x)
+
+#' @export
+#' @rdname coord_utils
+coord_last <- function(x) .Call(wrap__coord_last, x)
+
+coord_n_ <- function(x, n) .Call(wrap__coord_n_, x, n)
+
 geom_point_ <- function(x, y) .Call(wrap__geom_point_, x, y)
 
 geom_multipoint_ <- function(x, y, id) .Call(wrap__geom_multipoint_, x, y, id)

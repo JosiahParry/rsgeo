@@ -1,5 +1,6 @@
 # rsgeo (unreleased)
 
+* Adds `coord_first()`, `coord_last()`, `coord_n()`, and `n_coords()` functions for working with coordinates of geometries. 
 * Adds `densify_euclidean()` and `densify_haversine()` to densify planar and geographic linear geometries respectively.
 * Bug fix: `line_segmentize()` would not always return `n` elements (h/t [@Robinlovelace](https://github.com/Robinlovelace))
 * `geom_linestring()`, `geom_polygon()` and `geom_multipoint()` constructors ignored order. This was due to the internal use of a `HashMap`. These have been swapped to a `BTreeMap` which preserves order. Additional tests have been added to compare to`sf`s constructors as validation.
