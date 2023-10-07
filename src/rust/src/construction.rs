@@ -2,7 +2,6 @@ use extendr_api::prelude::*;
 use geo_types::{coord, point, Coord, LineString, MultiPoint, Point, Polygon};
 use sfconversions::{vctrs::{geom_class, as_rsgeo_vctr}, Geom, IntoGeom};
 use std::collections::BTreeMap;
-use geo::CoordsIter;
 
 pub trait IsReal {
     fn is_real(&self) -> bool;
@@ -215,16 +214,9 @@ fn geom_line(x: List, y: List) -> Robj {
             if xi.is_null() || yi.is_null() {
                 NULL.into_robj()
             } else {
-                let c1 = <&Geom>::from_robj(&xi).unwrap().geom
-                    .coords_iter()
-                    .next()
-                    .unwrap();
-
-                let c2 = <&Geom>::from_robj(&yi).unwrap().geom
-                    .coords_iter()
-                    .next()
-                    .unwrap();
-                LineString::new(vec![c1, c2]).into_geom().into_robj()
+                let p1 = Point::from(Geom::from(xi));
+                let p2 = Point::from(Geom::from(yi));
+                LineString::new(vec![p1.0, p2.0]).into_geom().into_robj()
             }
         })
         .collect::<Vec<Robj>>();
