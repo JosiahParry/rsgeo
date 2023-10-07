@@ -1,5 +1,6 @@
 # rsgeo (unreleased)
 
+* Adds `geom_line()` to construct a straight line geometry between two point vectors
 * Adds `coord_first()`, `coord_last()`, `coord_n()`, and `n_coords()` functions for working with coordinates of geometries. 
 * Adds `densify_euclidean()` and `densify_haversine()` to densify planar and geographic linear geometries respectively.
 * Bug fix: `line_segmentize()` would not always return `n` elements (h/t [@Robinlovelace](https://github.com/Robinlovelace))

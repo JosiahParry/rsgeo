@@ -14,7 +14,15 @@
 #' geom_multipoint(1:10, 10:1)
 #' geom_linestring(1:10, 10:1)
 #' geom_polygon(c(0, 1, 1, 0, 0), c(0, 0, 1, 1, 0))
+#' x <- geom_point(0, 0)
+#' y <- geom_point(5, 0)
+#' geom_line(x, y)
 #' @returns an object of class `rsgeo`
+#' @details
+#'
+#' In the case of `geom_line()`, both `x` and `y` are vectors of `rs_POINT`
+#' geometries. `geom_line()` creates a straight line between two points.
+#'
 geom_point <- function(x, y) geom_point_(as.double(x), as.double(y))
 
 #' @export

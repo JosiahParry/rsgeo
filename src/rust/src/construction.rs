@@ -1,7 +1,8 @@
 use extendr_api::prelude::*;
 use geo_types::{coord, point, Coord, LineString, MultiPoint, Point, Polygon};
-use sfconversions::{vctrs::geom_class, Geom};
+use sfconversions::{vctrs::{geom_class, as_rsgeo_vctr}, Geom, IntoGeom};
 use std::collections::BTreeMap;
+use geo::CoordsIter;
 
 pub trait IsReal {
     fn is_real(&self) -> bool;
@@ -199,10 +200,46 @@ fn geom_polygon_(x: Doubles, y: Doubles, id: Integers, ring: Integers) -> Robj {
         .unwrap()
 }
 
+#[extendr]
+/// @export
+/// @rdname construction
+fn geom_line(x: List, y: List) -> Robj {
+    if !x.inherits("rs_POINT") || !y.inherits("rs_POINT") {
+        panic!("`x` and `y` must be of class `rs_POINT`")
+    }
+
+    let res_vec = x
+        .into_iter()
+        .zip(y.into_iter())
+        .map(|((_, xi), (_, yi))| {
+            if xi.is_null() || yi.is_null() {
+                NULL.into_robj()
+            } else {
+                let c1 = <&Geom>::from_robj(&xi).unwrap().geom
+                    .coords_iter()
+                    .next()
+                    .unwrap();
+
+                let c2 = <&Geom>::from_robj(&yi).unwrap().geom
+                    .coords_iter()
+                    .next()
+                    .unwrap();
+                LineString::new(vec![c1, c2]).into_geom().into_robj()
+            }
+        })
+        .collect::<Vec<Robj>>();
+
+    let res = List::from_values(res_vec);
+
+    as_rsgeo_vctr(res, "linestring")
+
+}
+
 extendr_module! {
     mod construction;
     fn geom_point_;
     fn geom_multipoint_;
     fn geom_linestring_;
     fn geom_polygon_;
+    fn geom_line;
 }

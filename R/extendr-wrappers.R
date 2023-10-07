@@ -252,6 +252,10 @@ geom_linestring_ <- function(x, y, id) .Call(wrap__geom_linestring_, x, y, id)
 
 geom_polygon_ <- function(x, y, id, ring) .Call(wrap__geom_polygon_, x, y, id, ring)
 
+#' @export
+#' @rdname construction
+geom_line <- function(x, y) .Call(wrap__geom_line, x, y)
+
 #' Densify linear geometries 
 #' 
 #' Adds coordinates along a `LineString` ensuring that no two coordinates are
