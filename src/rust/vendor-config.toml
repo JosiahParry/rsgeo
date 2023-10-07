@@ -9,10 +9,6 @@ replace-with = "vendored-sources"
 git = "https://github.com/georust/geo"
 replace-with = "vendored-sources"
 
-[source."git+https://github.com/georust/rstar"]
-git = "https://github.com/georust/rstar"
-replace-with = "vendored-sources"
-
 [source.vendored-sources]
 directory = "vendor"
 

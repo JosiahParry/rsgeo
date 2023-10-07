@@ -8,7 +8,7 @@ crate-type = [ 'staticlib' ]
 name = 'rsgeo'
 
 [dependencies]
-extendr-api = { version = "0.4.0" }
+extendr-api = { version = "0.6.0" }
 geo = { version = "0.26.0" }
 geo-types = "0.7.8"
 rayon = "1.7.0"
@@ -18,5 +18,4 @@ sfconversions = { git = "https://github.com/JosiahParry/sfconversions" }
 
 [patch.crates-io]
 geo = { git = "https://github.com/georust/geo" }
-#geo = { path = "../../../geo/geo" }
-rstar = {git = "https://github.com/georust/rstar"}
+# geo = { path = "../../../geo/geo" }
