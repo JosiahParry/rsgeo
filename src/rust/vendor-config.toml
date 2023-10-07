@@ -5,9 +5,12 @@ replace-with = "vendored-sources"
 git = "https://github.com/JosiahParry/sfconversions"
 replace-with = "vendored-sources"
 
-[source."git+https://github.com/josiahparry/geo?branch=segment-patch"]
-git = "https://github.com/josiahparry/geo"
-branch = "segment-patch"
+[source."git+https://github.com/georust/geo"]
+git = "https://github.com/georust/geo"
+replace-with = "vendored-sources"
+
+[source."git+https://github.com/georust/rstar"]
+git = "https://github.com/georust/rstar"
 replace-with = "vendored-sources"
 
 [source.vendored-sources]
