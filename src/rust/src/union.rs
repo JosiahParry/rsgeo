@@ -1,20 +1,16 @@
 use extendr_api::prelude::*;
 use geo::{
-    BooleanOps, 
-    LineString, MultiLineString, 
-    MultiPoint, 
-    MultiPolygon, RemoveRepeatedPoints, 
-
+    BooleanOps, LineString, MultiLineString, MultiPoint, MultiPolygon, RemoveRepeatedPoints,
 };
 use geo_types::Point;
 use sfconversions::vctrs::as_rsgeo_vctr;
 
 use std::rc::Rc;
 
-use sfconversions::{Geom, IntoGeom};
 use crate::spatial_index::create_cached_rtree;
+use sfconversions::{Geom, IntoGeom};
 
-use rstar::primitives::{GeomWithData, CachedEnvelope};
+use rstar::primitives::{CachedEnvelope, GeomWithData};
 use rstar::{ParentNode, RTreeNode};
 
 extendr_module! {
@@ -22,13 +18,11 @@ extendr_module! {
     fn union_geoms;
 }
 
-
 #[extendr]
 /// Union Geometries
 /// @export
 /// @rdname combine_geoms
 fn union_geoms(x: List) -> Robj {
-
     // Class checking
     if !x.inherits("rsgeo") {
         panic!("Must provide an object of class `rsgeo`")
@@ -45,16 +39,14 @@ fn union_geoms(x: List) -> Robj {
         "rs_MULTIPOLYGON" => union_multipolygons(x),
         "rs_LINESTRING" => union_linestrings(x),
         "rs_MULTILINESTRING" => union_multilinestrings(x),
-        _ => as_rsgeo_vctr(list!(extendr_api::NULL), "geometry")
+        _ => as_rsgeo_vctr(list!(extendr_api::NULL), "geometry"),
     };
     res
 }
 
-
-
 #[extendr]
 fn union_points(x: List) -> Robj {
-    let pnts = x  
+    let pnts = x
         .into_iter()
         .filter(|(_, xi)| !xi.is_null())
         .map(|(_, robj)| Point::from(Geom::from(robj)))
@@ -62,18 +54,15 @@ fn union_points(x: List) -> Robj {
 
     let mpnt = MultiPoint::from(pnts);
 
-    let res = mpnt
-        .remove_repeated_points()
-        .into_geom();
+    let res = mpnt.remove_repeated_points().into_geom();
 
     as_rsgeo_vctr(list!(res), "multipoint")
 }
 
-
 // duplicate points are not removed
 #[extendr]
 fn union_multipoints(x: List) -> Robj {
-    let pnts = x  
+    let pnts = x
         .into_iter()
         .filter(|(_, xi)| !xi.is_null())
         .flat_map(|(_, robj)| MultiPoint::from(Geom::from(robj)).0)
@@ -81,21 +70,17 @@ fn union_multipoints(x: List) -> Robj {
 
     let mpnt = MultiPoint::from(pnts);
 
-    let res = mpnt
-        .remove_repeated_points()
-        .into_geom();
+    let res = mpnt.remove_repeated_points().into_geom();
 
     as_rsgeo_vctr(list!(res), "multipoint")
-
 }
 
 fn union_linestrings(x: List) -> Robj {
-
-    let lns = x  
+    let lns = x
         .into_iter()
         .filter(|(_, xi)| !xi.is_null())
         .map(|(_, robj)| LineString::from(Geom::from(robj)))
-    .collect::<Vec<LineString>>();
+        .collect::<Vec<LineString>>();
 
     let res = MultiLineString::new(lns)
         .remove_repeated_points()
@@ -105,12 +90,11 @@ fn union_linestrings(x: List) -> Robj {
 }
 
 fn union_multilinestrings(x: List) -> Robj {
-
-    let lns = x  
+    let lns = x
         .into_iter()
         .filter(|(_, xi)| !xi.is_null())
         .flat_map(|(_, robj)| MultiLineString::try_from(Geom::from(robj).geom).unwrap().0)
-    .collect::<Vec<LineString>>();
+        .collect::<Vec<LineString>>();
 
     let res = MultiLineString::new(lns)
         .remove_repeated_points()
@@ -118,7 +102,6 @@ fn union_multilinestrings(x: List) -> Robj {
 
     as_rsgeo_vctr(list!(res), "multilinestring")
 }
-
 
 fn union_multipolygons(x: List) -> Robj {
     // first extract the underlying multipolygons into a single
@@ -132,22 +115,19 @@ fn union_multipolygons(x: List) -> Robj {
             let g = Geom::from(x).geom;
 
             let p = MultiPolygon::try_from(g).unwrap();
-    
-            p
-                .0
-                .into_iter()
+
+            p.0.into_iter()
                 .map(|x| x.into_geom().into_robj())
                 .collect::<Vec<Robj>>()
-        }).collect::<Vec<Robj>>();
+        })
+        .collect::<Vec<Robj>>();
     // convert to a list cannot collect due to list collection bugh
     let x = List::from_values(x);
 
     union_polygons(x)
 }
 
-
 fn union_polygons(x: List) -> Robj {
-
     let shared_geo = Rc::new(x);
 
     let tree = create_cached_rtree(shared_geo.clone().as_list().unwrap());
@@ -156,36 +136,32 @@ fn union_polygons(x: List) -> Robj {
         .root()
         .children()
         .into_iter()
-        .fold(MultiPolygon::new(vec![]), |accum, child| {
-            match child {
-                RTreeNode::Leaf(val) => {
-                    let robj = MultiPolygon::from(shared_geo.elt(val.data).unwrap().into_geom());
-                    accum.union(&robj)
-                }
-                RTreeNode::Parent(parent) => {
-                    accum.union(&inner(parent, shared_geo.clone()))
-                }
+        .fold(MultiPolygon::new(vec![]), |accum, child| match child {
+            RTreeNode::Leaf(val) => {
+                let robj = MultiPolygon::from(shared_geo.elt(val.data).unwrap().into_geom());
+                accum.union(&robj)
             }
-        }).into_geom();
+            RTreeNode::Parent(parent) => accum.union(&inner(parent, shared_geo.clone())),
+        })
+        .into_geom();
 
     as_rsgeo_vctr(list!(res), "multipolygon")
 }
 
-
-fn inner(papa: &ParentNode<GeomWithData<CachedEnvelope<Geom>, usize>>, shared_geo: Rc<List>) -> MultiPolygon {
-    papa
-        .children()
+fn inner(
+    papa: &ParentNode<GeomWithData<CachedEnvelope<Geom>, usize>>,
+    shared_geo: Rc<List>,
+) -> MultiPolygon {
+    papa.children()
         .into_iter()
-        .fold(MultiPolygon::new(vec![]), |accum, child| {
-            match child {
-                RTreeNode::Leaf(val) => {
-                    let robj = MultiPolygon::from(shared_geo.elt(val.data).unwrap().into_geom());
-                    accum.union(&robj)
-                }
-                RTreeNode::Parent(parent) => {
-                    let value = inner(parent, shared_geo.clone());
-                    accum.union(&value)
-                }
+        .fold(MultiPolygon::new(vec![]), |accum, child| match child {
+            RTreeNode::Leaf(val) => {
+                let robj = MultiPolygon::from(shared_geo.elt(val.data).unwrap().into_geom());
+                accum.union(&robj)
+            }
+            RTreeNode::Parent(parent) => {
+                let value = inner(parent, shared_geo.clone());
+                accum.union(&value)
             }
         })
 }

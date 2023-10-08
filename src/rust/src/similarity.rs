@@ -5,20 +5,20 @@ use sfconversions::Geom;
 
 #[extendr]
 /// Calculate Frechet Distance
-/// 
-/// Given two LineStrings compare thier similarity 
-/// by calculating the Fréchet distance. 
-/// 
-/// @param x an object of class `rs_LINESTRING` 
-/// @param y an object of class `rs_LINESTRING` 
-/// 
+///
+/// Given two LineStrings compare thier similarity
+/// by calculating the Fréchet distance.
+///
+/// @param x an object of class `rs_LINESTRING`
+/// @param y an object of class `rs_LINESTRING`
+///
 /// @returns
 /// A numeric vector
 /// @examples
 /// x <- geom_linestring(1:10, runif(10, -1, 1))
 /// y <- geom_linestring(1:10, runif(10, -3, 3))
 /// frechet_distance(x, y)
-/// @export 
+/// @export
 fn frechet_distance(x: List, y: List) -> Doubles {
     if !x.inherits("rs_LINESTRING") || !y.inherits("rs_LINESTRING") {
         panic!("`x` and `y` but be an `rs_LINESTRING` object")

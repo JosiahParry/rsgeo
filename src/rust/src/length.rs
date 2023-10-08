@@ -1,42 +1,40 @@
 use extendr_api::prelude::*;
-use rayon::prelude::*;
-use sfconversions::{Geom, geometry_from_list};
 use geo::prelude::*;
 use geo::{EuclideanLength, Geometry};
-
+use rayon::prelude::*;
+use sfconversions::{geometry_from_list, Geom};
 
 #[extendr]
 /// Calculate LineString Length
-/// 
-/// For a given LineString or MultiLineString geometry, calculate its length. 
+///
+/// For a given LineString or MultiLineString geometry, calculate its length.
 /// Other geometries will return a value of `NA`.
-/// 
+///
 /// ### Notes
-/// 
+///
 /// * Vicenty, Geodesic, and Haversine methods will return in units of meters.
 /// * Geodesic length will always converge and is more accurate than the Vicenty methods.
 /// * Haversine uses a mean earth radius of 6371.088 km.
-/// 
+///
 /// See [`geo`](https://docs.rs/geo/latest/geo/index.html#length) docs for more details.
-/// 
+///
 /// @param x an object of class `rsgeo`
-/// 
+///
 /// @examples
 /// set.seed(0)
 /// y <- runif(25, -5, 5)
 /// x <- 1:25
-/// 
+///
 /// ln <- geom_linestring(x, y)
-/// 
+///
 /// length_euclidean(ln)
 /// length_geodesic(ln)
 /// length_vincenty(ln)
 /// length_haversine(ln)
 /// @export
 /// @rdname length
-/// @returns A numeric vector 
+/// @returns A numeric vector
 fn length_euclidean(x: List) -> Doubles {
-    
     if !x.inherits("rsgeo") {
         panic!("`x` must be an object of class `rsgeo`")
     }
@@ -59,8 +57,6 @@ fn length_euclidean(x: List) -> Doubles {
         .collect::<Doubles>()
 }
 
-
-
 #[extendr]
 /// @export
 /// @rdname length
@@ -73,16 +69,14 @@ fn length_geodesic(x: List) -> Doubles {
 
     let res_vec = x
         .into_par_iter()
-        .map(|xi| {
-            match xi {
-                Some(Geometry::Line(geom)) => Some(geom.geodesic_length()),
-                Some(Geometry::LineString(geom)) => Some(geom.geodesic_length()),
-                Some(Geometry::MultiLineString(geom)) => Some(geom.geodesic_length()),
-                _ => None
-            }
+        .map(|xi| match xi {
+            Some(Geometry::Line(geom)) => Some(geom.geodesic_length()),
+            Some(Geometry::LineString(geom)) => Some(geom.geodesic_length()),
+            Some(Geometry::MultiLineString(geom)) => Some(geom.geodesic_length()),
+            _ => None,
         })
         .collect::<Vec<Option<f64>>>();
-    
+
     Doubles::from_values(res_vec)
 }
 
@@ -90,7 +84,6 @@ fn length_geodesic(x: List) -> Doubles {
 /// @export
 /// @rdname length
 fn length_haversine(x: List) -> Doubles {
-
     if !x.inherits("rsgeo") {
         panic!("`x` must be an object of class `rsgeo`")
     }
@@ -99,13 +92,11 @@ fn length_haversine(x: List) -> Doubles {
 
     let res_vec = x
         .into_par_iter()
-        .map(|xi| {
-            match xi {
-                Some(Geometry::Line(geom)) => Some(geom.haversine_length()),
-                Some(Geometry::LineString(geom)) => Some(geom.haversine_length()),
-                Some(Geometry::MultiLineString(geom)) => Some(geom.haversine_length()),
-                _ => None
-            }
+        .map(|xi| match xi {
+            Some(Geometry::Line(geom)) => Some(geom.haversine_length()),
+            Some(Geometry::LineString(geom)) => Some(geom.haversine_length()),
+            Some(Geometry::MultiLineString(geom)) => Some(geom.haversine_length()),
+            _ => None,
         })
         .collect::<Vec<Option<f64>>>();
 
@@ -116,18 +107,15 @@ fn length_haversine(x: List) -> Doubles {
 /// @export
 /// @rdname length
 fn length_vincenty(x: List) -> Doubles {
-
     let x = geometry_from_list(x);
 
     let res_vec = x
         .into_par_iter()
-        .map(|xi| {
-            match xi {
-                Some(Geometry::Line(geom)) => geom.vincenty_length().ok(),
-                Some(Geometry::LineString(geom)) => geom.vincenty_length().ok(),
-                Some(Geometry::MultiLineString(geom)) => geom.vincenty_length().ok(),
-                _ => None
-            }
+        .map(|xi| match xi {
+            Some(Geometry::Line(geom)) => geom.vincenty_length().ok(),
+            Some(Geometry::LineString(geom)) => geom.vincenty_length().ok(),
+            Some(Geometry::MultiLineString(geom)) => geom.vincenty_length().ok(),
+            _ => None,
         })
         .collect::<Vec<Option<f64>>>();
 

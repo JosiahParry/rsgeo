@@ -1,7 +1,7 @@
 use extendr_api::prelude::*;
 use geo::CoordsIter;
 use geo_types::{LineString, MultiLineString, MultiPoint, MultiPolygon, Point, Polygon};
-use sfconversions::{Geom, vctrs::as_rsgeo_vctr, IntoGeom};
+use sfconversions::{vctrs::as_rsgeo_vctr, Geom, IntoGeom};
 
 //# cast 1 : 1
 //# expand 1 : many
@@ -99,7 +99,6 @@ fn cast_polygon_multilinestring(x: Geom) -> Geom {
     Geom::from(MultiLineString::new(ext))
 }
 
-
 // MultiPolygon Conversions
 // ————————————————————————
 
@@ -122,7 +121,11 @@ fn cast_multipolygon_multilinestring(x: Geom) -> Geom {
     let linestrings = mply
         .0
         .into_iter()
-        .flat_map(|x| MultiLineString::try_from(cast_polygon_multilinestring(x.into_geom()).geom).unwrap().0)
+        .flat_map(|x| {
+            MultiLineString::try_from(cast_polygon_multilinestring(x.into_geom()).geom)
+                .unwrap()
+                .0
+        })
         .collect::<Vec<LineString>>();
 
     Geom::from(MultiLineString::new(linestrings))
@@ -316,7 +319,6 @@ fn cast_polygons(x: List, to: &str) -> Robj {
 
 #[extendr]
 fn cast_multipolygons(x: List, to: &str) -> Robj {
-    
     if !x.inherits("rs_MULTIPOLYGON") {
         panic!("`x` must be an `rs_MULTIPOLYGON`")
     }
@@ -340,11 +342,7 @@ fn cast_multipolygons(x: List, to: &str) -> Robj {
         .collect::<Vec<Robj>>();
 
     as_rsgeo_vctr(List::from_values(res_vec), to)
-
 }
-
-
-
 
 extendr_module! {
     mod cast;

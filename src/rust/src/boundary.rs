@@ -1,14 +1,14 @@
 use sfconversions::{
-    vctrs::{geom_class, verify_rsgeo, as_rsgeo_vctr},
+    geometry_from_list,
+    vctrs::{as_rsgeo_vctr, geom_class, verify_rsgeo},
     Geom, IntoGeom,
-    geometry_from_list
 };
 
 use extendr_api::prelude::*;
 
+use crate::construction::IsReal;
 use geo::{BoundingRect, ConcaveHull, ConvexHull, Extremes, MinimumRotatedRect};
 use geo_types::{Geometry, Point, Polygon};
-use crate::construction::IsReal;
 
 use rayon::prelude::*;
 
@@ -16,16 +16,16 @@ use rayon::prelude::*;
 /// Compute Geometric Boundaries
 ///
 /// From a vector of geometries identify different types of boundaries.
-/// 
-/// Note that if you want a convex or concave hull over an entire vector of geometries 
+///
+/// Note that if you want a convex or concave hull over an entire vector of geometries
 /// you must first union or combine them using either `combine_geoms()` or `union_geoms()`
-/// 
+///
 /// @param x an object of class `rsgeo`
 /// @param concavity a value between 0 and 1 specifying the concavity of the convex hull
-/// 
+///
 /// @export
 /// @rdname boundaries
-/// 
+///
 /// @examples
 /// lns <- geom_linestring(
 ///   1:20,
@@ -38,12 +38,12 @@ use rayon::prelude::*;
 /// convex_hull(lns)
 /// concave_hull(lns, 0.5)
 /// extreme_coords(lns)
-/// 
-/// @returns 
-/// 
+///
+/// @returns
+///
 /// - `bounding_box()` returns a named vector of xmin, ymin, xmax, and ymax
 /// - `bounding_boxes()` returns a list of bounding box numeric vectors for each geometry
-/// - `bounding_rect()` returns an `rs_POLYGON` of the bounding rectangle of each geometry 
+/// - `bounding_rect()` returns an `rs_POLYGON` of the bounding rectangle of each geometry
 /// - `convex_hull()` returns an `rs_POLYGON` of the convex hull for each geometry
 /// - `concave_hull()` returns an `rs_POLYGON` of the specified concavity for each geometry
 /// - `extreme_coords()` returns the extreme coordinates of each geometry as a list where each element
@@ -54,7 +54,6 @@ fn bounding_box(x: List) -> Robj {
     let bbox = x
         .iter()
         .fold([f64::MAX, f64::MAX, f64::MIN, f64::MIN], |acc, (_, xi)| {
-
             let g = <&Geom>::from_robj(&xi);
 
             match g {
@@ -66,27 +65,27 @@ fn bounding_box(x: List) -> Robj {
                         acc[0].min(xmin),
                         acc[1].min(ymin),
                         acc[2].max(xmax),
-                        acc[3].max(ymax)
+                        acc[3].max(ymax),
                     ]
-                },
-                Err(_) => acc
+                }
+                Err(_) => acc,
             }
         });
-    
+
     // TODO what if all values are NA? We will be returning massive numbers and that wouldnt be good
 
     Doubles::from_values(bbox)
         .into_robj()
         .set_names(["xmin", "ymin", "xmax", "ymax"])
         .unwrap()
-
 }
 
 #[extendr]
 /// @rdname boundaries
 /// @export
 fn bounding_boxes(x: List) -> List {
-    let res_vec = x.iter()
+    let res_vec = x
+        .iter()
         .map(|(_, xi)| {
             if x.is_null() {
                 let bb = [Rfloat::na(); 4];
@@ -125,7 +124,8 @@ fn bounding_boxes(x: List) -> List {
 /// @rdname boundaries
 /// @export
 fn bounding_rect(x: List) -> Robj {
-    let res_vec = x.iter()
+    let res_vec = x
+        .iter()
         .map(|(_, xi)| {
             if x.is_null() {
                 ().into_robj()
@@ -146,7 +146,8 @@ fn bounding_rect(x: List) -> Robj {
 /// @rdname boundaries
 /// @export
 fn convex_hull(x: List) -> Robj {
-    let res_vec = x.iter() 
+    let res_vec = x
+        .iter()
         .map(|(_, xi)| {
             if xi.is_null() {
                 ().into_robj()
@@ -182,7 +183,8 @@ fn concave_hull(x: List, concavity: Doubles) -> Robj {
         concavity
     };
 
-    let res_vec = x.iter()
+    let res_vec = x
+        .iter()
         .zip(concavity.iter())
         .map(|((_, xi), ci)| {
             if xi.is_null() || !ci.is_real() {
@@ -211,7 +213,8 @@ fn concave_hull(x: List, concavity: Doubles) -> Robj {
 fn extreme_coords(x: List) -> List {
     verify_rsgeo(&x);
 
-    let res_vec = x.iter()
+    let res_vec = x
+        .iter()
         .map(|(_, xi)| {
             if xi.is_null() {
                 ().into_robj()
@@ -238,15 +241,13 @@ fn extreme_coords(x: List) -> List {
         })
         .collect::<Vec<Robj>>();
 
-        List::from_values(res_vec)
-
+    List::from_values(res_vec)
 }
 
 #[extendr]
 /// @rdname boundaries
 /// @export
 fn minimum_rotated_rect(x: List) -> Robj {
-
     if !x.inherits("rsgeo") {
         panic!("`x` must be of class `rsgeo`")
     }
@@ -255,23 +256,19 @@ fn minimum_rotated_rect(x: List) -> Robj {
 
     let res_vec = geoms
         .into_par_iter()
-        .map(|xi| {
-            match xi {
-                Some(g) => g.minimum_rotated_rect(),
-                None => None
-            }
+        .map(|xi| match xi {
+            Some(g) => g.minimum_rotated_rect(),
+            None => None,
         })
         .collect::<Vec<Option<Polygon>>>();
 
-    
     let res = res_vec
         .into_iter()
-        .map(|xi| {
-            match xi {
-                Some(p) => Geom::from(p).into_robj(),
-                None => ().into_robj()
-            }
-        }).collect::<Vec<Robj>>();
+        .map(|xi| match xi {
+            Some(p) => Geom::from(p).into_robj(),
+            None => ().into_robj(),
+        })
+        .collect::<Vec<Robj>>();
 
     // let res_vec = x.iter()
     //     .map(|(_, xi)| {

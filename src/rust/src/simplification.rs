@@ -1,7 +1,10 @@
 use extendr_api::prelude::*;
 use geo::{Simplify, SimplifyVw, SimplifyVwPreserve};
 use geo_types::Geometry;
-use sfconversions::{Geom, vctrs::{as_rsgeo_vctr, rsgeo_type}};
+use sfconversions::{
+    vctrs::{as_rsgeo_vctr, rsgeo_type},
+    Geom,
+};
 
 #[extendr]
 fn simplify_geoms_(x: List, epsilon: Doubles) -> Robj {
@@ -20,7 +23,8 @@ fn simplify_geoms_(x: List, epsilon: Doubles) -> Robj {
     // determine the input class the output must be the same type
     let cls = rsgeo_type(&x);
 
-    let res_vec = x.iter()
+    let res_vec = x
+        .iter()
         .zip(epsilon.iter())
         .map(|((_, xi), ei)| {
             if xi.is_null() || ei.is_na() || ei.is_infinite() || ei.is_nan() {
@@ -39,9 +43,8 @@ fn simplify_geoms_(x: List, epsilon: Doubles) -> Robj {
             }
         })
         .collect::<Vec<Robj>>();
-    
-    as_rsgeo_vctr(List::from_values(res_vec), cls.as_str())
 
+    as_rsgeo_vctr(List::from_values(res_vec), cls.as_str())
 }
 
 #[extendr]
@@ -61,7 +64,8 @@ fn simplify_vw_geoms_(x: List, epsilon: Doubles) -> Robj {
     // determine the input class the output must be the same type
     let cls = rsgeo_type(&x);
 
-    let res_vec = x.iter()
+    let res_vec = x
+        .iter()
         .zip(epsilon.iter())
         .map(|((_, xi), ei)| {
             if xi.is_null() || ei.is_na() || ei.is_infinite() || ei.is_nan() {
@@ -82,7 +86,6 @@ fn simplify_vw_geoms_(x: List, epsilon: Doubles) -> Robj {
         .collect::<Vec<Robj>>();
 
     as_rsgeo_vctr(List::from_values(res_vec), cls.as_str())
-
 }
 
 #[extendr]
@@ -102,7 +105,8 @@ fn simplify_vw_preserve_geoms_(x: List, epsilon: Doubles) -> Robj {
     // determine the input class the output must be the same type
     let cls = rsgeo_type(&x);
 
-    let res_vec = x.iter()
+    let res_vec = x
+        .iter()
         .zip(epsilon.iter())
         .map(|((_, xi), ei)| {
             if xi.is_null() || ei.is_na() || ei.is_infinite() || ei.is_nan() {
@@ -127,7 +131,6 @@ fn simplify_vw_preserve_geoms_(x: List, epsilon: Doubles) -> Robj {
         .collect::<Vec<Robj>>();
 
     as_rsgeo_vctr(List::from_values(res_vec), cls.as_str())
-
 }
 
 extendr_module! {

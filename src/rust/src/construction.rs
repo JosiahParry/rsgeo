@@ -1,6 +1,9 @@
 use extendr_api::prelude::*;
 use geo_types::{coord, point, Coord, LineString, MultiPoint, Point, Polygon};
-use sfconversions::{vctrs::{geom_class, as_rsgeo_vctr}, Geom, IntoGeom};
+use sfconversions::{
+    vctrs::{as_rsgeo_vctr, geom_class},
+    Geom, IntoGeom,
+};
 use std::collections::BTreeMap;
 
 pub trait IsReal {
@@ -15,7 +18,6 @@ impl IsReal for Rfloat {
 
 #[extendr]
 fn geom_point_(x: Doubles, y: Doubles) -> Robj {
-
     let n_x = x.len();
     let n_y = y.len();
 
@@ -40,7 +42,6 @@ fn geom_point_(x: Doubles, y: Doubles) -> Robj {
 
 #[extendr]
 fn geom_multipoint_(x: Doubles, y: Doubles, id: Integers) -> Robj {
-
     let n_id = id.len();
     let n_x = x.len();
     let n_y = y.len();
@@ -53,7 +54,7 @@ fn geom_multipoint_(x: Doubles, y: Doubles, id: Integers) -> Robj {
 
     let id = match n_id == 1 {
         true => Integers::from_values(vec![1; n_x]),
-        false => id
+        false => id,
     };
 
     // create empty hash map to store unique vectors of points
@@ -83,7 +84,6 @@ fn geom_multipoint_(x: Doubles, y: Doubles, id: Integers) -> Robj {
 
 #[extendr]
 fn geom_linestring_(x: Doubles, y: Doubles, id: Integers) -> Robj {
-
     let n_id = id.len();
     let n_x = x.len();
     let n_y = y.len();
@@ -93,10 +93,10 @@ fn geom_linestring_(x: Doubles, y: Doubles, id: Integers) -> Robj {
     } else if (n_id != n_x) && (n_id != 1) {
         panic!("`id` must be the same length as `x` or length 1")
     }
-    
+
     let id = match n_id == 1 {
         true => Integers::from_values(vec![1; n_x]),
-        false => id
+        false => id,
     };
 
     // create empty hash map to store unique vectors of points
@@ -126,29 +126,27 @@ fn geom_linestring_(x: Doubles, y: Doubles, id: Integers) -> Robj {
 
 #[extendr]
 fn geom_polygon_(x: Doubles, y: Doubles, id: Integers, ring: Integers) -> Robj {
-
     let n_id = id.len();
     let n_ring = ring.len();
     let n_x = x.len();
     let n_y = y.len();
 
-
-   if n_x != n_y {
+    if n_x != n_y {
         panic!("`x` and `y` must be the same length")
     } else if (n_id != n_x) && (n_id != 1) {
         panic!("`id` must be the same length as `x` or length 1")
     } else if (n_ring != n_x) && (n_ring != 1) {
         panic!("`ring` must be the same length as `x` or length 1")
     }
-    
+
     let id = match n_id == 1 {
         true => Integers::from_values(vec![1; n_x]),
-        false => id
+        false => id,
     };
 
     let ring: Integers = match n_ring == 1 {
         true => Integers::from_values(vec![1; n_x]),
-        false => ring
+        false => ring,
     };
 
     // create empty hash map to store unique vectors of points for each ring
@@ -224,7 +222,6 @@ fn geom_line(x: List, y: List) -> Robj {
     let res = List::from_values(res_vec);
 
     as_rsgeo_vctr(res, "linestring")
-
 }
 
 extendr_module! {

@@ -7,7 +7,6 @@ use sfconversions::{Geom, IntoGeom};
 
 // use cached envelopes
 pub fn create_cached_rtree(geoms: List) -> RTree<GeomWithData<CachedEnvelope<Geom>, usize>> {
-
     let all_geoms = geoms
         .iter()
         .enumerate()
@@ -28,8 +27,6 @@ pub fn create_cached_rtree(geoms: List) -> RTree<GeomWithData<CachedEnvelope<Geo
 extendr_module! {
     mod spatial_index;
 }
-
-
 
 // use std::rc::Rc;
 

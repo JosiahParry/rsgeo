@@ -1,15 +1,13 @@
 use extendr_api::prelude::*;
 use geo_types::*;
-use sfconversions::{
-    vctrs::as_rsgeo_vctr,
-    Geom,
-};
+use sfconversions::{vctrs::as_rsgeo_vctr, Geom};
 
 // EXPAND -------------------------------------------------------------------------
 // multis to the single varietys
 #[extendr]
 fn expand_multipolygon(x: Robj) -> Robj {
-    let res = MultiPolygon::try_from(Geom::from(x).geom).unwrap()
+    let res = MultiPolygon::try_from(Geom::from(x).geom)
+        .unwrap()
         .0
         .into_iter()
         .map(|p| Geom::from(p))
@@ -20,7 +18,8 @@ fn expand_multipolygon(x: Robj) -> Robj {
 
 #[extendr]
 fn expand_multipoint(x: Robj) -> Robj {
-    let res = MultiPoint::try_from(Geom::from(x).geom).unwrap()
+    let res = MultiPoint::try_from(Geom::from(x).geom)
+        .unwrap()
         .0
         .into_iter()
         .map(|p| Geom::from(p))
@@ -31,7 +30,8 @@ fn expand_multipoint(x: Robj) -> Robj {
 
 #[extendr]
 fn expand_multilinestring(x: Robj) -> Robj {
-    let res = MultiLineString::try_from(Geom::from(x).geom).unwrap()
+    let res = MultiLineString::try_from(Geom::from(x).geom)
+        .unwrap()
         .0
         .into_iter()
         .map(|p| Geom::from(p))
@@ -74,28 +74,28 @@ fn expand_linestring(x: Robj) -> Robj {
 }
 
 #[extendr]
-/// Expand Geometries 
-/// 
-/// Expands geometries into a list of vectors of their components. 
-/// 
+/// Expand Geometries
+///
+/// Expands geometries into a list of vectors of their components.
+///
 /// @param x an object of class `rsgeo`
-/// 
+///
 /// @details
-/// 
+///
 /// - `rs_MULTIPOINT` expands into a vector of points
 /// - `rs_LINESTRING` expands into a vector points
 /// - `rs_MULTILINESTRING` expands into a vector of linestrings
 /// - `rs_POLYGON` expands into a vector of linestrings
 /// - `rs_MULTIPOLYGON` expands into a vector of polygons
-/// 
+///
 /// If you wish to have a single vector returned, pass the results
 /// into `flatten_geoms()`.
-/// 
+///
 /// @returns
-/// 
+///
 /// A list of `rsgeo` vectors containing each original geometry's
 /// components as a new vector.
-/// 
+///
 /// @export
 /// @examples
 /// mpnts <- geom_multipoint(runif(10), runif(10), rep.int(1:5, 2))
@@ -109,18 +109,12 @@ fn expand_geoms(x: List) -> List {
         "rs_MULTILINESTRING" => expand_multilinestring,
         "rs_POLYGON" => expand_polygon,
         "rs_MULTIPOLYGON" => expand_multipolygon,
-        &_ => unimplemented!("not implemented for {}", cls)
+        &_ => unimplemented!("not implemented for {}", cls),
     };
 
     let res = x
         .into_iter()
-        .map(|(_, robj)| {
-            if robj.is_null() {
-                robj
-            } else {
-                f(robj)
-            }
-        })
+        .map(|(_, robj)| if robj.is_null() { robj } else { f(robj) })
         .collect::<Vec<Robj>>();
 
     List::from_values(res)
