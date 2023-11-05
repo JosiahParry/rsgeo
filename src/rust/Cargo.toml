@@ -17,5 +17,5 @@ sfconversions = { git = "https://github.com/JosiahParry/sfconversions" }
 
 
 [patch.crates-io]
-geo = { git = "https://github.com/georust/geo" }
-# geo = { path = "../../../geo/geo" }
+geo-types = { git = "https://github.com/georust/geo" }
+geo = { path = "../../../geo/geo" }
