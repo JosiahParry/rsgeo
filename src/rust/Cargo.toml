@@ -18,4 +18,5 @@ sfconversions = { git = "https://github.com/JosiahParry/sfconversions" }
 
 [patch.crates-io]
 geo-types = { git = "https://github.com/georust/geo" }
-geo = { path = "../../../geo/geo" }
+# geo = { path = "../../../geo/geo" }
+geo = { git = "https://github.com/JosiahParry/geo", branch = "macrofy-segment" }

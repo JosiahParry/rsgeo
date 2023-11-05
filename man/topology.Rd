@@ -51,7 +51,7 @@ if (rlang::is_installed("sf")) {
     # intersects
     intersects_sparse(x, y)
     intersects_pairwise(x, y)
-    # contains 
+    # contains
     contains_sparse(x, y)
     contains_pairwise(x, y)
     # within

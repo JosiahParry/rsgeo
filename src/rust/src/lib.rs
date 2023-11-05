@@ -7,6 +7,7 @@ mod densify;
 mod distance;
 mod length;
 mod query;
+mod segmentize;
 mod similarity;
 mod simplification;
 // mod io;
@@ -291,6 +292,7 @@ extendr_module! {
     use distance;
     use length;
     use query;
+    use segmentize;
     use simplification;
     use similarity;
     use topology;

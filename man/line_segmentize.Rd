@@ -2,9 +2,12 @@
 % Please edit documentation in R/segmentize.R
 \name{line_segmentize}
 \alias{line_segmentize}
+\alias{line_segmentize_haversine}
 \title{Segments a LineString into \code{n} equal length LineStrings}
 \usage{
 line_segmentize(x, n)
+
+line_segmentize_haversine(x, n)
 }
 \arguments{
 \item{x}{and object of class \code{rs_LINESTRING}}
@@ -19,6 +22,13 @@ Given a LineString, segment it into \code{n} equal length LineStrings.
 The \code{n} LineStrings are provided as a \code{MultiLineString} which can
 be expanded using \code{expand_geoms()} and consequently flattened
 using \code{flatten_geoms()} if desired.
+}
+\details{
+\code{line_segmentize()} will segment a LineString using a Euclidean length
+calculation. \code{line_segmentize_haversine()} will use a Haversine length
+calculation instead. If you have geometries in a geographic cooridnate
+system such as EPSG:4326 use the Haversine variant. Otherwise, prefer
+the euclidean variant.
 }
 \examples{
 x <- geom_linestring(1:10, runif(10, -1, 1))

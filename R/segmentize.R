@@ -7,6 +7,15 @@
 #'
 #' @param x and object of class `rs_LINESTRING`
 #' @param n an integer vector determining the number of equal length LineStrings to create
+#'
+#' @details
+#'
+#' `line_segmentize()` will segment a LineString using a Euclidean length
+#' calculation. `line_segmentize_haversine()` will use a Haversine length
+#' calculation instead. If you have geometries in a geographic cooridnate
+#' system such as EPSG:4326 use the Haversine variant. Otherwise, prefer
+#' the euclidean variant.
+#'
 #' @export
 #' @returns
 #' A vector of class `rs_MULTILINESTRING`
@@ -19,5 +28,19 @@
 #'   expand_geoms(segs)
 #' )
 line_segmentize <- function(x, n) {
+  if (!inherits(x, "rs_LINESTRING")) {
+    rlang::abort("`x` must be of class `rs_LINESTRING")
+  }
   line_segmentize_(x, as.integer(n))
+}
+
+#' @export
+#' @rdname line_segmentize
+line_segmentize_haversine <- function(x, n) {
+
+  if (!inherits(x, "rs_LINESTRING")) {
+    rlang::abort("`x` must be of class `rs_LINESTRING")
+  }
+
+  line_segmentize_haversine_(x, as.integer(n))
 }
