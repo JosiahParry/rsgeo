@@ -3,7 +3,7 @@ use extendr_api::prelude::*;
 use geo::{BoundingRect, EuclideanDistance};
 use geo_types::{LineString, Rect};
 use rstar::primitives::{CachedEnvelope, GeomWithData};
-use rstar::{RTree, AABB};
+use rstar::{RTree, RTreeObject, AABB};
 use sfconversions::{Geom, IntoGeom};
 use std::collections::BTreeMap;
 
@@ -31,8 +31,7 @@ fn create_line_segment_tree(x: List) -> RTree<GeomWithData<CachedEnvelope<Geom>,
                     // geometry so this will store it
                     .map(|li| {
                         let slope = li.slope();
-                        let line = Geom::from(LineString::from(li));
-                        let env = line.cached_envelope();
+                        let env = li.cached_envelope();
                         GeomWithData::new(env, (i, slope))
                     })
                     .collect::<Vec<GeomWithData<CachedEnvelope<Geom>, (usize, f64)>>>();
@@ -59,6 +58,58 @@ fn y_range(rect: &Rect) -> Range<f64> {
 fn range_contains(r1: Range<f64>, r2: Range<f64>) -> bool {
     r1.contains(&r2.start) || r1.contains(&r2.end)
 }
+
+
+// Given the overlap in the domain and range
+// we can calculate the segment lenth of the line that is provided
+// we use the bounding box as a &Rect to determine the width or height
+// of the triangle
+fn solve_segment_length(
+    x_overlap: Option<Range<f64>>, 
+    y_overlap: Option<Range<f64>>, 
+    bbox: &Rect
+) -> f64 {
+    if x_overlap.is_some() && y_overlap.is_some() {
+        let (base_w, base_h) = wh(&bbox);
+        let dy = solve_dy(y_overlap.unwrap());
+        let dx = solve_dx(dy, base_w, base_h);
+        solve_h(dx, dy)
+    } else if x_overlap.is_some() {
+        let x_over = x_overlap.unwrap();
+        x_over.end - x_over.start 
+    } else if y_overlap.is_some() {
+        let y_over = y_overlap.unwrap();
+        y_over.end - y_over.start
+    } else {
+        unreachable!() // this should never happen 
+    }
+} 
+
+
+// get height and width from a Line
+// do this by passing in the bounding rectangle
+// (width, height)
+fn wh(x: &Rect) -> (f64, f64) {
+    let (x1, y1) = x.min().x_y();
+    let (x2, y2) = x.max().x_y();
+    (x2 - x1, y2 - y1)
+}
+
+// Solve for dy:
+// This is the height of the range of Y values
+fn solve_dy(y_range: Range<f64>) -> f64 {
+    y_range.end - y_range.start
+}
+
+// base_w is dx2 (the )
+fn solve_dx(dy: f64, base_w: f64, base_h: f64) -> f64 {
+    dy * base_w / base_h
+}
+
+fn solve_h(dx: f64, dy: f64) -> f64 {
+    (dx.powi(2)+ dy.powi(2)).sqrt()
+}
+
 
 fn identify_candidates(
     x: RTree<GeomWithData<CachedEnvelope<Geom>, (usize, f64)>>,
@@ -163,3 +214,29 @@ extendr_module! {
 // after comparing slopes, the distance should be captured and checked so that
 // we can make sure they're within a distance of eachother
 // how much of x is in y??
+
+// fn create_target_rtree(y: Vec<LineString>, D: f64) {
+//     let half_d = D/2.0;
+
+//     let _ = y
+//         .iter()
+//         .enumerate()
+//         .map(|(i, yi)| {
+//             yi.lines()
+//                 .map(|yij| {
+
+//                     let bb = yij.bounding_rect();
+//                     let (ll_x, ll_y) = bb.min().x_y();
+//                     let (ur_x, ur_y) = bb.max().x_y();
+        
+//                     // create the AABB
+//                     let aabb = AABB::from_corners(
+//                         [ll_x - half_d, ll_y - half_d],
+//                         [ur_x + half_d, ur_y + half_d],
+//                     );
+
+                    
+//                 })
+//         });
+
+// }
