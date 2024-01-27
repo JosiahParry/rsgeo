@@ -1,13 +1,14 @@
+use core::ops::Range;
 use extendr_api::prelude::*;
 use geo::{BoundingRect, EuclideanDistance};
-use sfconversions::{Geom, IntoGeom};
-use geo_types::LineString;
-use std::collections::BTreeMap;
+use geo_types::{LineString, Rect};
 use rstar::primitives::{CachedEnvelope, GeomWithData};
 use rstar::{RTree, AABB};
+use sfconversions::{Geom, IntoGeom};
+use std::collections::BTreeMap;
 
 fn create_line_segment_tree(x: List) -> RTree<GeomWithData<CachedEnvelope<Geom>, (usize, f64)>> {
-    // for each geometry in the vector x 
+    // for each geometry in the vector x
     let x_segments = x
         .iter()
         // we get the index position
@@ -17,7 +18,7 @@ fn create_line_segment_tree(x: List) -> RTree<GeomWithData<CachedEnvelope<Geom>,
             if xi.is_null() {
                 None
             } else {
-                // get the Geom struct 
+                // get the Geom struct
                 let geo = Geom::try_from(xi).unwrap();
                 // get the linestring -- will panic if not a linstring
                 let lines = LineString::try_from(geo.geom)
@@ -35,7 +36,7 @@ fn create_line_segment_tree(x: List) -> RTree<GeomWithData<CachedEnvelope<Geom>,
                         GeomWithData::new(env, (i, slope))
                     })
                     .collect::<Vec<GeomWithData<CachedEnvelope<Geom>, (usize, f64)>>>();
-                    
+
                 // return an option here so null geomerties are excluded from the tree
                 Some(lines)
             }
@@ -47,6 +48,17 @@ fn create_line_segment_tree(x: List) -> RTree<GeomWithData<CachedEnvelope<Geom>,
     RTree::bulk_load(x_segments)
 }
 
+fn x_range(rect: &Rect) -> Range<f64> {
+    rect.min().x..rect.max().x
+}
+
+fn y_range(rect: &Rect) -> Range<f64> {
+    rect.min().y..rect.max().y
+}
+
+fn range_contains(r1: Range<f64>, r2: Range<f64>) -> bool {
+    r1.contains(&r2.start) || r1.contains(&r2.end)
+}
 
 fn identify_candidates(
     x: RTree<GeomWithData<CachedEnvelope<Geom>, (usize, f64)>>,
@@ -59,8 +71,8 @@ fn identify_candidates(
 
     let _ = y.into_iter().enumerate().for_each(|(j, lns)| {
         lns.lines().for_each(|li| {
-            // increase the size of our bounding rectangle to ensure that our padding distance 
-            // is respected. 
+            // increase the size of our bounding rectangle to ensure that our padding distance
+            // is respected.
             let bb = li.bounding_rect();
             let (ll_x, ll_y) = bb.min().x_y();
             let (ur_x, ur_y) = bb.max().x_y();
@@ -68,35 +80,41 @@ fn identify_candidates(
             // create the AABB
             let aabb = AABB::from_corners(
                 [ll_x - half_d, ll_y - half_d],
-                [ur_x + half_d, ur_y + half_d]);
+                [ur_x + half_d, ur_y + half_d],
+            );
 
             // get the intersection candidates based on the AABB
-            let cands = x
-                .locate_in_envelope_intersecting(&aabb);    
+            let cands = x.locate_in_envelope_intersecting(&aabb);
 
-            // for each possible candidate 
+            // for each possible candidate
             cands.for_each(|ci| {
                 let (i, slope) = ci.data;
                 // check if the they are within a tolerance
-                
+
                 // is the difference between slopes within our pre-defined tolerance?
                 let is_tolerant = (slope - li.slope()).abs() < slope_tolerance;
 
                 // if the slopes are sufficiently similar we can check if they're close enough
                 if is_tolerant {
+                    // next we check to see if there is overlap in the domain and range
+                    let bbox_1 = ci.geom().geom.bounding_rect().unwrap();
+                    let bbox_2 = li.bounding_rect();
 
-
-                    // calculate the distance from the line segment
-                    // if its within our threshold we include it
-                    let d = ci.geom().geom.euclidean_distance(&li);
-                    
-                    // if distance is less than or equal to tolerance, add the key
-                    if d <= dist {
-                        // add 1 for R indexing
-                        // ensures that no duplicates are inserted. Creates a new empty vector is needed
-                        let entry = matches.entry((i + 1) as i32).or_insert_with(Vec::new);
-                        if !entry.contains(&((j+1) as i32)) {
-                            entry.push((j + 1) as i32);
+                    // if theres overlap then we do a distance based check
+                    if range_contains(x_range(&bbox_2), x_range(&bbox_1))
+                        || range_contains(y_range(&bbox_2), y_range(&bbox_1))
+                    {
+                        // calculate the distance from the line segment
+                        // if its within our threshold we include it;
+                        let d = ci.geom().geom.euclidean_distance(&li);
+                        // if distance is less than or equal to tolerance, add the key
+                        if d <= dist {
+                            // add 1 for R indexing
+                            // ensures that no duplicates are inserted. Creates a new empty vector is needed
+                            let entry = matches.entry((i + 1) as i32).or_insert_with(Vec::new);
+                            if !entry.contains(&((j + 1) as i32)) {
+                                entry.push((j + 1) as i32);
+                            }
                         }
                     }
                 }
@@ -110,24 +128,21 @@ fn identify_candidates(
 #[extendr]
 fn rnet_merge(x: List, y: List, dist: f64, slope_tolerance: f64) -> List {
     let x_tree = create_line_segment_tree(x);
-    // from rsgeo vector create vector of linestrings. will not handle missingvalues 
+    // from rsgeo vector create vector of linestrings. will not handle missingvalues
     let y = y
         .into_iter()
-        .map(|(_, lns)| {
-            LineString::try_from(Geom::from(lns).geom).unwrap()
-        })
+        .map(|(_, lns)| LineString::try_from(Geom::from(lns).geom).unwrap())
         .collect::<Vec<_>>();
 
     let res = identify_candidates(x_tree, y, dist, slope_tolerance);
 
-    let (keys, vals): (Vec<_>, Vec<_>) = res
-        .into_iter()
-        .map(|(k, v)| (k, v))
-        .unzip();
-    
-    list!(from = Integers::from_values(keys), to = List::from_values(vals))
-}
+    let (keys, vals): (Vec<_>, Vec<_>) = res.into_iter().map(|(k, v)| (k, v)).unzip();
 
+    list!(
+        from = Integers::from_values(keys),
+        to = List::from_values(vals)
+    )
+}
 
 // For each linestring in X, expand to a vector of component lines
 // For each Line in Xi, insert it into an RTree with the index of the linestring and it's slope
@@ -142,9 +157,9 @@ extendr_module! {
     fn rnet_merge;
 }
 
-// Notes: 
-// after geting candidates the bounding boxes might intersect but still will be 
+// Notes:
+// after geting candidates the bounding boxes might intersect but still will be
 // far away
-// after comparing slopes, the distance should be captured and checked so that 
+// after comparing slopes, the distance should be captured and checked so that
 // we can make sure they're within a distance of eachother
 // how much of x is in y??
