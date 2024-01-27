@@ -693,5 +693,7 @@ combine_polygons <- function(x) .Call(wrap__combine_polygons, x)
 
 combine_multipolygons <- function(x) .Call(wrap__combine_multipolygons, x)
 
+rnet_merge <- function(x, y, dist, slope_tolerance) .Call(wrap__rnet_merge, x, y, dist, slope_tolerance)
+
 
 # nolint end
