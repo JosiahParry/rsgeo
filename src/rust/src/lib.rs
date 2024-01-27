@@ -23,6 +23,8 @@ pub use sfconversions::{fromsf::sfc_to_rsgeo, vctrs::*, Geom};
 mod utils;
 // MISC algos -------
 
+mod rnetmerge;
+
 use crate::construction::IsReal;
 
 use geo::{Centroid, HaversineDestination};
@@ -299,4 +301,5 @@ extendr_module! {
     use union;
     use utils;
     use casting;
+    use rnetmerge;
 }
