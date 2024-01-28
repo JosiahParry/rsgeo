@@ -8,15 +8,19 @@ crate-type = [ 'staticlib' ]
 name = 'rsgeo'
 
 [dependencies]
+# crossbeam-skiplist = "0.1.3"
 extendr-api = { version = "0.6.0" }
-geo = { version = "0.26.0" }
-geo-types = "0.7.8"
+geo = { version = "0.27.0" }
+geo-types = "0.7.12"
+itertools = "0.12.0"
 rayon = "1.7.0"
 rstar = "0.11.0"
 sfconversions = { git = "https://github.com/JosiahParry/sfconversions" }
+syn = "2.0.38"
 
 
 [patch.crates-io]
-geo-types = { git = "https://github.com/georust/geo" }
+geo = { git = "https://github.com/georust/geo" }
+# geo-types = { git = "https://github.com/georust/geo" }
 # geo = { path = "../../../geo/geo" }
-geo = { git = "https://github.com/JosiahParry/geo", branch = "macrofy-segment" }
+# geo = { git = "https://github.com/JosiahParry/geo", branch = "macrofy-segment" }

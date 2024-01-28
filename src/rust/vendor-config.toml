@@ -1,11 +1,6 @@
 [source.crates-io]
 replace-with = "vendored-sources"
 
-[source."git+https://github.com/JosiahParry/geo?branch=macrofy-segment"]
-git = "https://github.com/JosiahParry/geo"
-branch = "macrofy-segment"
-replace-with = "vendored-sources"
-
 [source."git+https://github.com/JosiahParry/sfconversions"]
 git = "https://github.com/JosiahParry/sfconversions"
 replace-with = "vendored-sources"
@@ -16,4 +11,3 @@ replace-with = "vendored-sources"
 
 [source.vendored-sources]
 directory = "vendor"
-
