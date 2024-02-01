@@ -693,5 +693,9 @@ combine_polygons <- function(x) .Call(wrap__combine_polygons, x)
 
 combine_multipolygons <- function(x) .Call(wrap__combine_multipolygons, x)
 
+explode_linestrings_ <- function(x) .Call(wrap__explode_linestrings_, x)
+
+explode_multilinestrings_ <- function(x) .Call(wrap__explode_multilinestrings_, x)
+
 
 # nolint end

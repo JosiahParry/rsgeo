@@ -1,5 +1,6 @@
 # rsgeo (unreleased)
 
+* `explode_lines()` will expand an `rs_LINESTRING` or `rs_MULTILINESTRING` into their component segments
 * Adds `line_segmentize_haversine()` to segment LineStrings in geographic space.
 * Adds `geom_line()` to construct a straight line geometry between two point vectors.
 * Adds `coord_first()`, `coord_last()`, `coord_n()`, and `n_coords()` functions for working with coordinates of geometries. 
