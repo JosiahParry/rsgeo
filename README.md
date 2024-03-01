@@ -1,6 +1,7 @@
 
 <!-- badges: start -->
 
+[![CRAN](http://www.r-pkg.org/badges/version/rsgeo)](https://cran.r-project.org/package=rsgeo)
 [![R-CMD-check](https://github.com/JosiahParry/rsgeo/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/JosiahParry/rsgeo/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
