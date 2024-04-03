@@ -20,3 +20,4 @@ sfconversions = { git = "https://github.com/JosiahParry/sfconversions" }
 geo-types = { git = "https://github.com/georust/geo" }
 # geo = { path = "../../../geo/geo" }
 geo = { git = "https://github.com/georust/geo" }
+libR-sys = { git = "https://github.com/extendr/libR-sys", branch = "parry-wasm" }
