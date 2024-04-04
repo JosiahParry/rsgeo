@@ -8,7 +8,7 @@ all: C_clean
 $(SHLIB): $(STATLIB)
 
 CARGOTMP = $(CURDIR)/.cargo
-CRAN_FLAGS=-j 2 --offline
+# CRAN_FLAGS=-j 2 --offline
 
 $(STATLIB):
 	if [ -f ./rust/vendor.tar.xz ]; then \
