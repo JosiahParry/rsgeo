@@ -21,6 +21,7 @@ $(STATLIB):
 	    export CC="$(CC)" && \
 	    export CFLAGS="$(CFLAGS)" && \
 	    export CARGO_PROFILE_RELEASE_PANIC="abort" && \
+		export RAYON_NUM_THREADS=1 && \
 	    cargo +nightly build $(CARGO_BUILD_ARGS) --target $(TARGET) -Zbuild-std=panic_abort,std; \
 	  fi
 
