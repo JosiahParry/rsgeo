@@ -59,7 +59,7 @@ fn densify_euclidean(x: List, max_distance: Doubles) -> Robj {
         .into_iter()
         .zip(max_distance.iter())
         .map(|((_, xi), md)| {
-            let xi = <&Geom>::from_robj(&xi).unwrap();
+            let xi = <&Geom>::try_from(&xi).unwrap();
             match &xi.geom {
                 Geometry::LineString(l) => l.densify(md.inner()).into_geom(),
                 Geometry::MultiLineString(l) => l.densify(md.inner()).into_geom(),
@@ -102,7 +102,7 @@ fn densify_haversine(x: List, max_distance: Doubles) -> Robj {
         .into_iter()
         .zip(max_distance.iter())
         .map(|((_, xi), md)| {
-            let xi = <&Geom>::from_robj(&xi).unwrap();
+            let xi = <&Geom>::try_from(&xi).unwrap();
             match &xi.geom {
                 Geometry::LineString(l) => l.densify_haversine(md.inner()).into_geom(),
                 Geometry::MultiLineString(l) => l.densify_haversine(md.inner()).into_geom(),

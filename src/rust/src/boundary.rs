@@ -54,7 +54,7 @@ fn bounding_box(x: List) -> Robj {
     let bbox = x
         .iter()
         .fold([f64::MAX, f64::MAX, f64::MIN, f64::MIN], |acc, (_, xi)| {
-            let g = <&Geom>::from_robj(&xi);
+            let g = <&Geom>::try_from(&xi);
 
             match g {
                 Ok(geo) => {
@@ -74,10 +74,9 @@ fn bounding_box(x: List) -> Robj {
 
     // TODO what if all values are NA? We will be returning massive numbers and that wouldnt be good
 
-    Doubles::from_values(bbox)
-        .into_robj()
-        .set_names(["xmin", "ymin", "xmax", "ymax"])
-        .unwrap()
+    let mut robj = Doubles::from_values(bbox).into_robj();
+    robj.set_names(["xmin", "ymin", "xmax", "ymax"]).unwrap();
+    robj
 }
 
 #[extendr]
@@ -89,10 +88,9 @@ fn bounding_boxes(x: List) -> List {
         .map(|(_, xi)| {
             if x.is_null() {
                 let bb = [Rfloat::na(); 4];
-                Doubles::from_values(bb)
-                    .into_robj()
-                    .set_names(["xmin", "ymin", "xmax", "ymax"])
-                    .unwrap()
+                let mut robj = Doubles::from_values(bb).into_robj();
+                robj.set_names(["xmin", "ymin", "xmax", "ymax"]).unwrap();
+                robj
             } else {
                 let bb = Geom::try_from(xi).unwrap().geom.bounding_rect();
 
@@ -100,17 +98,15 @@ fn bounding_boxes(x: List) -> List {
                     Some(b) => {
                         let (xmin, ymin) = b.min().x_y();
                         let (xmax, ymax) = b.max().x_y();
-                        Doubles::from_values([xmin, ymin, xmax, ymax])
-                            .into_robj()
-                            .set_names(["xmin", "ymin", "xmax", "ymax"])
-                            .unwrap()
+                        let mut robj = Doubles::from_values([xmin, ymin, xmax, ymax]).into_robj();
+                        robj.set_names(["xmin", "ymin", "xmax", "ymax"]).unwrap();
+                        robj
                     }
                     None => {
                         let bb = [Rfloat::na(); 4];
-                        Doubles::from_values(bb)
-                            .into_robj()
-                            .set_names(["xmin", "ymin", "xmax", "ymax"])
-                            .unwrap()
+                        let mut robj = Doubles::from_values(bb).into_robj();
+                        robj.set_names(["xmin", "ymin", "xmax", "ymax"]).unwrap();
+                        robj
                     }
                 }
             }
@@ -130,7 +126,7 @@ fn bounding_rect(x: List) -> Robj {
             if x.is_null() {
                 ().into_robj()
             } else {
-                let bb = <&Geom>::from_robj(&xi).unwrap().geom.bounding_rect();
+                let bb = <&Geom>::try_from(&xi).unwrap().geom.bounding_rect();
 
                 match bb {
                     Some(b) => Geom::from(Polygon::from(b)).into_robj(),
@@ -152,7 +148,7 @@ fn convex_hull(x: List) -> Robj {
             if xi.is_null() {
                 ().into_robj()
             } else {
-                let xi = <&Geom>::from_robj(&xi).unwrap().geom.convex_hull();
+                let xi = <&Geom>::try_from(&xi).unwrap().geom.convex_hull();
                 Geom::from(xi).into_robj()
             }
         })
@@ -190,7 +186,7 @@ fn concave_hull(x: List, concavity: Doubles) -> Robj {
             if xi.is_null() || !ci.is_real() {
                 ().into_robj()
             } else {
-                let g = <&Geom>::from_robj(&xi).unwrap();
+                let g = <&Geom>::try_from(&xi).unwrap();
 
                 match &g.geom {
                     Geometry::LineString(g) => g.concave_hull(ci.inner()).into_geom().into(),
@@ -219,7 +215,7 @@ fn extreme_coords(x: List) -> List {
             if xi.is_null() {
                 ().into_robj()
             } else {
-                let extremes = <&Geom>::from_robj(&xi).unwrap().geom.extremes();
+                let extremes = <&Geom>::try_from(&xi).unwrap().geom.extremes();
                 match extremes {
                     Some(ext) => {
                         let crds = [
@@ -229,11 +225,12 @@ fn extreme_coords(x: List) -> List {
                             Point::from(ext.y_max.coord).into_geom(),
                         ];
 
-                        List::from_values(crds)
-                            .set_class(geom_class("point"))
+                        let mut robj = List::from_values(crds);
+                        robj.set_class(geom_class("point"))
                             .unwrap()
                             .set_names(["xmin", "ymin", "xmax", "ymax"])
-                            .unwrap()
+                            .unwrap();
+                        robj.into_robj()
                     }
                     _ => ().into_robj(),
                 }
@@ -275,7 +272,7 @@ fn minimum_rotated_rect(x: List) -> Robj {
     //         if xi.is_null() {
     //             ().into_robj()
     //         } else {
-    //             let bb = <&Geom>::from_robj(&xi).unwrap().geom.minimum_rotated_rect();
+    //             let bb = <&Geom>::try_from(&xi).unwrap().geom.minimum_rotated_rect();
     //             match bb {
     //                 Some(b) => b.into_geom().into_robj(),
     //                 None => NULL.into_robj(),

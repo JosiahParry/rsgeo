@@ -44,7 +44,7 @@ fn signed_area(x: List) -> Doubles {
             if xi.is_null() {
                 Rfloat::na()
             } else {
-                let area = <&Geom>::from_robj(&xi).unwrap().geom.signed_area();
+                let area = <&Geom>::try_from(&xi).unwrap().geom.signed_area();
                 Rfloat::from(area)
             }
         })
@@ -60,7 +60,7 @@ fn unsigned_area(x: List) -> Doubles {
             if xi.is_null() {
                 Rfloat::na()
             } else {
-                let area = <&Geom>::from_robj(&xi).unwrap().geom.unsigned_area();
+                let area = <&Geom>::try_from(&xi).unwrap().geom.unsigned_area();
                 Rfloat::from(area)
             }
         })
@@ -76,7 +76,7 @@ fn signed_area_cd(x: List) -> Doubles {
             if xi.is_null() {
                 Rfloat::na()
             } else {
-                let area = <&Geom>::from_robj(&xi)
+                let area = <&Geom>::try_from(&xi)
                     .unwrap()
                     .geom
                     .chamberlain_duquette_signed_area();
@@ -95,7 +95,7 @@ fn unsigned_area_cd(x: List) -> Doubles {
             if xi.is_null() {
                 Rfloat::na()
             } else {
-                let area = <&Geom>::from_robj(&xi)
+                let area = <&Geom>::try_from(&xi)
                     .unwrap()
                     .geom
                     .chamberlain_duquette_unsigned_area();
@@ -114,7 +114,7 @@ fn unsigned_area_geodesic(x: List) -> Doubles {
             if xi.is_null() {
                 Rfloat::na()
             } else {
-                let area = <&Geom>::from_robj(&xi)
+                let area = <&Geom>::try_from(&xi)
                     .unwrap()
                     .geom
                     .geodesic_area_unsigned();
@@ -133,7 +133,7 @@ fn signed_area_geodesic(x: List) -> Doubles {
             if xi.is_null() {
                 Rfloat::na()
             } else {
-                let area = <&Geom>::from_robj(&xi).unwrap().geom.geodesic_area_signed();
+                let area = <&Geom>::try_from(&xi).unwrap().geom.geodesic_area_signed();
                 Rfloat::from(area)
             }
         })
