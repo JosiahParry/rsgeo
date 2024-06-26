@@ -88,10 +88,9 @@ fn bounding_boxes(x: List) -> List {
         .map(|(_, xi)| {
             if x.is_null() {
                 let bb = [Rfloat::na(); 4];
-                Doubles::from_values(bb)
-                    .into_robj()
-                    .set_names(["xmin", "ymin", "xmax", "ymax"])
-                    .unwrap()
+                let mut robj = Doubles::from_values(bb).into_robj();
+                robj.set_names(["xmin", "ymin", "xmax", "ymax"]).unwrap();
+                robj
             } else {
                 let bb = Geom::try_from(xi).unwrap().geom.bounding_rect();
 
@@ -99,17 +98,15 @@ fn bounding_boxes(x: List) -> List {
                     Some(b) => {
                         let (xmin, ymin) = b.min().x_y();
                         let (xmax, ymax) = b.max().x_y();
-                        Doubles::from_values([xmin, ymin, xmax, ymax])
-                            .into_robj()
-                            .set_names(["xmin", "ymin", "xmax", "ymax"])
-                            .unwrap()
+                        let mut robj = Doubles::from_values([xmin, ymin, xmax, ymax]).into_robj();
+                        robj.set_names(["xmin", "ymin", "xmax", "ymax"]).unwrap();
+                        robj
                     }
                     None => {
                         let bb = [Rfloat::na(); 4];
-                        Doubles::from_values(bb)
-                            .into_robj()
-                            .set_names(["xmin", "ymin", "xmax", "ymax"])
-                            .unwrap()
+                        let mut robj = Doubles::from_values(bb).into_robj();
+                        robj.set_names(["xmin", "ymin", "xmax", "ymax"]).unwrap();
+                        robj
                     }
                 }
             }
@@ -233,7 +230,7 @@ fn extreme_coords(x: List) -> List {
                             .unwrap()
                             .set_names(["xmin", "ymin", "xmax", "ymax"])
                             .unwrap();
-                        robj
+                        robj.into_robj()
                     }
                     _ => ().into_robj(),
                 }

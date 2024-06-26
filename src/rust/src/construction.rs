@@ -37,7 +37,8 @@ fn geom_point_(x: Doubles, y: Doubles) -> Robj {
         }
     }
 
-    res.set_attrib("class", geom_class("point")).unwrap()
+    res.set_attrib("class", geom_class("point")).unwrap();
+    res.into()
 }
 
 #[extendr]
@@ -77,9 +78,9 @@ fn geom_multipoint_(x: Doubles, y: Doubles, id: Integers) -> Robj {
         .collect::<Vec<Geom>>();
 
     // create multipoint vector
-    List::from_values(res_vec)
-        .set_class(geom_class("multipoint"))
-        .unwrap()
+    let mut robj = List::from_values(res_vec);
+    robj.set_class(geom_class("multipoint")).unwrap();
+    robj.into()
 }
 
 #[extendr]
@@ -119,9 +120,9 @@ fn geom_linestring_(x: Doubles, y: Doubles, id: Integers) -> Robj {
         .collect::<Vec<Geom>>();
 
     // create multipoint vector
-    List::from_values(res_vec)
-        .set_class(geom_class("linestring"))
-        .unwrap()
+    let mut robj = List::from_values(res_vec);
+    robj.set_class(geom_class("linestring")).unwrap();
+    robj.into()
 }
 
 #[extendr]
@@ -192,9 +193,9 @@ fn geom_polygon_(x: Doubles, y: Doubles, id: Integers, ring: Integers) -> Robj {
         .collect::<Vec<Geom>>();
 
     // create multipolygon vector
-    List::from_values(res_vec)
-        .set_class(geom_class("polygon"))
-        .unwrap()
+    let mut robj = List::from_values(res_vec);
+    robj.set_class(geom_class("polygon")).unwrap();
+    robj.into()
 }
 
 #[extendr]
