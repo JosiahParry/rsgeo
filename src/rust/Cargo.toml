@@ -13,11 +13,13 @@ geo = { version = "0.27.0" }
 geo-types = "0.7.8"
 rayon = "1.7.0"
 rstar = "0.12.0"
-sfconversions = { git = "https://github.com/JosiahParry/sfconversions" }
+sfconversions = "*"
+# sfconversions = { git = "https://github.com/JosiahParry/sfconversions" }
 
 
 [patch.crates-io]
 extendr-api = { git = "https://github.com/extendr/extendr", branch = "extendr_is_singlethreaded" }
+sfconversions = { git = "https://github.com/CGMossa/sfconversions.git", branch = "extendr_main" }
 geo-types = { git = "https://github.com/georust/geo" }
 # geo = { path = "../../../geo/geo" }
 geo = { git = "https://github.com/georust/geo" }
