@@ -10,7 +10,6 @@ use geo::{
 use crate::construction::IsReal;
 use geo_types::{LineString, Point};
 
-
 #[extendr]
 /// Calculate Bearing
 ///
@@ -410,8 +409,6 @@ fn locate_point_on_line(x: List, y: List) -> Doubles {
         })
         .collect::<Doubles>()
 }
-
-
 
 extendr_module! {
     mod query;

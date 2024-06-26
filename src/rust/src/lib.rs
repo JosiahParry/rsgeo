@@ -48,7 +48,7 @@ fn centroids(x: List) -> Robj {
             if x.is_null() {
                 x
             } else {
-                let geo = <&Geom>::from_robj(&x).unwrap().geom.centroid();
+                let geo = <&Geom>::try_from(&x).unwrap().geom.centroid();
 
                 match geo {
                     Some(cnt) => Geom::from(cnt).into_robj(),
@@ -242,9 +242,9 @@ fn haversine_intermediate(x: List, y: List, distance: Doubles) -> Robj {
         res.push(Geom::from(p).into());
     }
 
-    List::from_values(res)
-        .set_attrib("class", geom_class("point"))
-        .unwrap()
+    let mut robj = List::from_values(res);
+    robj.set_attrib("class", geom_class("point")).unwrap();
+    robj.into()
 }
 
 // /// Chaikin Smoothing

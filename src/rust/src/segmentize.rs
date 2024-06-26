@@ -1,7 +1,7 @@
-use extendr_api::prelude::*; 
-use rayon::prelude::*;
+use extendr_api::prelude::*;
 use geo::{LineStringSegmentize, LineStringSegmentizeHaversine};
-use sfconversions::{Geom, geometry_from_list, vctrs::as_rsgeo_vctr};
+use rayon::prelude::*;
+use sfconversions::{geometry_from_list, vctrs::as_rsgeo_vctr, Geom};
 
 use geo_types::{LineString, MultiLineString};
 
@@ -50,7 +50,6 @@ fn line_segmentize_(x: List, n: Integers) -> Robj {
     as_rsgeo_vctr(List::from_values(res), "multilinestring")
 }
 
-
 #[extendr]
 fn line_segmentize_haversine_(x: List, n: Integers) -> Robj {
     let n_x = x.len();
@@ -95,8 +94,8 @@ fn line_segmentize_haversine_(x: List, n: Integers) -> Robj {
     as_rsgeo_vctr(List::from_values(res), "multilinestring")
 }
 
-extendr_module!{
-    mod segmentize; 
+extendr_module! {
+    mod segmentize;
     fn line_segmentize_;
     fn line_segmentize_haversine_;
 }

@@ -44,7 +44,7 @@ fn length_euclidean(x: List) -> Doubles {
             if xi.is_null() {
                 Rfloat::na()
             } else {
-                let geom = <&Geom>::from_robj(&xi).unwrap();
+                let geom = <&Geom>::try_from(&xi).unwrap();
 
                 match &geom.geom {
                     Geometry::Line(geom) => geom.euclidean_length().into(),
@@ -126,7 +126,7 @@ fn length_vincenty(x: List) -> Doubles {
     //         if xi.is_null() {
     //             Rfloat::na()
     //         } else {
-    //             let geom = <&Geom>::from_robj(&xi).unwrap();
+    //             let geom = <&Geom>::try_from(&xi).unwrap();
 
     //             match &geom.geom {
     //                 Geometry::Line(geom) => match geom.vincenty_length().into() {
