@@ -8,6 +8,7 @@ crate-type = ['staticlib']
 name = 'rsgeo'
 
 [dependencies]
+# extendr-api = { git = "https://github.com/extendr/extendr", rev = "32fce33627862bd25e3e4ddcb842cfea323ebb47" }
 extendr-api = { version = "0.7.0" }
 geo = { version = "0.28.0" }
 geo-types = "0.7.8"
