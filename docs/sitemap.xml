@@ -67,13 +67,22 @@
     <loc>/reference/convex.html</loc>
   </url>
   <url>
+    <loc>/reference/coord_utils.html</loc>
+  </url>
+  <url>
     <loc>/reference/coords.html</loc>
+  </url>
+  <url>
+    <loc>/reference/densify.html</loc>
   </url>
   <url>
     <loc>/reference/distance.html</loc>
   </url>
   <url>
     <loc>/reference/expand_geoms.html</loc>
+  </url>
+  <url>
+    <loc>/reference/explode_lines.html</loc>
   </url>
   <url>
     <loc>/reference/extreme_coords.html</loc>
@@ -119,6 +128,9 @@
   </url>
   <url>
     <loc>/reference/read_geojson.html</loc>
+  </url>
+  <url>
+    <loc>/reference/rsgeo-package.html</loc>
   </url>
   <url>
     <loc>/reference/rstar_rtree.html</loc>
