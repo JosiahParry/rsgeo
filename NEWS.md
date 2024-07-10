@@ -1,4 +1,4 @@
-# rsgeo (unreleased)
+# rsgeo 0.1.7
 
 * `explode_lines()` will expand an `rs_LINESTRING` or `rs_MULTILINESTRING` into their component segments
 * Adds `line_segmentize_haversine()` to segment LineStrings in geographic space.
