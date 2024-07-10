@@ -63,8 +63,8 @@ fn distance_euclidean_pairwise(x: List, y: List) -> Doubles {
             if xi.is_null() || yi.is_null() {
                 Rfloat::na()
             } else {
-                let xg = <&Geom>::from_robj(&xi).unwrap();
-                let yg = <&Geom>::from_robj(&yi).unwrap();
+                let xg = <&Geom>::try_from(&xi).unwrap();
+                let yg = <&Geom>::try_from(&yi).unwrap();
 
                 let d = xg.geom.euclidean_distance(&yg.geom);
                 Rfloat::from(d)
@@ -87,8 +87,8 @@ fn distance_hausdorff_pairwise(x: List, y: List) -> Doubles {
             if xi.is_null() || yi.is_null() {
                 Rfloat::na()
             } else {
-                let xg = <&Geom>::from_robj(&xi).unwrap();
-                let yg = <&Geom>::from_robj(&yi).unwrap();
+                let xg = <&Geom>::try_from(&xi).unwrap();
+                let yg = <&Geom>::try_from(&yi).unwrap();
 
                 let d = xg.geom.hausdorff_distance(&yg.geom);
                 Rfloat::from(d)
@@ -209,7 +209,7 @@ fn distance_euclidean_matrix(x: List, y: List) -> Robj {
 
     let x = x
         .into_iter()
-        .map(|(_, xi)| match <&Geom>::from_robj(&xi) {
+        .map(|(_, xi)| match <&Geom>::try_from(&xi) {
             Ok(g) => Some(g.geom.clone()),
             Err(_) => None,
         })
@@ -217,7 +217,7 @@ fn distance_euclidean_matrix(x: List, y: List) -> Robj {
 
     let y = y
         .into_iter()
-        .map(|(_, yi)| match <&Geom>::from_robj(&yi) {
+        .map(|(_, yi)| match <&Geom>::try_from(&yi) {
             Ok(g) => Some(g.geom.clone()),
             Err(_) => None,
         })
@@ -243,6 +243,8 @@ fn distance_euclidean_matrix(x: List, y: List) -> Robj {
         .unwrap()
         .set_attrib("dim", [n_y, n_x])
         .unwrap()
+        .clone()
+        .into_robj()
 }
 
 // TODO check if x and y are identical then only calculate
@@ -260,7 +262,7 @@ fn distance_hausdorff_matrix(x: List, y: List) -> Robj {
 
     let x = x
         .into_iter()
-        .map(|(_, xi)| match <&Geom>::from_robj(&xi) {
+        .map(|(_, xi)| match <&Geom>::try_from(&xi) {
             Ok(g) => Some(g.geom.clone()),
             Err(_) => None,
         })
@@ -268,7 +270,7 @@ fn distance_hausdorff_matrix(x: List, y: List) -> Robj {
 
     let y = y
         .into_iter()
-        .map(|(_, yi)| match <&Geom>::from_robj(&yi) {
+        .map(|(_, yi)| match <&Geom>::try_from(&yi) {
             Ok(g) => Some(g.geom.clone()),
             Err(_) => None,
         })
@@ -294,6 +296,8 @@ fn distance_hausdorff_matrix(x: List, y: List) -> Robj {
         .unwrap()
         .set_attrib("dim", [n_y, n_x])
         .unwrap()
+        .clone()
+        .into_robj()
 }
 
 #[extendr]
@@ -309,7 +313,7 @@ fn distance_haversine_matrix(x: List, y: List) -> Robj {
 
     let x = x
         .into_iter()
-        .map(|(_, xi)| match <&Geom>::from_robj(&xi) {
+        .map(|(_, xi)| match <&Geom>::try_from(&xi) {
             Ok(g) => Some(Point::try_from(g.geom.clone()).unwrap()),
             Err(_) => None,
         })
@@ -317,7 +321,7 @@ fn distance_haversine_matrix(x: List, y: List) -> Robj {
 
     let y = y
         .into_iter()
-        .map(|(_, yi)| match <&Geom>::from_robj(&yi) {
+        .map(|(_, yi)| match <&Geom>::try_from(&yi) {
             Ok(g) => Some(Point::try_from(g.geom.clone()).unwrap()),
             Err(_) => None,
         })
@@ -343,6 +347,8 @@ fn distance_haversine_matrix(x: List, y: List) -> Robj {
         .unwrap()
         .set_attrib("dim", [n_y, n_x])
         .unwrap()
+        .clone()
+        .into_robj()
 }
 
 #[extendr]
@@ -358,7 +364,7 @@ fn distance_vicenty_matrix(x: List, y: List) -> Robj {
 
     let x = x
         .into_iter()
-        .map(|(_, xi)| match <&Geom>::from_robj(&xi) {
+        .map(|(_, xi)| match <&Geom>::try_from(&xi) {
             Ok(g) => Some(Point::try_from(g.geom.clone()).unwrap()),
             Err(_) => None,
         })
@@ -366,7 +372,7 @@ fn distance_vicenty_matrix(x: List, y: List) -> Robj {
 
     let y = y
         .into_iter()
-        .map(|(_, yi)| match <&Geom>::from_robj(&yi) {
+        .map(|(_, yi)| match <&Geom>::try_from(&yi) {
             Ok(g) => Some(Point::try_from(g.geom.clone()).unwrap()),
             Err(_) => None,
         })
@@ -395,6 +401,8 @@ fn distance_vicenty_matrix(x: List, y: List) -> Robj {
         .unwrap()
         .set_attrib("dim", [n_y, n_x])
         .unwrap()
+        .clone()
+        .into_robj()
 }
 
 #[extendr]
@@ -410,7 +418,7 @@ fn distance_geodesic_matrix(x: List, y: List) -> Robj {
 
     let x = x
         .into_iter()
-        .map(|(_, xi)| match <&Geom>::from_robj(&xi) {
+        .map(|(_, xi)| match <&Geom>::try_from(&xi) {
             Ok(g) => Some(Point::try_from(g.geom.clone()).unwrap()),
             Err(_) => None,
         })
@@ -418,7 +426,7 @@ fn distance_geodesic_matrix(x: List, y: List) -> Robj {
 
     let y = y
         .into_iter()
-        .map(|(_, yi)| match <&Geom>::from_robj(&yi) {
+        .map(|(_, yi)| match <&Geom>::try_from(&yi) {
             Ok(g) => Some(Point::try_from(g.geom.clone()).unwrap()),
             Err(_) => None,
         })
@@ -444,4 +452,6 @@ fn distance_geodesic_matrix(x: List, y: List) -> Robj {
         .unwrap()
         .set_attrib("dim", [n_y, n_x])
         .unwrap()
+        .clone()
+        .into_robj()
 }
