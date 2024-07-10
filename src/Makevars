@@ -1,37 +1,34 @@
 TARGET_DIR = ./rust/target
 LIBDIR = $(TARGET_DIR)/release
 STATLIB = $(LIBDIR)/librsgeo.a
-PKG_LIBS = -L$(LIBDIR) -lrsgeo
+PKG_LIBS = -L$(LIBDIR) -lrsgeo -lssl -lcrypto
+CRAN_FLAGS=-j 2 --offline
 
 all: C_clean
 
 $(SHLIB): $(STATLIB)
 
 CARGOTMP = $(CURDIR)/.cargo
-# CRAN_FLAGS=-j 2 --offline
+VENDOR_DIR = $(CURDIR)/vendor
 
 $(STATLIB):
-	if [ -f ./rust/vendor.tar.xz ]; then \
-		tar xf rust/vendor.tar.xz && \
-		mkdir -p $(CARGOTMP) && \
-		cp rust/vendor-config.toml $(CARGOTMP)/config.toml; \
-	fi
-
-	# In some environments, ~/.cargo/bin might not be included in PATH, so we need
-	# to set it here to ensure cargo can be invoked. It is appended to PATH and
-	# therefore is only used if cargo is absent from the user's PATH.
 	if [ "$(NOT_CRAN)" != "true" ]; then \
+		if [ -f ./rust/vendor.tar.xz ]; then \
+			tar xf ./rust/vendor.tar.xz && \
+			mkdir -p $(CARGOTMP) && \
+			cp ./rust/vendor-config.toml $(CARGOTMP)/config.toml; \
+		fi; \
 		export CARGO_HOME=$(CARGOTMP); \
-	fi && \
 		export PATH="$(PATH):$(HOME)/.cargo/bin" && \
-			cargo build $(CRAN_FLAGS) --lib --release --manifest-path=./rust/Cargo.toml --target-dir $(TARGET_DIR) && \
-			echo `cargo --version` && echo `rustc --version`;
-	if [ "$(NOT_CRAN)" != "true" ]; then \
-		rm -Rf $(CARGOTMP) $(VENDOR_DIR) $(LIBDIR)/build; \
+		cargo build $(CRAN_FLAGS) --lib --release --manifest-path=./rust/Cargo.toml --target-dir $(TARGET_DIR); \
+			rm -Rf $(CARGOTMP) $(VENDOR_DIR) $(LIBDIR)/build; \
+	else \
+		export PATH="$(PATH):$(HOME)/.cargo/bin" && \
+		cargo build --lib --release --manifest-path=./rust/Cargo.toml --target-dir $(TARGET_DIR); \
 	fi
 
 C_clean:
-	rm -Rf $(SHLIB) $(STATLIB) $(OBJECTS)
+	rm -Rf $(SHLIB) $(STATLIB) $(OBJECTS) 
 
 clean:
-	rm -Rf $(SHLIB) $(STATLIB) $(OBJECTS) ./rust/target
+		rm -Rf $(SHLIB) $(STATLIB) $(OBJECTS) $(TARGET_DIR) $(VENDOR_DIR)

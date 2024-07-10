@@ -9,7 +9,7 @@ fn point_to_coords(x: List) -> Robj {
     let (x, y): (Vec<f64>, Vec<f64>) = x
         .into_iter()
         .filter_map(|(_, robj)| {
-            let p = <&Geom>::from_robj(&robj).unwrap();
+            let p = <&Geom>::try_from(&robj).unwrap();
             let crds = match p.geom {
                 Geometry::Point(p) => Some(p.x_y()),
                 _ => None,
@@ -26,7 +26,7 @@ fn multipoint_to_coords(x: List) -> Robj {
         .into_iter()
         .enumerate()
         .filter_map(|(i, (_, robj))| {
-            let g = <&Geom>::from_robj(&robj).unwrap();
+            let g = <&Geom>::try_from(&robj).unwrap();
             let crds = match &g.geom {
                 Geometry::MultiPoint(mp) => {
                     let n = mp.coords_count();

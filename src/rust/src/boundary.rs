@@ -54,7 +54,7 @@ fn bounding_box(x: List) -> Robj {
     let bbox = x
         .iter()
         .fold([f64::MAX, f64::MAX, f64::MIN, f64::MIN], |acc, (_, xi)| {
-            let g = <&Geom>::from_robj(&xi);
+            let g = <&Geom>::try_from(&xi);
 
             match g {
                 Ok(geo) => {
@@ -78,6 +78,8 @@ fn bounding_box(x: List) -> Robj {
         .into_robj()
         .set_names(["xmin", "ymin", "xmax", "ymax"])
         .unwrap()
+        .clone()
+        .into()
 }
 
 #[extendr]
@@ -93,6 +95,7 @@ fn bounding_boxes(x: List) -> List {
                     .into_robj()
                     .set_names(["xmin", "ymin", "xmax", "ymax"])
                     .unwrap()
+                    .clone()
             } else {
                 let bb = Geom::try_from(xi).unwrap().geom.bounding_rect();
 
@@ -104,6 +107,7 @@ fn bounding_boxes(x: List) -> List {
                             .into_robj()
                             .set_names(["xmin", "ymin", "xmax", "ymax"])
                             .unwrap()
+                            .clone()
                     }
                     None => {
                         let bb = [Rfloat::na(); 4];
@@ -111,9 +115,12 @@ fn bounding_boxes(x: List) -> List {
                             .into_robj()
                             .set_names(["xmin", "ymin", "xmax", "ymax"])
                             .unwrap()
+                            .clone()
                     }
                 }
             }
+            .clone()
+            .into()
         })
         .collect::<Vec<Robj>>();
 
@@ -130,7 +137,7 @@ fn bounding_rect(x: List) -> Robj {
             if x.is_null() {
                 ().into_robj()
             } else {
-                let bb = <&Geom>::from_robj(&xi).unwrap().geom.bounding_rect();
+                let bb = <&Geom>::try_from(&xi).unwrap().geom.bounding_rect();
 
                 match bb {
                     Some(b) => Geom::from(Polygon::from(b)).into_robj(),
@@ -152,7 +159,7 @@ fn convex_hull(x: List) -> Robj {
             if xi.is_null() {
                 ().into_robj()
             } else {
-                let xi = <&Geom>::from_robj(&xi).unwrap().geom.convex_hull();
+                let xi = <&Geom>::try_from(&xi).unwrap().geom.convex_hull();
                 Geom::from(xi).into_robj()
             }
         })
@@ -190,7 +197,7 @@ fn concave_hull(x: List, concavity: Doubles) -> Robj {
             if xi.is_null() || !ci.is_real() {
                 ().into_robj()
             } else {
-                let g = <&Geom>::from_robj(&xi).unwrap();
+                let g = <&Geom>::try_from(&xi).unwrap();
 
                 match &g.geom {
                     Geometry::LineString(g) => g.concave_hull(ci.inner()).into_geom().into(),
@@ -219,7 +226,7 @@ fn extreme_coords(x: List) -> List {
             if xi.is_null() {
                 ().into_robj()
             } else {
-                let extremes = <&Geom>::from_robj(&xi).unwrap().geom.extremes();
+                let extremes = <&Geom>::try_from(&xi).unwrap().geom.extremes();
                 match extremes {
                     Some(ext) => {
                         let crds = [
@@ -235,6 +242,8 @@ fn extreme_coords(x: List) -> List {
                             .set_names(["xmin", "ymin", "xmax", "ymax"])
                             .unwrap()
                     }
+                    .clone()
+                    .into(),
                     _ => ().into_robj(),
                 }
             }
@@ -275,7 +284,7 @@ fn minimum_rotated_rect(x: List) -> Robj {
     //         if xi.is_null() {
     //             ().into_robj()
     //         } else {
-    //             let bb = <&Geom>::from_robj(&xi).unwrap().geom.minimum_rotated_rect();
+    //             let bb = <&Geom>::try_from(&xi).unwrap().geom.minimum_rotated_rect();
     //             match bb {
     //                 Some(b) => b.into_geom().into_robj(),
     //                 None => NULL.into_robj(),

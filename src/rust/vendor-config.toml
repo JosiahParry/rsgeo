@@ -1,0 +1,18 @@
+[source.crates-io]
+replace-with = "vendored-sources"
+
+[source."git+https://github.com/JosiahParry/serde_esri"]
+git = "https://github.com/JosiahParry/serde_esri"
+replace-with = "vendored-sources"
+
+[source."git+https://github.com/JosiahParry/sfconversions?rev=bac5a7108e5e9b20b9ee11f455827ce255947156"]
+git = "https://github.com/JosiahParry/sfconversions"
+rev = "bac5a7108e5e9b20b9ee11f455827ce255947156"
+replace-with = "vendored-sources"
+
+[source."git+https://github.com/georust/geo"]
+git = "https://github.com/georust/geo"
+replace-with = "vendored-sources"
+
+[source.vendored-sources]
+directory = "vendor"

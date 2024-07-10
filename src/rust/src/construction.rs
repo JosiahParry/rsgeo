@@ -37,7 +37,10 @@ fn geom_point_(x: Doubles, y: Doubles) -> Robj {
         }
     }
 
-    res.set_attrib("class", geom_class("point")).unwrap()
+    res.set_attrib("class", geom_class("point"))
+        .unwrap()
+        .clone()
+        .into_robj()
 }
 
 #[extendr]
@@ -80,6 +83,8 @@ fn geom_multipoint_(x: Doubles, y: Doubles, id: Integers) -> Robj {
     List::from_values(res_vec)
         .set_class(geom_class("multipoint"))
         .unwrap()
+        .clone()
+        .into_robj()
 }
 
 #[extendr]
@@ -122,6 +127,8 @@ fn geom_linestring_(x: Doubles, y: Doubles, id: Integers) -> Robj {
     List::from_values(res_vec)
         .set_class(geom_class("linestring"))
         .unwrap()
+        .clone()
+        .into_robj()
 }
 
 #[extendr]
@@ -195,6 +202,8 @@ fn geom_polygon_(x: Doubles, y: Doubles, id: Integers, ring: Integers) -> Robj {
     List::from_values(res_vec)
         .set_class(geom_class("polygon"))
         .unwrap()
+        .clone()
+        .into_robj()
 }
 
 #[extendr]

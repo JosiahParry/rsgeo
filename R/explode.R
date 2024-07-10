@@ -20,7 +20,7 @@ explode_lines <- function(x) {
   } else if (rlang::inherits_any(x, "rs_MULTILINESTRING")) {
     res <- explode_multilinestrings_(x)
   } else {
-    cli::cli_abort("{.arg x} must be of class {.cls rs_LINESTRING} or {.cls rs_MULTILINESTRING")
+    rlang::abort("`x` must be of class `rs_LINESTRING` or `rs_MULTILINESTRING`")
   }
 
   res

@@ -4,20 +4,20 @@ version = "0.1.3"
 edition = '2021'
 
 [lib]
-crate-type = [ 'staticlib' ]
+crate-type = ['staticlib']
 name = 'rsgeo'
 
 [dependencies]
-extendr-api = { version = "0.6.0" }
-geo = { version = "0.27.0" }
+# extendr-api = { git = "https://github.com/extendr/extendr", rev = "32fce33627862bd25e3e4ddcb842cfea323ebb47" }
+extendr-api = { version = "0.7.0" }
+geo = { version = "0.28.0" }
 geo-types = "0.7.8"
 rayon = "1.7.0"
 rstar = "0.12.0"
-sfconversions = { git = "https://github.com/JosiahParry/sfconversions" }
+sfconversions = { version = "0.3.0", git = "https://github.com/JosiahParry/sfconversions", rev = "bac5a7108e5e9b20b9ee11f455827ce255947156" }
 
 
 [patch.crates-io]
 geo-types = { git = "https://github.com/georust/geo" }
-# geo = { path = "../../../geo/geo" }
 geo = { git = "https://github.com/georust/geo" }
-libR-sys = { git = "https://github.com/extendr/libR-sys", branch = "parry-wasm" }
+# libR-sys = { git = "https://github.com/extendr/libR-sys", branch = "parry-wasm" }

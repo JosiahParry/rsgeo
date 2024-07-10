@@ -31,7 +31,7 @@ fn n_coords(x: List) -> Integers {
             if xi.is_null() {
                 Rint::na()
             } else {
-                let n = <&Geom>::from_robj(&xi).unwrap().geom.coords_count() as i32;
+                let n = <&Geom>::try_from(&xi).unwrap().geom.coords_count() as i32;
                 Rint::from(n)
             }
         })
@@ -54,7 +54,7 @@ fn coord_last(x: List) -> Robj {
             if xi.is_null() {
                 NULL.into_robj()
             } else {
-                let pnt: Point = <&Geom>::from_robj(&xi)
+                let pnt: Point = <&Geom>::try_from(&xi)
                     .unwrap()
                     .geom
                     .coords_iter()
@@ -87,7 +87,7 @@ fn coord_first(x: List) -> Robj {
             if xi.is_null() {
                 NULL.into_robj()
             } else {
-                let pnt: Point = <&Geom>::from_robj(&xi)
+                let pnt: Point = <&Geom>::try_from(&xi)
                     .unwrap()
                     .geom
                     .coords_iter()
@@ -130,7 +130,7 @@ fn coord_n_(x: List, n: Integers) -> Robj {
             if xi.is_null() || ni.is_na() {
                 NULL.into_robj()
             } else {
-                let crd = <&Geom>::from_robj(&xi)
+                let crd = <&Geom>::try_from(&xi)
                     .unwrap()
                     .geom
                     .coords_iter()
