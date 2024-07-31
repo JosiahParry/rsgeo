@@ -8,7 +8,6 @@ crate-type = ['staticlib']
 name = 'rsgeo'
 
 [dependencies]
-# extendr-api = { git = "https://github.com/extendr/extendr", rev = "32fce33627862bd25e3e4ddcb842cfea323ebb47" }
 extendr-api = { version = "0.7.0" }
 geo = { version = "0.28.0" }
 geo-types = "0.7.8"
@@ -20,4 +19,5 @@ sfconversions = { version = "0.3.0", git = "https://github.com/JosiahParry/sfcon
 [patch.crates-io]
 geo-types = { git = "https://github.com/georust/geo" }
 geo = { git = "https://github.com/georust/geo" }
+libR-sys = { git = "https://github.com/extendr/libR-sys", rev = "976c56d396175f8d09548b0a1f0a77fc393018f2" }
 # libR-sys = { git = "https://github.com/extendr/libR-sys", branch = "parry-wasm" }

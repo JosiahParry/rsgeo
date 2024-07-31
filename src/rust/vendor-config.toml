@@ -10,6 +10,11 @@ git = "https://github.com/JosiahParry/sfconversions"
 rev = "bac5a7108e5e9b20b9ee11f455827ce255947156"
 replace-with = "vendored-sources"
 
+[source."git+https://github.com/extendr/libR-sys?rev=976c56d396175f8d09548b0a1f0a77fc393018f2"]
+git = "https://github.com/extendr/libR-sys"
+rev = "976c56d396175f8d09548b0a1f0a77fc393018f2"
+replace-with = "vendored-sources"
+
 [source."git+https://github.com/georust/geo"]
 git = "https://github.com/georust/geo"
 replace-with = "vendored-sources"
